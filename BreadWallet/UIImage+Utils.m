@@ -28,13 +28,13 @@
 
 @implementation UIImage (Utils)
 
-+ (instancetype)imageWithQRCodeData:(NSData *)data size:(CGSize)size color:(CIColor *)color
++ (instancetype)imageWithQRCodeData:(NSData*)data size:(CGSize)size color:(CIColor*)color
 {
     CIFilter *qrFilter = [CIFilter filterWithName:@"CIQRCodeGenerator"],
              *maskFilter = [CIFilter filterWithName:@"CIMaskToAlpha"],
              *invertFilter = [CIFilter filterWithName:@"CIColorInvert"],
              *colorFilter = [CIFilter filterWithName:@"CIFalseColor"], *filter = colorFilter;
-    
+
     [qrFilter setValue:data forKey:@"inputMessage"];
     [qrFilter setValue:@"L" forKey:@"inputCorrectionLevel"];
 
@@ -45,15 +45,16 @@
         [colorFilter setValue:invertFilter.outputImage forKey:@"inputImage"];
         [colorFilter setValue:color forKey:@"inputColor0"];
     }
-    else [maskFilter setValue:qrFilter.outputImage forKey:@"inputImage"], filter = maskFilter;
-    
+    else
+        [maskFilter setValue:qrFilter.outputImage forKey:@"inputImage"], filter = maskFilter;
+
     UIGraphicsBeginImageContext(size);
-    
-    UIImage *image = nil;
+
+    UIImage* image = nil;
     CGContextRef context = UIGraphicsGetCurrentContext();
-    CGImageRef img = [[CIContext contextWithOptions:nil] createCGImage:filter.outputImage
-                      fromRect:filter.outputImage.extent];
-    
+    CGImageRef img =
+        [[CIContext contextWithOptions:nil] createCGImage:filter.outputImage fromRect:filter.outputImage.extent];
+
     if (context) {
         CGContextSetInterpolationQuality(context, kCGInterpolationNone);
         CGContextRotateCTM(context, M_PI); // flip
@@ -61,48 +62,41 @@
         CGContextDrawImage(context, CGContextGetClipBoundingBox(context), img);
         image = UIGraphicsGetImageFromCurrentImageContext();
     }
-    
+
     UIGraphicsEndImageContext();
     CGImageRelease(img);
     return image;
 }
 
-- (UIImage *)blurWithRadius:(CGFloat)radius
+- (UIImage*)blurWithRadius:(CGFloat)radius
 {
     UIGraphicsBeginImageContext(self.size);
-    
+
     CGContextRef context = UIGraphicsGetCurrentContext();
     CGRect rect = { CGPointZero, self.size };
-    uint32_t r = floor(radius*[UIScreen mainScreen].scale*3.0*sqrt(2.0*M_PI)/4.0 + 0.5);
-    
+    uint32_t r = floor(radius * [UIScreen mainScreen].scale * 3.0 * sqrt(2.0 * M_PI) / 4.0 + 0.5);
+
     CGContextScaleCTM(context, 1.0, -1.0);
     CGContextTranslateCTM(context, 0.0, -self.size.height);
     CGContextDrawImage(context, rect, self.CGImage);
-    
-    vImage_Buffer inbuf = {
-        CGBitmapContextGetData(context),
-        CGBitmapContextGetHeight(context),
-        CGBitmapContextGetWidth(context),
-        CGBitmapContextGetBytesPerRow(context)
-    };
-    
+
+    vImage_Buffer inbuf = { CGBitmapContextGetData(context), CGBitmapContextGetHeight(context),
+        CGBitmapContextGetWidth(context), CGBitmapContextGetBytesPerRow(context) };
+
     UIGraphicsBeginImageContext(self.size);
     context = UIGraphicsGetCurrentContext();
-    
-    vImage_Buffer outbuf = {
-        CGBitmapContextGetData(context),
-        CGBitmapContextGetHeight(context),
-        CGBitmapContextGetWidth(context),
-        CGBitmapContextGetBytesPerRow(context)
-    };
-    
-    if (r % 2 == 0) r++; // make sure radius is odd for three box-blur method
+
+    vImage_Buffer outbuf = { CGBitmapContextGetData(context), CGBitmapContextGetHeight(context),
+        CGBitmapContextGetWidth(context), CGBitmapContextGetBytesPerRow(context) };
+
+    if (r % 2 == 0)
+        r++; // make sure radius is odd for three box-blur method
     vImageBoxConvolve_ARGB8888(&inbuf, &outbuf, NULL, 0, 0, r, r, 0, kvImageEdgeExtend);
     vImageBoxConvolve_ARGB8888(&outbuf, &inbuf, NULL, 0, 0, r, r, 0, kvImageEdgeExtend);
     vImageBoxConvolve_ARGB8888(&inbuf, &outbuf, NULL, 0, 0, r, r, 0, kvImageEdgeExtend);
-    
-    UIImage *img = UIGraphicsGetImageFromCurrentImageContext();
-    
+
+    UIImage* img = UIGraphicsGetImageFromCurrentImageContext();
+
     UIGraphicsEndImageContext();
     UIGraphicsBeginImageContext(self.size);
     context = UIGraphicsGetCurrentContext();

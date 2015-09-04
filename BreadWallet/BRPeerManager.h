@@ -27,10 +27,10 @@
 #import <Foundation/Foundation.h>
 #import "BRPeer.h"
 
-#define BRPeerManagerSyncStartedNotification  @"BRPeerManagerSyncStartedNotification"
+#define BRPeerManagerSyncStartedNotification @"BRPeerManagerSyncStartedNotification"
 #define BRPeerManagerSyncFinishedNotification @"BRPeerManagerSyncFinishedNotification"
-#define BRPeerManagerSyncFailedNotification   @"BRPeerManagerSyncFailedNotification"
-#define BRPeerManagerTxStatusNotification     @"BRPeerManagerTxStatusNotification"
+#define BRPeerManagerSyncFailedNotification @"BRPeerManagerSyncFailedNotification"
+#define BRPeerManagerTxStatusNotification @"BRPeerManagerTxStatusNotification"
 
 #define PEER_MAX_CONNECTIONS 3
 
@@ -48,7 +48,7 @@
 
 - (void)connect;
 - (void)rescan;
-- (void)publishTransaction:(BRTransaction *)transaction completion:(void (^)(NSError *error))completion;
+- (void)publishTransaction:(BRTransaction*)transaction completion:(void (^)(NSError* error))completion;
 - (NSUInteger)relayCountForTransaction:(UInt256)txHash; // number of connected peers that have relayed the transaction
 - (NSTimeInterval)timestampForBlockHeight:(uint32_t)blockHeight; // seconds since reference date, 00:00:00 01/01/01 GMT
 

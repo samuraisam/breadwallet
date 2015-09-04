@@ -32,15 +32,15 @@
 
 @interface BRTransactionEntity : NSManagedObject
 
-@property (nonatomic, retain) NSData *txHash;
+@property (nonatomic, retain) NSData* txHash;
 @property (nonatomic) int32_t blockHeight;
 @property (nonatomic) NSTimeInterval timestamp;
-@property (nonatomic, retain) NSOrderedSet *inputs;
-@property (nonatomic, retain) NSOrderedSet *outputs;
+@property (nonatomic, retain) NSOrderedSet* inputs;
+@property (nonatomic, retain) NSOrderedSet* outputs;
 @property (nonatomic) int32_t lockTime;
 
-- (instancetype)setAttributesFromTx:(BRTransaction *)tx;
-- (BRTransaction *)transaction;
+- (instancetype)setAttributesFromTx:(BRTransaction*)tx;
+- (BRTransaction*)transaction;
 
 @end
 
@@ -49,24 +49,24 @@
 // Per core data release notes, use [NSObject<NSKeyValueCoding> mutableOrderedSetValueForKey:] instead.
 @interface BRTransactionEntity (CoreDataGeneratedAccessors)
 
-- (void)insertObject:(BRTxInputEntity *)value inInputsAtIndex:(NSUInteger)idx;
+- (void)insertObject:(BRTxInputEntity*)value inInputsAtIndex:(NSUInteger)idx;
 - (void)removeObjectFromInputsAtIndex:(NSUInteger)idx;
-- (void)insertInputs:(NSArray *)value atIndexes:(NSIndexSet *)indexes;
-- (void)removeInputsAtIndexes:(NSIndexSet *)indexes;
-- (void)replaceObjectInInputsAtIndex:(NSUInteger)idx withObject:(BRTxInputEntity *)value;
-- (void)replaceInputsAtIndexes:(NSIndexSet *)indexes withInputs:(NSArray *)values;
-- (void)addInputsObject:(BRTxInputEntity *)value;
-- (void)removeInputsObject:(BRTxInputEntity *)value;
-- (void)addInputs:(NSOrderedSet *)values;
-- (void)removeInputs:(NSOrderedSet *)values;
-- (void)insertObject:(BRTxOutputEntity *)value inOutputsAtIndex:(NSUInteger)idx;
+- (void)insertInputs:(NSArray*)value atIndexes:(NSIndexSet*)indexes;
+- (void)removeInputsAtIndexes:(NSIndexSet*)indexes;
+- (void)replaceObjectInInputsAtIndex:(NSUInteger)idx withObject:(BRTxInputEntity*)value;
+- (void)replaceInputsAtIndexes:(NSIndexSet*)indexes withInputs:(NSArray*)values;
+- (void)addInputsObject:(BRTxInputEntity*)value;
+- (void)removeInputsObject:(BRTxInputEntity*)value;
+- (void)addInputs:(NSOrderedSet*)values;
+- (void)removeInputs:(NSOrderedSet*)values;
+- (void)insertObject:(BRTxOutputEntity*)value inOutputsAtIndex:(NSUInteger)idx;
 - (void)removeObjectFromOutputsAtIndex:(NSUInteger)idx;
-- (void)insertOutputs:(NSArray *)value atIndexes:(NSIndexSet *)indexes;
-- (void)removeOutputsAtIndexes:(NSIndexSet *)indexes;
-- (void)replaceObjectInOutputsAtIndex:(NSUInteger)idx withObject:(BRTxOutputEntity *)value;
-- (void)replaceOutputsAtIndexes:(NSIndexSet *)indexes withOutputs:(NSArray *)values;
-- (void)addOutputsObject:(BRTxOutputEntity *)value;
-- (void)removeOutputsObject:(BRTxOutputEntity *)value;
-- (void)addOutputs:(NSOrderedSet *)values;
-- (void)removeOutputs:(NSOrderedSet *)values;
+- (void)insertOutputs:(NSArray*)value atIndexes:(NSIndexSet*)indexes;
+- (void)removeOutputsAtIndexes:(NSIndexSet*)indexes;
+- (void)replaceObjectInOutputsAtIndex:(NSUInteger)idx withObject:(BRTxOutputEntity*)value;
+- (void)replaceOutputsAtIndexes:(NSIndexSet*)indexes withOutputs:(NSArray*)values;
+- (void)addOutputsObject:(BRTxOutputEntity*)value;
+- (void)removeOutputsObject:(BRTxOutputEntity*)value;
+- (void)addOutputs:(NSOrderedSet*)values;
+- (void)removeOutputs:(NSOrderedSet*)values;
 @end

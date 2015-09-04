@@ -38,21 +38,21 @@
 @dynamic sequence;
 @dynamic transaction;
 
-- (instancetype)setAttributesFromTx:(BRTransaction *)tx inputIndex:(NSUInteger)index
+- (instancetype)setAttributesFromTx:(BRTransaction*)tx inputIndex:(NSUInteger)index
 {
     [self.managedObjectContext performBlockAndWait:^{
         UInt256 hash = UINT256_ZERO;
-        
+
         [tx.inputHashes[index] getValue:&hash];
         self.txHash = [NSData dataWithBytes:&hash length:sizeof(hash)];
         self.n = [tx.inputIndexes[index] intValue];
         self.signature = (tx.inputSignatures[index] != [NSNull null]) ? tx.inputSignatures[index] : nil;
         self.sequence = [tx.inputSequences[index] intValue];
-    
+
         // mark previously unspent outputs as spent
         [[BRTxOutputEntity objectsMatching:@"txHash == %@ && n == %d", self.txHash, self.n].lastObject setSpent:YES];
     }];
-    
+
     return self;
 }
 

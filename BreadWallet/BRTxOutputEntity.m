@@ -39,18 +39,18 @@
 @dynamic spent;
 @dynamic transaction;
 
-- (instancetype)setAttributesFromTx:(BRTransaction *)tx outputIndex:(NSUInteger)index
+- (instancetype)setAttributesFromTx:(BRTransaction*)tx outputIndex:(NSUInteger)index
 {
     [self.managedObjectContext performBlockAndWait:^{
         UInt256 txHash = tx.txHash;
-    
+
         self.txHash = [NSData dataWithBytes:&txHash length:sizeof(txHash)];
         self.n = (int32_t)index;
         self.address = (tx.outputAddresses[index] == [NSNull null]) ? nil : tx.outputAddresses[index];
         self.script = tx.outputScripts[index];
         self.value = [tx.outputAmounts[index] longLongValue];
     }];
-    
+
     return self;
 }
 

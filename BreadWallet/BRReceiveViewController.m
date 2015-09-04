@@ -33,19 +33,23 @@
 #import "UIImage+Utils.h"
 #import <MobileCoreServices/UTCoreTypes.h>
 
-#define QR_TIP      NSLocalizedString(@"Let others scan this QR code to get your bitcoin address. Anyone can send "\
-                    "bitcoins to your wallet by transferring them to your address.", nil)
-#define ADDRESS_TIP NSLocalizedString(@"This is your bitcoin address. Tap to copy it or send it by email or sms. The "\
-                    "address will change each time you receive funds, but old addresses always work.", nil)
+#define QR_TIP                                                                                                         \
+    NSLocalizedString(@"Let others scan this QR code to get your bitcoin address. Anyone can send "                    \
+                       "bitcoins to your wallet by transferring them to your address.",                                \
+        nil)
+#define ADDRESS_TIP                                                                                                    \
+    NSLocalizedString(@"This is your bitcoin address. Tap to copy it or send it by email or sms. The "                 \
+                       "address will change each time you receive funds, but old addresses always work.",              \
+        nil)
 
 @interface BRReceiveViewController ()
 
-@property (nonatomic, strong) BRBubbleView *tipView;
+@property (nonatomic, strong) BRBubbleView* tipView;
 @property (nonatomic, assign) BOOL showTips;
 
-@property (nonatomic, strong) IBOutlet UILabel *label;
-@property (nonatomic, strong) IBOutlet UIButton *addressButton;
-@property (nonatomic, strong) IBOutlet UIImageView *qrView;
+@property (nonatomic, strong) IBOutlet UILabel* label;
+@property (nonatomic, strong) IBOutlet UIButton* addressButton;
+@property (nonatomic, strong) IBOutlet UIImageView* qrView;
 
 @end
 
@@ -63,25 +67,28 @@
 - (void)viewWillDisappear:(BOOL)animated
 {
     [self hideTips];
-    
+
     [super viewWillDisappear:animated];
 }
 
 - (void)updateAddress
 {
-    static NSUserDefaults *groupDefs = nil;
-    BRWalletManager *manager = [BRWalletManager sharedInstance];
-    BRPaymentRequest *req = self.paymentRequest;
+    static NSUserDefaults* groupDefs = nil;
+    BRWalletManager* manager = [BRWalletManager sharedInstance];
+    BRPaymentRequest* req = self.paymentRequest;
 
-    if ([self.paymentAddress isEqual:self.addressButton.currentTitle]) return;
-    self.qrView.image = [UIImage imageWithQRCodeData:req.data size:self.qrView.bounds.size
-                         color:[CIColor colorWithRed:0.0 green:0.0 blue:0.0]];
+    if ([self.paymentAddress isEqual:self.addressButton.currentTitle])
+        return;
+    self.qrView.image = [UIImage imageWithQRCodeData:req.data
+                                                size:self.qrView.bounds.size
+                                               color:[CIColor colorWithRed:0.0 green:0.0 blue:0.0]];
     [self.addressButton setTitle:self.paymentAddress forState:UIControlStateNormal];
-    if (! groupDefs) groupDefs = [[NSUserDefaults alloc] initWithSuiteName:APP_GROUP_ID];
-    
+    if (!groupDefs)
+        groupDefs = [[NSUserDefaults alloc] initWithSuiteName:APP_GROUP_ID];
+
     if (req.amount > 0) {
         self.label.text = [NSString stringWithFormat:@"%@ (%@)", [manager stringForAmount:req.amount],
-                           [manager localCurrencyStringForAmount:req.amount]];
+                                    [manager localCurrencyStringForAmount:req.amount]];
     }
     else if (req.isValid) {
         [groupDefs setObject:req.data forKey:APP_GROUP_REQUEST_DATA_KEY];
@@ -95,31 +102,37 @@
     }
 }
 
-- (BRPaymentRequest *)paymentRequest
+- (BRPaymentRequest*)paymentRequest
 {
-    if (_paymentRequest) return _paymentRequest;
+    if (_paymentRequest)
+        return _paymentRequest;
     return [BRPaymentRequest requestWithString:self.paymentAddress];
 }
 
-- (NSString *)paymentAddress
+- (NSString*)paymentAddress
 {
-    if (_paymentRequest) return _paymentRequest.paymentAddress;
+    if (_paymentRequest)
+        return _paymentRequest.paymentAddress;
     return [BRWalletManager sharedInstance].wallet.receiveAddress;
 }
 
 - (BOOL)nextTip
 {
-    if (self.tipView.alpha < 0.5) return [(id)self.parentViewController.parentViewController nextTip];
+    if (self.tipView.alpha < 0.5)
+        return [(id)self.parentViewController.parentViewController nextTip];
 
-    BRBubbleView *tipView = self.tipView;
+    BRBubbleView* tipView = self.tipView;
 
     self.tipView = nil;
     [tipView popOut];
 
     if ([tipView.text hasPrefix:QR_TIP]) {
-        self.tipView = [BRBubbleView viewWithText:ADDRESS_TIP tipPoint:[self.addressButton.superview
-                        convertPoint:CGPointMake(self.addressButton.center.x, self.addressButton.center.y - 10.0)
-                        toView:self.view] tipDirection:BRBubbleTipDirectionDown];
+        self.tipView = [BRBubbleView
+            viewWithText:ADDRESS_TIP
+                tipPoint:[self.addressButton.superview
+                             convertPoint:CGPointMake(self.addressButton.center.x, self.addressButton.center.y - 10.0)
+                                   toView:self.view]
+            tipDirection:BRBubbleTipDirectionDown];
         self.tipView.backgroundColor = tipView.backgroundColor;
         self.tipView.font = tipView.font;
         self.tipView.userInteractionEnabled = NO;
@@ -135,7 +148,8 @@
 
 - (void)hideTips
 {
-    if (self.tipView.alpha > 0.5) [self.tipView popOut];
+    if (self.tipView.alpha > 0.5)
+        [self.tipView popOut];
 }
 
 #pragma mark - IBAction
@@ -147,17 +161,19 @@
 
 - (IBAction)tip:(id)sender
 {
-    if ([self nextTip]) return;
+    if ([self nextTip])
+        return;
 
-    if (! [sender isKindOfClass:[UIGestureRecognizer class]] ||
-        ([sender view] != self.qrView && ! [[sender view] isKindOfClass:[UILabel class]])) {
-        if (! [sender isKindOfClass:[UIViewController class]]) return;
+    if (![sender isKindOfClass:[UIGestureRecognizer class]]
+        || ([sender view] != self.qrView && ![[sender view] isKindOfClass:[UILabel class]])) {
+        if (![sender isKindOfClass:[UIViewController class]])
+            return;
         self.showTips = YES;
     }
 
     self.tipView = [BRBubbleView viewWithText:QR_TIP
-                    tipPoint:[self.qrView.superview convertPoint:self.qrView.center toView:self.view]
-                    tipDirection:BRBubbleTipDirectionUp];
+                                     tipPoint:[self.qrView.superview convertPoint:self.qrView.center toView:self.view]
+                                 tipDirection:BRBubbleTipDirectionUp];
     self.tipView.backgroundColor = [UIColor orangeColor];
     self.tipView.font = [UIFont fontWithName:@"HelveticaNeue" size:15.0];
     [self.view addSubview:[self.tipView popIn]];
@@ -165,184 +181,209 @@
 
 - (IBAction)address:(id)sender
 {
-    if ([self nextTip]) return;
+    if ([self nextTip])
+        return;
 
     BOOL req = (_paymentRequest) ? YES : NO;
-    UIActionSheet *actionSheet = [UIActionSheet new];
+    UIActionSheet* actionSheet = [UIActionSheet new];
 
-    actionSheet.title = [NSString stringWithFormat:NSLocalizedString(@"Receive bitcoins at this address: %@", nil),
-               self.paymentAddress];
+    actionSheet.title = [NSString
+        stringWithFormat:NSLocalizedString(@"Receive bitcoins at this address: %@", nil), self.paymentAddress];
     actionSheet.delegate = self;
-    [actionSheet addButtonWithTitle:(req) ? NSLocalizedString(@"copy request to clipboard", nil) :
-     NSLocalizedString(@"copy address to clipboard", nil)];
+    [actionSheet addButtonWithTitle:(req) ? NSLocalizedString(@"copy request to clipboard", nil)
+                                          : NSLocalizedString(@"copy address to clipboard", nil)];
 
     if ([MFMailComposeViewController canSendMail]) {
-        [actionSheet addButtonWithTitle:(req) ? NSLocalizedString(@"send request as email", nil) :
-         NSLocalizedString(@"send address as email", nil)];
+        [actionSheet addButtonWithTitle:(req) ? NSLocalizedString(@"send request as email", nil)
+                                              : NSLocalizedString(@"send address as email", nil)];
     }
 
-#if ! TARGET_IPHONE_SIMULATOR
+#if !TARGET_IPHONE_SIMULATOR
     if ([MFMessageComposeViewController canSendText]) {
-        [actionSheet addButtonWithTitle:(req) ? NSLocalizedString(@"send request as message", nil) :
-         NSLocalizedString(@"send address as message", nil)];
+        [actionSheet addButtonWithTitle:(req) ? NSLocalizedString(@"send request as message", nil)
+                                              : NSLocalizedString(@"send address as message", nil)];
     }
 #endif
 
-    if (! req) [actionSheet addButtonWithTitle:NSLocalizedString(@"request an amount", nil)];
+    if (!req)
+        [actionSheet addButtonWithTitle:NSLocalizedString(@"request an amount", nil)];
     [actionSheet addButtonWithTitle:NSLocalizedString(@"cancel", nil)];
     actionSheet.cancelButtonIndex = actionSheet.numberOfButtons - 1;
-    
+
     [actionSheet showInView:[UIApplication sharedApplication].keyWindow];
 }
 
 #pragma mark - UIActionSheetDelegate
 
-- (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
+- (void)actionSheet:(UIActionSheet*)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
 {
-    NSString *title = [actionSheet buttonTitleAtIndex:buttonIndex];
+    NSString* title = [actionSheet buttonTitleAtIndex:buttonIndex];
 
-    //TODO: allow user to create a payment protocol request object, and use merge avoidance techniques:
+    // TODO: allow user to create a payment protocol request object, and use merge avoidance techniques:
     // https://medium.com/@octskyward/merge-avoidance-7f95a386692f
-    if ([title isEqual:NSLocalizedString(@"copy address to clipboard", nil)] ||
-        [title isEqual:NSLocalizedString(@"copy request to clipboard", nil)]) {
-        [UIPasteboard generalPasteboard].string =
-            (self.paymentRequest.amount > 0) ? self.paymentRequest.string : self.paymentAddress;
+    if ([title isEqual:NSLocalizedString(@"copy address to clipboard", nil)]
+        || [title isEqual:NSLocalizedString(@"copy request to clipboard", nil)]) {
+        [UIPasteboard generalPasteboard].string = (self.paymentRequest.amount > 0) ? self.paymentRequest.string
+                                                                                   : self.paymentAddress;
 
         [self.view addSubview:[[[BRBubbleView viewWithText:NSLocalizedString(@"copied", nil)
-         center:CGPointMake(self.view.bounds.size.width/2.0, self.view.bounds.size.height/2.0 - 130.0)] popIn]
-         popOutAfterDelay:2.0]];
+                                                    center:CGPointMake(self.view.bounds.size.width / 2.0,
+                                                               self.view.bounds.size.height / 2.0 - 130.0)] popIn]
+                                  popOutAfterDelay:2.0]];
     }
-    else if ([title isEqual:NSLocalizedString(@"send address as email", nil)] ||
-             [title isEqual:NSLocalizedString(@"send request as email", nil)]) {
-        //TODO: implement BIP71 payment protocol mime attachement
+    else if ([title isEqual:NSLocalizedString(@"send address as email", nil)]
+        || [title isEqual:NSLocalizedString(@"send request as email", nil)]) {
+        // TODO: implement BIP71 payment protocol mime attachement
         // https://github.com/bitcoin/bips/blob/master/bip-0071.mediawiki
-        
+
         if ([MFMailComposeViewController canSendMail]) {
-            MFMailComposeViewController *composeController = [MFMailComposeViewController new];
-            
+            MFMailComposeViewController* composeController = [MFMailComposeViewController new];
+
             composeController.subject = NSLocalizedString(@"Bitcoin address", nil);
             [composeController setMessageBody:self.paymentRequest.string isHTML:NO];
-            [composeController addAttachmentData:UIImagePNGRepresentation(self.qrView.image) mimeType:@"image/png" fileName:@"qr.png"];
+            [composeController addAttachmentData:UIImagePNGRepresentation(self.qrView.image)
+                                        mimeType:@"image/png"
+                                        fileName:@"qr.png"];
             composeController.mailComposeDelegate = self;
             [self.navigationController presentViewController:composeController animated:YES completion:nil];
-            composeController.view.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"wallpaper-default"]];
+            composeController.view.backgroundColor =
+                [UIColor colorWithPatternImage:[UIImage imageNamed:@"wallpaper-default"]];
         }
         else {
-            [[[UIAlertView alloc] initWithTitle:@"" message:NSLocalizedString(@"email not configured", nil) delegate:nil
-              cancelButtonTitle:NSLocalizedString(@"ok", nil) otherButtonTitles:nil] show];
+            [[[UIAlertView alloc] initWithTitle:@""
+                                        message:NSLocalizedString(@"email not configured", nil)
+                                       delegate:nil
+                              cancelButtonTitle:NSLocalizedString(@"ok", nil)
+                              otherButtonTitles:nil] show];
         }
     }
-    else if ([title isEqual:NSLocalizedString(@"send address as message", nil)] ||
-             [title isEqual:NSLocalizedString(@"send request as message", nil)]) {
+    else if ([title isEqual:NSLocalizedString(@"send address as message", nil)]
+        || [title isEqual:NSLocalizedString(@"send request as message", nil)]) {
         if ([MFMessageComposeViewController canSendText]) {
-            MFMessageComposeViewController *composeController = [MFMessageComposeViewController new];
+            MFMessageComposeViewController* composeController = [MFMessageComposeViewController new];
 
-            if ([MFMessageComposeViewController canSendSubject]) composeController.subject = NSLocalizedString(@"Bitcoin address", nil);
+            if ([MFMessageComposeViewController canSendSubject])
+                composeController.subject = NSLocalizedString(@"Bitcoin address", nil);
             composeController.body = self.paymentRequest.string;
-            
+
             if ([MFMessageComposeViewController canSendAttachments]) {
-                [composeController addAttachmentData:UIImagePNGRepresentation(self.qrView.image) typeIdentifier:(NSString *)kUTTypePNG
-                 filename:@"qr.png"];
+                [composeController addAttachmentData:UIImagePNGRepresentation(self.qrView.image)
+                                      typeIdentifier:(NSString*)kUTTypePNG
+                                            filename:@"qr.png"];
             }
-            
+
             composeController.messageComposeDelegate = self;
             [self.navigationController presentViewController:composeController animated:YES completion:nil];
-            composeController.view.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"wallpaper-default"]];
+            composeController.view.backgroundColor =
+                [UIColor colorWithPatternImage:[UIImage imageNamed:@"wallpaper-default"]];
         }
         else {
-            [[[UIAlertView alloc] initWithTitle:@"" message:NSLocalizedString(@"sms not currently available", nil)
-              delegate:nil cancelButtonTitle:NSLocalizedString(@"ok", nil) otherButtonTitles:nil] show];
+            [[[UIAlertView alloc] initWithTitle:@""
+                                        message:NSLocalizedString(@"sms not currently available", nil)
+                                       delegate:nil
+                              cancelButtonTitle:NSLocalizedString(@"ok", nil)
+                              otherButtonTitles:nil] show];
         }
     }
     else if ([title isEqual:NSLocalizedString(@"request an amount", nil)]) {
-        UINavigationController *amountNavController = [self.storyboard instantiateViewControllerWithIdentifier:@"AmountNav"];
-        
-        ((BRAmountViewController *)amountNavController.topViewController).delegate = self;
+        UINavigationController* amountNavController =
+            [self.storyboard instantiateViewControllerWithIdentifier:@"AmountNav"];
+
+        ((BRAmountViewController*)amountNavController.topViewController).delegate = self;
         [self.navigationController presentViewController:amountNavController animated:YES completion:nil];
     }
 }
 
 #pragma mark - MFMessageComposeViewControllerDelegate
 
-- (void)messageComposeViewController:(MFMessageComposeViewController *)controller
-didFinishWithResult:(MessageComposeResult)result
+- (void)messageComposeViewController:(MFMessageComposeViewController*)controller
+                 didFinishWithResult:(MessageComposeResult)result
 {
     [self.navigationController dismissViewControllerAnimated:YES completion:nil];
 }
 
 #pragma mark - MFMailComposeViewControllerDelegate
 
-- (void)mailComposeController:(MFMailComposeViewController *)controller didFinishWithResult:(MFMailComposeResult)result
-error:(NSError *)error
+- (void)mailComposeController:(MFMailComposeViewController*)controller
+          didFinishWithResult:(MFMailComposeResult)result
+                        error:(NSError*)error
 {
     [self.navigationController dismissViewControllerAnimated:YES completion:nil];
 }
 
 #pragma mark - BRAmountViewControllerDelegate
 
-- (void)amountViewController:(BRAmountViewController *)amountViewController selectedAmount:(uint64_t)amount
+- (void)amountViewController:(BRAmountViewController*)amountViewController selectedAmount:(uint64_t)amount
 {
     if (amount < TX_MIN_OUTPUT_AMOUNT) {
-        BRWalletManager *manager = [BRWalletManager sharedInstance];
-    
-        [[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"amount too small", nil)
-          message:[NSString stringWithFormat:NSLocalizedString(@"bitcoin payments can't be less than %@", nil),
-                   [manager stringForAmount:TX_MIN_OUTPUT_AMOUNT]] delegate:nil
-          cancelButtonTitle:NSLocalizedString(@"ok", nil) otherButtonTitles:nil] show];
+        BRWalletManager* manager = [BRWalletManager sharedInstance];
+
+        [[[UIAlertView alloc]
+                initWithTitle:NSLocalizedString(@"amount too small", nil)
+                      message:[NSString
+                                  stringWithFormat:NSLocalizedString(@"bitcoin payments can't be less than %@", nil),
+                                  [manager stringForAmount:TX_MIN_OUTPUT_AMOUNT]]
+                     delegate:nil
+            cancelButtonTitle:NSLocalizedString(@"ok", nil)
+            otherButtonTitles:nil] show];
         return;
     }
 
-    BRReceiveViewController *receiveController = [self.storyboard instantiateViewControllerWithIdentifier:@"RequestViewController"];
-    
+    BRReceiveViewController* receiveController =
+        [self.storyboard instantiateViewControllerWithIdentifier:@"RequestViewController"];
+
     receiveController.paymentRequest = self.paymentRequest;
     receiveController.paymentRequest.amount = amount;
-    ((UINavigationController *)self.navigationController.presentedViewController).delegate = receiveController;
-    [(UINavigationController *)self.navigationController.presentedViewController pushViewController:receiveController animated:YES];
+    ((UINavigationController*)self.navigationController.presentedViewController).delegate = receiveController;
+    [(UINavigationController*)self.navigationController.presentedViewController pushViewController:receiveController
+                                                                                          animated:YES];
 }
 
 #pragma mark - UIViewControllerAnimatedTransitioning
 
 // This is used for percent driven interactive transitions, as well as for container controllers that have companion
 // animations that might need to synchronize with the main animation.
-- (NSTimeInterval)transitionDuration:(id<UIViewControllerContextTransitioning>)transitionContext
-{
-    return 0.35;
-}
+- (NSTimeInterval)transitionDuration:(id<UIViewControllerContextTransitioning>)transitionContext { return 0.35; }
 
 // This method can only be a nop if the transition is interactive and not a percentDriven interactive transition.
 - (void)animateTransition:(id<UIViewControllerContextTransitioning>)transitionContext
 {
-    UIView *containerView = transitionContext.containerView;
+    UIView* containerView = transitionContext.containerView;
     UIViewController *to = [transitionContext viewControllerForKey:UITransitionContextToViewControllerKey],
                      *from = [transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
 
     [containerView addSubview:to.view];
-    
-    [UIView transitionFromView:from.view toView:to.view duration:[self transitionDuration:transitionContext]
-    options:UIViewAnimationOptionTransitionFlipFromLeft completion:^(BOOL finished) {
-        [from.view removeFromSuperview];
-        [transitionContext completeTransition:YES];
-    }];
+
+    [UIView transitionFromView:from.view
+                        toView:to.view
+                      duration:[self transitionDuration:transitionContext]
+                       options:UIViewAnimationOptionTransitionFlipFromLeft
+                    completion:^(BOOL finished) {
+                        [from.view removeFromSuperview];
+                        [transitionContext completeTransition:YES];
+                    }];
 }
 
 #pragma mark - UINavigationControllerDelegate
 
-- (id<UIViewControllerAnimatedTransitioning>)navigationController:(UINavigationController *)navigationController
-animationControllerForOperation:(UINavigationControllerOperation)operation fromViewController:(UIViewController *)fromVC
-toViewController:(UIViewController *)toVC
+- (id<UIViewControllerAnimatedTransitioning>)navigationController:(UINavigationController*)navigationController
+                                  animationControllerForOperation:(UINavigationControllerOperation)operation
+                                               fromViewController:(UIViewController*)fromVC
+                                                 toViewController:(UIViewController*)toVC
 {
     return self;
 }
 
 #pragma mark - UIViewControllerTransitioningDelegate
 
-- (id<UIViewControllerAnimatedTransitioning>)animationControllerForPresentedController:(UIViewController *)presented
-presentingController:(UIViewController *)presenting sourceController:(UIViewController *)source
+- (id<UIViewControllerAnimatedTransitioning>)animationControllerForPresentedController:(UIViewController*)presented
+                                                                  presentingController:(UIViewController*)presenting
+                                                                      sourceController:(UIViewController*)source
 {
     return self;
 }
 
-- (id<UIViewControllerAnimatedTransitioning>)animationControllerForDismissedController:(UIViewController *)dismissed
+- (id<UIViewControllerAnimatedTransitioning>)animationControllerForDismissedController:(UIViewController*)dismissed
 {
     return self;
 }

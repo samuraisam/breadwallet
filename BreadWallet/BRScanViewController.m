@@ -27,11 +27,11 @@
 
 @interface BRScanViewController ()
 
-@property (nonatomic, strong) IBOutlet UIView *cameraView;
-@property (nonatomic, strong) IBOutlet UIToolbar *toolbar;
+@property (nonatomic, strong) IBOutlet UIView* cameraView;
+@property (nonatomic, strong) IBOutlet UIToolbar* toolbar;
 
-@property (nonatomic, strong) AVCaptureSession *session;
-@property (nonatomic, strong) AVCaptureVideoPreviewLayer *preview;
+@property (nonatomic, strong) AVCaptureSession* session;
+@property (nonatomic, strong) AVCaptureVideoPreviewLayer* preview;
 @property (nonatomic, assign) UIStatusBarStyle barStyle;
 
 @end
@@ -43,10 +43,11 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view.
 
-    AVCaptureDevice *device = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
+    AVCaptureDevice* device = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
 
-    if (! device.hasTorch) self.toolbar.items = @[self.toolbar.items[0]];
-    
+    if (!device.hasTorch)
+        self.toolbar.items = @[ self.toolbar.items[0] ];
+
     [self.toolbar setBackgroundImage:[UIImage new] forToolbarPosition:UIBarPositionAny barMetrics:UIBarMetricsDefault];
     [self.toolbar setShadowImage:[UIImage new] forToolbarPosition:UIToolbarPositionAny];
 }
@@ -60,41 +61,47 @@
 
     if ([AVCaptureDevice authorizationStatusForMediaType:AVMediaTypeVideo] == AVAuthorizationStatusDenied) {
         [[[UIAlertView alloc]
-          initWithTitle:[NSString stringWithFormat:NSLocalizedString(@"%@ is not allowed to access the camera", nil),
-                         NSBundle.mainBundle.infoDictionary[@"CFBundleDisplayName"]]
-          message:[NSString stringWithFormat:NSLocalizedString(@"\nallow camera access in\n"
-                                                               "Settings->Privacy->Camera->%@", nil),
-                   NSBundle.mainBundle.infoDictionary[@"CFBundleDisplayName"]] delegate:nil
-          cancelButtonTitle:NSLocalizedString(@"ok", nil) otherButtonTitles:nil] show];
+                initWithTitle:[NSString
+                                  stringWithFormat:NSLocalizedString(@"%@ is not allowed to access the camera", nil),
+                                  NSBundle.mainBundle.infoDictionary[@"CFBundleDisplayName"]]
+                      message:[NSString stringWithFormat:NSLocalizedString(@"\nallow camera access in\n"
+                                                                            "Settings->Privacy->Camera->%@",
+                                                             nil),
+                                        NSBundle.mainBundle.infoDictionary[@"CFBundleDisplayName"]]
+                     delegate:nil
+            cancelButtonTitle:NSLocalizedString(@"ok", nil)
+            otherButtonTitles:nil] show];
         return;
     }
 
-    NSError *error = nil;
-    AVCaptureDevice *device = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
-    AVCaptureDeviceInput *input = [AVCaptureDeviceInput deviceInputWithDevice:device error:&error];
-    AVCaptureMetadataOutput *output = [AVCaptureMetadataOutput new];
+    NSError* error = nil;
+    AVCaptureDevice* device = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
+    AVCaptureDeviceInput* input = [AVCaptureDeviceInput deviceInputWithDevice:device error:&error];
+    AVCaptureMetadataOutput* output = [AVCaptureMetadataOutput new];
 
-    if (error) NSLog(@"%@", error.localizedDescription);
-    
+    if (error)
+        NSLog(@"%@", error.localizedDescription);
+
     if ([device lockForConfiguration:&error]) {
         if (device.isAutoFocusRangeRestrictionSupported) {
             device.autoFocusRangeRestriction = AVCaptureAutoFocusRangeRestrictionNear;
         }
-        
+
         if ([device isFocusModeSupported:AVCaptureFocusModeContinuousAutoFocus]) {
             device.focusMode = AVCaptureFocusModeContinuousAutoFocus;
         }
-        
+
         [device unlockForConfiguration];
     }
-    
+
     self.session = [AVCaptureSession new];
-    if (input) [self.session addInput:input];
+    if (input)
+        [self.session addInput:input];
     [self.session addOutput:output];
     [output setMetadataObjectsDelegate:self.delegate queue:dispatch_get_main_queue()];
 
     if ([output.availableMetadataObjectTypes containsObject:AVMetadataObjectTypeQRCode]) {
-        output.metadataObjectTypes = @[AVMetadataObjectTypeQRCode];
+        output.metadataObjectTypes = @[ AVMetadataObjectTypeQRCode ];
     }
 
     self.preview = [[AVCaptureVideoPreviewLayer alloc] initWithSession:self.session];
@@ -110,7 +117,7 @@
 - (void)viewWillDisappear:(BOOL)animated
 {
     [[UIApplication sharedApplication] setStatusBarStyle:self.barStyle animated:animated];
-    
+
     [super viewWillDisappear:animated];
 }
 
@@ -124,17 +131,14 @@
     [super viewDidDisappear:animated];
 }
 
-- (void)stop
-{
-    [self.session removeOutput:self.session.outputs.firstObject];
-}
+- (void)stop { [self.session removeOutput:self.session.outputs.firstObject]; }
 
 #pragma mark - IBAction
 
 - (IBAction)flash:(id)sender
 {
-    NSError *error = nil;
-    AVCaptureDevice *device = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
+    NSError* error = nil;
+    AVCaptureDevice* device = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
 
     if ([device lockForConfiguration:&error]) {
         device.torchMode = (device.torchActive) ? AVCaptureTorchModeOff : AVCaptureTorchModeOn;
@@ -142,9 +146,6 @@
     }
 }
 
-- (IBAction)done:(id)sender
-{
-    [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
-}
+- (IBAction)done:(id)sender { [self.presentingViewController dismissViewControllerAnimated:YES completion:nil]; }
 
 @end

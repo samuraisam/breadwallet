@@ -28,13 +28,13 @@
 #import "BRAmountViewController.h"
 
 @interface BRSendViewController : UIViewController <UIAlertViewDelegate, UITextViewDelegate,
-BRAmountViewControllerDelegate, AVCaptureMetadataOutputObjectsDelegate, UIViewControllerTransitioningDelegate,
-UIViewControllerAnimatedTransitioning>
+                                      BRAmountViewControllerDelegate, AVCaptureMetadataOutputObjectsDelegate,
+                                      UIViewControllerTransitioningDelegate, UIViewControllerAnimatedTransitioning>
 
 - (IBAction)tip:(id)sender;
 
-- (void)handleURL:(NSURL *)url;
-- (void)handleFile:(NSData *)file;
+- (void)handleURL:(NSURL*)url;
+- (void)handleFile:(NSData*)file;
 - (void)updateClipboardText;
 
 @end

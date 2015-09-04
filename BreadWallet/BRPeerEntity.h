@@ -36,7 +36,7 @@
 @property (nonatomic) int64_t services;
 @property (nonatomic) int16_t misbehavin;
 
-- (instancetype)setAttributesFromPeer:(BRPeer *)peer;
-- (BRPeer *)peer;
+- (instancetype)setAttributesFromPeer:(BRPeer*)peer;
+- (BRPeer*)peer;
 
 @end

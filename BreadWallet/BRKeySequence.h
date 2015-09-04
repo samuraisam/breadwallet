@@ -28,12 +28,12 @@
 #define SEQUENCE_GAP_LIMIT_EXTERNAL 10
 #define SEQUENCE_GAP_LIMIT_INTERNAL 5
 
-@protocol BRKeySequence<NSObject>
+@protocol BRKeySequence <NSObject>
 @required
 
-- (NSData *)masterPublicKeyFromSeed:(NSData *)seed;
-- (NSData *)publicKey:(unsigned)n internal:(BOOL)internal masterPublicKey:(NSData *)masterPublicKey;
-- (NSString *)privateKey:(unsigned)n internal:(BOOL)internal fromSeed:(NSData *)seed;
-- (NSArray *)privateKeys:(NSArray *)n internal:(BOOL)internal fromSeed:(NSData *)seed;
+- (NSData*)masterPublicKeyFromSeed:(NSData*)seed;
+- (NSData*)publicKey:(unsigned)n internal:(BOOL)internal masterPublicKey:(NSData*)masterPublicKey;
+- (NSString*)privateKey:(unsigned)n internal:(BOOL)internal fromSeed:(NSData*)seed;
+- (NSArray*)privateKeys:(NSArray*)n internal:(BOOL)internal fromSeed:(NSData*)seed;
 
 @end

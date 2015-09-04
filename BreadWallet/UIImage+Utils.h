@@ -27,8 +27,8 @@
 
 @interface UIImage (Utils)
 
-+ (instancetype)imageWithQRCodeData:(NSData *)data size:(CGSize)size color:(CIColor *)color;
++ (instancetype)imageWithQRCodeData:(NSData*)data size:(CGSize)size color:(CIColor*)color;
 
-- (UIImage *)blurWithRadius:(CGFloat)radius;
+- (UIImage*)blurWithRadius:(CGFloat)radius;
 
 @end

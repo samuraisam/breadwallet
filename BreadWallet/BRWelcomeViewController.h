@@ -26,6 +26,6 @@
 #import <UIKit/UIKit.h>
 
 @interface BRWelcomeViewController : UIViewController <UINavigationControllerDelegate,
-UIViewControllerTransitioningDelegate, UIViewControllerAnimatedTransitioning>
+                                         UIViewControllerTransitioningDelegate, UIViewControllerAnimatedTransitioning>
 
 @end

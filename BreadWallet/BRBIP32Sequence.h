@@ -29,14 +29,14 @@
 // BIP32 is a scheme for deriving chains of addresses from a seed value
 // https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki
 
-@interface BRBIP32Sequence : NSObject<BRKeySequence>
+@interface BRBIP32Sequence : NSObject <BRKeySequence>
 
-- (NSData *)masterPublicKeyFromSeed:(NSData *)seed;
-- (NSData *)publicKey:(unsigned)n internal:(BOOL)internal masterPublicKey:(NSData *)masterPublicKey;
-- (NSString *)privateKey:(unsigned)n internal:(BOOL)internal fromSeed:(NSData *)seed;
-- (NSArray *)privateKeys:(NSArray *)n internal:(BOOL)internal fromSeed:(NSData *)seed;
+- (NSData*)masterPublicKeyFromSeed:(NSData*)seed;
+- (NSData*)publicKey:(unsigned)n internal:(BOOL)internal masterPublicKey:(NSData*)masterPublicKey;
+- (NSString*)privateKey:(unsigned)n internal:(BOOL)internal fromSeed:(NSData*)seed;
+- (NSArray*)privateKeys:(NSArray*)n internal:(BOOL)internal fromSeed:(NSData*)seed;
 
-- (NSString *)serializedPrivateMasterFromSeed:(NSData *)seed;
-- (NSString *)serializedMasterPublicKey:(NSData *)masterPublicKey;
+- (NSString*)serializedPrivateMasterFromSeed:(NSData*)seed;
+- (NSString*)serializedMasterPublicKey:(NSData*)masterPublicKey;
 
 @end

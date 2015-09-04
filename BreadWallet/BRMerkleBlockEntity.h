@@ -30,19 +30,19 @@
 
 @interface BRMerkleBlockEntity : NSManagedObject
 
-@property (nonatomic, retain) NSData *blockHash;
+@property (nonatomic, retain) NSData* blockHash;
 @property (nonatomic) int32_t height;
 @property (nonatomic) int32_t version;
-@property (nonatomic, retain) NSData *prevBlock;
-@property (nonatomic, retain) NSData *merkleRoot;
+@property (nonatomic, retain) NSData* prevBlock;
+@property (nonatomic, retain) NSData* merkleRoot;
 @property (nonatomic) NSTimeInterval timestamp;
 @property (nonatomic) int32_t target;
 @property (nonatomic) int32_t nonce;
 @property (nonatomic) int32_t totalTransactions;
-@property (nonatomic, retain) NSData *hashes;
-@property (nonatomic, retain) NSData *flags;
+@property (nonatomic, retain) NSData* hashes;
+@property (nonatomic, retain) NSData* flags;
 
-- (instancetype)setAttributesFromBlock:(BRMerkleBlock *)block;
-- (BRMerkleBlock *)merkleBlock;
+- (instancetype)setAttributesFromBlock:(BRMerkleBlock*)block;
+- (BRMerkleBlock*)merkleBlock;
 
 @end

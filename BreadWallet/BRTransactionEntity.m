@@ -42,87 +42,92 @@
 @dynamic outputs;
 @dynamic lockTime;
 
-+ (void)setContext:(NSManagedObjectContext *)context
++ (void)setContext:(NSManagedObjectContext*)context
 {
     [super setContext:context];
     [BRTxInputEntity setContext:context];
     [BRTxOutputEntity setContext:context];
 }
 
-- (instancetype)setAttributesFromTx:(BRTransaction *)tx
+- (instancetype)setAttributesFromTx:(BRTransaction*)tx
 {
     [self.managedObjectContext performBlockAndWait:^{
-        NSMutableOrderedSet *inputs = [self mutableOrderedSetValueForKey:@"inputs"];
-        NSMutableOrderedSet *outputs = [self mutableOrderedSetValueForKey:@"outputs"];
+        NSMutableOrderedSet* inputs = [self mutableOrderedSetValueForKey:@"inputs"];
+        NSMutableOrderedSet* outputs = [self mutableOrderedSetValueForKey:@"outputs"];
         UInt256 txHash = tx.txHash;
         NSUInteger idx = 0;
-        
+
         self.txHash = [NSData dataWithBytes:&txHash length:sizeof(txHash)];
         self.blockHeight = tx.blockHeight;
         self.timestamp = tx.timestamp;
-    
+
         while (inputs.count < tx.inputHashes.count) {
             [inputs addObject:[BRTxInputEntity managedObject]];
         }
-    
+
         while (inputs.count > tx.inputHashes.count) {
             [inputs removeObjectAtIndex:inputs.count - 1];
         }
-    
-        for (BRTxInputEntity *e in inputs) {
+
+        for (BRTxInputEntity* e in inputs) {
             [e setAttributesFromTx:tx inputIndex:idx++];
         }
 
         while (outputs.count < tx.outputAddresses.count) {
             [outputs addObject:[BRTxOutputEntity managedObject]];
         }
-    
+
         while (outputs.count > tx.outputAddresses.count) {
             [self removeObjectFromOutputsAtIndex:outputs.count - 1];
         }
 
         idx = 0;
-        
-        for (BRTxOutputEntity *e in outputs) {
+
+        for (BRTxOutputEntity* e in outputs) {
             [e setAttributesFromTx:tx outputIndex:idx++];
         }
-        
+
         self.lockTime = tx.lockTime;
     }];
-    
+
     return self;
 }
 
-- (BRTransaction *)transaction
+- (BRTransaction*)transaction
 {
-    BRTransaction *tx = [BRTransaction new];
-    
+    BRTransaction* tx = [BRTransaction new];
+
     [self.managedObjectContext performBlockAndWait:^{
-        NSData *txHash = self.txHash;
-        
-        if (txHash.length == sizeof(UInt256)) tx.txHash = *(const UInt256 *)txHash.bytes;
+        NSData* txHash = self.txHash;
+
+        if (txHash.length == sizeof(UInt256))
+            tx.txHash = *(const UInt256*)txHash.bytes;
         tx.lockTime = self.lockTime;
         tx.blockHeight = self.blockHeight;
         tx.timestamp = self.timestamp;
-    
-        for (BRTxInputEntity *e in self.inputs) {
+
+        for (BRTxInputEntity* e in self.inputs) {
             txHash = e.txHash;
-            if (txHash.length != sizeof(UInt256)) continue;
-            [tx addInputHash:*(const UInt256 *)txHash.bytes index:e.n script:nil signature:e.signature
-             sequence:e.sequence];
+            if (txHash.length != sizeof(UInt256))
+                continue;
+            [tx addInputHash:*(const UInt256*)txHash.bytes
+                       index:e.n
+                      script:nil
+                   signature:e.signature
+                    sequence:e.sequence];
         }
-        
-        for (BRTxOutputEntity *e in self.outputs) {
+
+        for (BRTxOutputEntity* e in self.outputs) {
             [tx addOutputScript:e.script amount:e.value];
         }
     }];
-    
+
     return tx;
 }
 
 - (void)deleteObject
 {
-    for (BRTxInputEntity *e in self.inputs) { // mark inputs as unspent
+    for (BRTxInputEntity* e in self.inputs) { // mark inputs as unspent
         [[BRTxOutputEntity objectsMatching:@"txHash == %@ && n == %d", e.txHash, e.n].lastObject setSpent:NO];
     }
 
