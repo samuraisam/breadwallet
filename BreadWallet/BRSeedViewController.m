@@ -37,12 +37,12 @@
 
 // TODO: create a secure version of UILabel and use it for seedLabel, but make sure there's an accessibility work around
 @property (nonatomic, strong) IBOutlet UILabel *seedLabel, *writeLabel;
-@property (nonatomic, strong) IBOutlet UIButton* writeButton;
-@property (nonatomic, strong) IBOutlet UIToolbar* toolbar;
+@property (nonatomic, strong) IBOutlet UIButton *writeButton;
+@property (nonatomic, strong) IBOutlet UIToolbar *toolbar;
 @property (nonatomic, strong) IBOutlet UIBarButtonItem *remindButton, *doneButton;
-@property (nonatomic, strong) IBOutlet UIImageView* wallpaper;
+@property (nonatomic, strong) IBOutlet UIImageView *wallpaper;
 
-@property (nonatomic, strong) NSString* seedPhrase;
+@property (nonatomic, strong) NSString *seedPhrase;
 @property (nonatomic, strong) id resignActiveObserver, screenshotObserver;
 
 @end
@@ -51,7 +51,7 @@
 
 - (instancetype)customInit
 {
-    BRWalletManager* m = [BRWalletManager sharedInstance];
+    BRWalletManager *m = [BRWalletManager sharedInstance];
 
     if (m.noWallet) {
         self.seedPhrase = [m generateRandomSeed];
@@ -75,14 +75,14 @@
     return [self customInit];
 }
 
-- (instancetype)initWithCoder:(NSCoder*)aDecoder
+- (instancetype)initWithCoder:(NSCoder *)aDecoder
 {
     if (!(self = [super initWithCoder:aDecoder]))
         return nil;
     return [self customInit];
 }
 
-- (instancetype)initWithNibName:(NSString*)nibNameOrNil bundle:(NSBundle*)nibBundleOrNil
+- (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
     if (!(self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil]))
         return nil;
@@ -107,7 +107,7 @@
             NSMutableString *s = CFBridgingRelease(CFStringCreateMutable(SecureAllocator(), 0)),
                             *l = CFBridgingRelease(CFStringCreateMutable(SecureAllocator(), 0));
 
-            for (NSString* w in CFBridgingRelease(CFStringCreateArrayBySeparatingStrings(
+            for (NSString *w in CFBridgingRelease(CFStringCreateArrayBySeparatingStrings(
                      SecureAllocator(), (CFStringRef)self.seedPhrase, CFSTR(" ")))) {
                 if (l.length > 0)
                     [l appendString:IDEO_SP];
@@ -175,7 +175,7 @@
             addObserverForName:UIApplicationWillResignActiveNotification
                         object:nil
                          queue:nil
-                    usingBlock:^(NSNotification* note) {
+                    usingBlock:^(NSNotification *note) {
                         if (self.navigationController.viewControllers.firstObject != self) {
                             [self.navigationController popViewControllerAnimated:NO];
                         }
@@ -188,7 +188,7 @@
             addObserverForName:UIApplicationUserDidTakeScreenshotNotification
                         object:nil
                          queue:nil
-                    usingBlock:^(NSNotification* note) {
+                    usingBlock:^(NSNotification *note) {
                         if (self.navigationController.viewControllers.firstObject != self) {
                             [[[UIAlertView alloc]
                                     initWithTitle:NSLocalizedString(@"WARNING", nil)
@@ -271,7 +271,7 @@
 
 - (IBAction)toggleWrite:(id)sender
 {
-    NSUserDefaults* defs = [NSUserDefaults standardUserDefaults];
+    NSUserDefaults *defs = [NSUserDefaults standardUserDefaults];
 
     if ([defs boolForKey:WALLET_NEEDS_BACKUP_KEY]) {
         [self.toolbar setItems:@[ self.toolbar.items[0], self.doneButton ] animated:YES];

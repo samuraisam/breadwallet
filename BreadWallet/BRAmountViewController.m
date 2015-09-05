@@ -31,15 +31,15 @@
 
 @interface BRAmountViewController ()
 
-@property (nonatomic, strong) IBOutlet UITextField* amountField;
+@property (nonatomic, strong) IBOutlet UITextField *amountField;
 @property (nonatomic, strong) IBOutlet UILabel *localCurrencyLabel, *addressLabel;
 @property (nonatomic, strong) IBOutlet UIBarButtonItem *payButton, *lock;
 @property (nonatomic, strong) IBOutlet UIButton *delButton, *decimalButton;
-@property (nonatomic, strong) IBOutlet UIImageView* wallpaper;
-@property (nonatomic, strong) IBOutlet UIView* logo;
+@property (nonatomic, strong) IBOutlet UIImageView *wallpaper;
+@property (nonatomic, strong) IBOutlet UIView *logo;
 
 @property (nonatomic, assign) uint64_t amount;
-@property (nonatomic, strong) NSCharacterSet* charset;
+@property (nonatomic, strong) NSCharacterSet *charset;
 @property (nonatomic, strong) UILabel *swapLeftLabel, *swapRightLabel;
 @property (nonatomic, assign) BOOL swapped;
 @property (nonatomic, strong) id balanceObserver, backgroundObserver;
@@ -53,8 +53,8 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view.
 
-    BRWalletManager* m = [BRWalletManager sharedInstance];
-    NSMutableCharacterSet* charset = [NSMutableCharacterSet decimalDigitCharacterSet];
+    BRWalletManager *m = [BRWalletManager sharedInstance];
+    NSMutableCharacterSet *charset = [NSMutableCharacterSet decimalDigitCharacterSet];
 
     [charset addCharactersInString:m.format.currencyDecimalSeparator];
     self.charset = charset;
@@ -84,7 +84,7 @@
         addObserverForName:BRWalletBalanceChangedNotification
                     object:nil
                      queue:nil
-                usingBlock:^(NSNotification* note) {
+                usingBlock:^(NSNotification *note) {
                     if ([BRPeerManager sharedInstance].syncProgress < 1.0)
                         return; // wait for sync before updating balance
 
@@ -97,7 +97,7 @@
         [[NSNotificationCenter defaultCenter] addObserverForName:UIApplicationDidEnterBackgroundNotification
                                                           object:nil
                                                            queue:nil
-                                                      usingBlock:^(NSNotification* note) {
+                                                      usingBlock:^(NSNotification *note) {
                                                           self.navigationItem.titleView = self.logo;
                                                       }];
 }
@@ -143,7 +143,7 @@
 
 - (void)updateLocalCurrencyLabel
 {
-    BRWalletManager* m = [BRWalletManager sharedInstance];
+    BRWalletManager *m = [BRWalletManager sharedInstance];
     uint64_t amount = (self.swapped) ? [m amountForLocalCurrencyString:self.amountField.text]
                                      : [m amountForString:self.amountField.text];
 
@@ -159,7 +159,7 @@
 
 - (IBAction)unlock:(id)sender
 {
-    BRWalletManager* manager = [BRWalletManager sharedInstance];
+    BRWalletManager *manager = [BRWalletManager sharedInstance];
 
     if (sender && !manager.didAuthenticate && ![manager authenticateWithPrompt:nil andTouchId:YES])
         return;
@@ -175,7 +175,7 @@
     l = (l < self.amountField.text.length) ? l + 1 : self.amountField.text.length;
     [self textField:self.amountField
         shouldChangeCharactersInRange:NSMakeRange(l, 0)
-                    replacementString:((UIButton*)sender).titleLabel.text];
+                    replacementString:((UIButton *)sender).titleLabel.text];
 }
 
 - (IBAction)del:(id)sender
@@ -189,7 +189,7 @@
 
 - (IBAction)pay:(id)sender
 {
-    BRWalletManager* manager = [BRWalletManager sharedInstance];
+    BRWalletManager *manager = [BRWalletManager sharedInstance];
 
     self.amount = (self.swapped) ? [manager amountForLocalCurrencyString:self.amountField.text]
                                  : [manager amountForString:self.amountField.text];
@@ -231,8 +231,8 @@
     }
 
     CGFloat scale = self.swapRightLabel.font.pointSize / self.swapLeftLabel.font.pointSize;
-    BRWalletManager* m = [BRWalletManager sharedInstance];
-    NSString* s = (self.swapped) ? self.localCurrencyLabel.text : self.amountField.text;
+    BRWalletManager *m = [BRWalletManager sharedInstance];
+    NSString *s = (self.swapped) ? self.localCurrencyLabel.text : self.amountField.text;
     uint64_t amount =
         [m amountForLocalCurrencyString:(self.swapped) ? [s substringWithRange:NSMakeRange(1, s.length - 2)] : s];
 
@@ -358,16 +358,16 @@
 
 #pragma mark - UITextFieldDelegate
 
-- (BOOL)textField:(UITextField*)textField
+- (BOOL)textField:(UITextField *)textField
     shouldChangeCharactersInRange:(NSRange)range
-                replacementString:(NSString*)string
+                replacementString:(NSString *)string
 {
-    BRWalletManager* manager = [BRWalletManager sharedInstance];
-    NSNumberFormatter* numberFormatter = (self.swapped) ? manager.localFormat : manager.format;
+    BRWalletManager *manager = [BRWalletManager sharedInstance];
+    NSNumberFormatter *numberFormatter = (self.swapped) ? manager.localFormat : manager.format;
     NSUInteger mindigits = numberFormatter.minimumFractionDigits;
     NSUInteger point = [textField.text rangeOfString:numberFormatter.currencyDecimalSeparator].location;
     NSUInteger loc;
-    NSString* textVal = textField.text ? [textField.text stringByReplacingCharactersInRange:range withString:string]
+    NSString *textVal = textField.text ? [textField.text stringByReplacingCharactersInRange:range withString:string]
                                        : string;
 
     numberFormatter.minimumFractionDigits = 0;

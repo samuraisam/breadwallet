@@ -50,19 +50,19 @@
 @interface BRRootViewController ()
 
 @property (nonatomic, strong) IBOutlet UIProgressView *progress, *pulse;
-@property (nonatomic, strong) IBOutlet UILabel* percent;
+@property (nonatomic, strong) IBOutlet UILabel *percent;
 @property (nonatomic, strong) IBOutlet UIView *errorBar, *wallpaper, *splash, *logo, *blur;
-@property (nonatomic, strong) IBOutlet UIGestureRecognizer* navBarTap;
-@property (nonatomic, strong) IBOutlet UIBarButtonItem* lock;
-@property (nonatomic, strong) IBOutlet BRBouncyBurgerButton* burger;
+@property (nonatomic, strong) IBOutlet UIGestureRecognizer *navBarTap;
+@property (nonatomic, strong) IBOutlet UIBarButtonItem *lock;
+@property (nonatomic, strong) IBOutlet BRBouncyBurgerButton *burger;
 
-@property (nonatomic, strong) UIScrollView* scrollView;
-@property (nonatomic, strong) BRBubbleView* tipView;
+@property (nonatomic, strong) UIScrollView *scrollView;
+@property (nonatomic, strong) BRBubbleView *tipView;
 @property (nonatomic, assign) BOOL showTips, inNextTip, didAppear;
 @property (nonatomic, assign) uint64_t balance;
-@property (nonatomic, strong) NSURL* url;
-@property (nonatomic, strong) NSData* file;
-@property (nonatomic, strong) Reachability* reachability;
+@property (nonatomic, strong) NSURL *url;
+@property (nonatomic, strong) NSData *file;
+@property (nonatomic, strong) Reachability *reachability;
 @property (nonatomic, strong) id urlObserver, fileObserver, foregroundObserver, backgroundObserver, balanceObserver;
 @property (nonatomic, strong) id reachabilityObserver, syncStartedObserver, syncFinishedObserver, syncFailedObserver;
 @property (nonatomic, strong) id activeObserver, resignActiveObserver, protectedObserver, seedObserver;
@@ -108,7 +108,7 @@
     [self.view insertSubview:self.pageViewController.view belowSubview:self.splash];
     [self.pageViewController didMoveToParentViewController:self];
 
-    for (UIView* view in self.pageViewController.view.subviews) {
+    for (UIView *view in self.pageViewController.view.subviews) {
         if (![view isKindOfClass:[UIScrollView class]])
             continue;
         self.scrollView = (id)view;
@@ -116,14 +116,14 @@
         break;
     }
 
-    NSUserDefaults* defs = [NSUserDefaults standardUserDefaults];
-    BRWalletManager* manager = [BRWalletManager sharedInstance];
+    NSUserDefaults *defs = [NSUserDefaults standardUserDefaults];
+    BRWalletManager *manager = [BRWalletManager sharedInstance];
 
     self.urlObserver = [[NSNotificationCenter defaultCenter]
         addObserverForName:BRURLNotification
                     object:nil
                      queue:nil
-                usingBlock:^(NSNotification* note) {
+                usingBlock:^(NSNotification *note) {
                     if (!manager.noWallet) {
                         if (self.navigationController.topViewController != self) {
                             [self.navigationController popToRootViewControllerAnimated:YES];
@@ -133,7 +133,7 @@
                             [self.navigationController dismissViewControllerAnimated:YES completion:nil];
                         }
 
-                        BRSendViewController* c = self.sendViewController;
+                        BRSendViewController *c = self.sendViewController;
 
                         [self.pageViewController setViewControllers:(c ? @[ c ] : @[])
                                                           direction:UIPageViewControllerNavigationDirectionForward
@@ -157,7 +157,7 @@
         addObserverForName:BRFileNotification
                     object:nil
                      queue:nil
-                usingBlock:^(NSNotification* note) {
+                usingBlock:^(NSNotification *note) {
                     if (!manager.noWallet) {
                         if (self.navigationController.topViewController != self) {
                             [self.navigationController popToRootViewControllerAnimated:YES];
@@ -167,7 +167,7 @@
                             [self.navigationController dismissViewControllerAnimated:YES completion:nil];
                         }
 
-                        BRSendViewController* sendController = self.sendViewController;
+                        BRSendViewController *sendController = self.sendViewController;
 
                         [self.pageViewController setViewControllers:(sendController ? @[ sendController ] : @[])
                                                           direction:UIPageViewControllerNavigationDirectionForward
@@ -189,7 +189,7 @@
         addObserverForName:UIApplicationWillEnterForegroundNotification
                     object:nil
                      queue:nil
-                usingBlock:^(NSNotification* note) {
+                usingBlock:^(NSNotification *note) {
                     if (!manager.noWallet) {
                         [[BRPeerManager sharedInstance] connect];
                         [self.sendViewController updateClipboardText];
@@ -202,7 +202,7 @@
                                 registerUserNotificationSettings:[UIUserNotificationSettings
                                                                      settingsForTypes:UIUserNotificationTypeBadge
                                                                            categories:nil]]; // register for badge
-                                                                                             // notifications
+                            // notifications
                         }
                     }
 
@@ -237,7 +237,7 @@
         [[NSNotificationCenter defaultCenter] addObserverForName:UIApplicationDidEnterBackgroundNotification
                                                           object:nil
                                                            queue:nil
-                                                      usingBlock:^(NSNotification* note) {
+                                                      usingBlock:^(NSNotification *note) {
                                                           if (!manager.noWallet) { // lockdown the app
                                                               manager.didAuthenticate = NO;
                                                               self.navigationItem.titleView = self.logo;
@@ -252,7 +252,7 @@
         addObserverForName:UIApplicationDidBecomeActiveNotification
                     object:nil
                      queue:nil
-                usingBlock:^(NSNotification* note) {
+                usingBlock:^(NSNotification *note) {
                     [self.blur removeFromSuperview];
                     self.blur = nil;
                     [UIApplication sharedApplication].applicationIconBadgeNumber = 0; // reset app badge number
@@ -271,9 +271,9 @@
         addObserverForName:UIApplicationWillResignActiveNotification
                     object:nil
                      queue:nil
-                usingBlock:^(NSNotification* note) {
-                    UIView* keyWindow = [UIApplication sharedApplication].keyWindow;
-                    UIImage* img;
+                usingBlock:^(NSNotification *note) {
+                    UIView *keyWindow = [UIApplication sharedApplication].keyWindow;
+                    UIImage *img;
 
                     if (![keyWindow
                             viewWithTag:-411]) { // only take a screenshot if no views are marked highly sensitive
@@ -294,7 +294,7 @@
         addObserverForName:kReachabilityChangedNotification
                     object:nil
                      queue:nil
-                usingBlock:^(NSNotification* note) {
+                usingBlock:^(NSNotification *note) {
                     if (!manager.noWallet && self.reachability.currentReachabilityStatus != NotReachable
                         && [UIApplication sharedApplication].applicationState != UIApplicationStateBackground) {
                         [[BRPeerManager sharedInstance] connect];
@@ -307,7 +307,7 @@
         addObserverForName:BRWalletBalanceChangedNotification
                     object:nil
                      queue:nil
-                usingBlock:^(NSNotification* note) {
+                usingBlock:^(NSNotification *note) {
                     if (_balance != UINT64_MAX
                         &&
                         [BRPeerManager sharedInstance].syncProgress<1.0 && [BRPeerManager sharedInstance].syncProgress>
@@ -329,7 +329,7 @@
     self.seedObserver = [[NSNotificationCenter defaultCenter] addObserverForName:BRWalletManagerSeedChangedNotification
                                                                           object:nil
                                                                            queue:nil
-                                                                      usingBlock:^(NSNotification* note) {
+                                                                      usingBlock:^(NSNotification *note) {
                                                                           [self.receiveViewController updateAddress];
                                                                           self.balance = manager.wallet.balance;
                                                                       }];
@@ -338,7 +338,7 @@
         addObserverForName:BRPeerManagerSyncStartedNotification
                     object:nil
                      queue:nil
-                usingBlock:^(NSNotification* note) {
+                usingBlock:^(NSNotification *note) {
                     if (self.reachability.currentReachabilityStatus == NotReachable)
                         return;
                     [self hideErrorBar];
@@ -358,7 +358,7 @@
         [[NSNotificationCenter defaultCenter] addObserverForName:BRPeerManagerSyncFinishedNotification
                                                           object:nil
                                                            queue:nil
-                                                      usingBlock:^(NSNotification* note) {
+                                                      usingBlock:^(NSNotification *note) {
                                                           if (self.timeout < 1.0)
                                                               [self stopActivityWithSuccess:YES];
                                                           [self showBackupDialogIfNeeded];
@@ -375,7 +375,7 @@
         [[NSNotificationCenter defaultCenter] addObserverForName:BRPeerManagerSyncFailedNotification
                                                           object:nil
                                                            queue:nil
-                                                      usingBlock:^(NSNotification* note) {
+                                                      usingBlock:^(NSNotification *note) {
                                                           if (self.timeout < 1.0)
                                                               [self stopActivityWithSuccess:YES];
                                                           [self showBackupDialogIfNeeded];
@@ -389,7 +389,7 @@
     self.navigationController.delegate = self;
 
 #if BITCOIN_TESTNET
-    UILabel* label = [UILabel new];
+    UILabel *label = [UILabel new];
 
     label.font = [UIFont fontWithName:@"HelveticaNeue-Light" size:13.0];
     label.textColor = [UIColor redColor];
@@ -462,7 +462,7 @@
             [[NSNotificationCenter defaultCenter] addObserverForName:UIApplicationProtectedDataDidBecomeAvailable
                                                               object:nil
                                                                queue:nil
-                                                          usingBlock:^(NSNotification* note) {
+                                                          usingBlock:^(NSNotification *note) {
                                                               [self protectedViewDidAppear:animated];
                                                           }];
     }
@@ -475,7 +475,7 @@
 
 - (void)protectedViewDidAppear:(BOOL)animated
 {
-    BRWalletManager* manager = [BRWalletManager sharedInstance];
+    BRWalletManager *manager = [BRWalletManager sharedInstance];
 
     if (self.protectedObserver)
         [[NSNotificationCenter defaultCenter] removeObserver:self.protectedObserver];
@@ -544,7 +544,7 @@
     [super viewWillDisappear:animated];
 }
 
-- (BOOL)shouldPerformSegueWithIdentifier:(NSString*)identifier sender:(id)sender
+- (BOOL)shouldPerformSegueWithIdentifier:(NSString *)identifier sender:(id)sender
 {
     if ([self nextTip])
         return NO;
@@ -552,7 +552,7 @@
     return YES;
 }
 
-- (void)prepareForSegue:(UIStoryboardSegue*)segue sender:(id)sender
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
 {
     [super prepareForSegue:segue sender:sender];
 
@@ -617,7 +617,7 @@
 
 - (void)setBalance:(uint64_t)balance
 {
-    BRWalletManager* manager = [BRWalletManager sharedInstance];
+    BRWalletManager *manager = [BRWalletManager sharedInstance];
 
     if (balance > _balance && [UIApplication sharedApplication].applicationState != UIApplicationStateBackground) {
         [self.view addSubview:[[[BRBubbleView
@@ -687,7 +687,7 @@
     }
 }
 
-- (void)setProgressTo:(NSNumber*)n { self.progress.progress = n.floatValue; }
+- (void)setProgressTo:(NSNumber *)n { self.progress.progress = n.floatValue; }
 
 - (void)updateProgress
 {
@@ -759,7 +759,7 @@
                      }
                      completion:nil];
 
-    BRWalletManager* manager = [BRWalletManager sharedInstance];
+    BRWalletManager *manager = [BRWalletManager sharedInstance];
 
     if (!self.percent.hidden)
         [self hideTips];
@@ -791,8 +791,8 @@
 
 - (void)showBackupDialogIfNeeded
 {
-    BRWalletManager* manager = [BRWalletManager sharedInstance];
-    NSUserDefaults* defs = [NSUserDefaults standardUserDefaults];
+    BRWalletManager *manager = [BRWalletManager sharedInstance];
+    NSUserDefaults *defs = [NSUserDefaults standardUserDefaults];
     NSTimeInterval now = [NSDate timeIntervalSinceReferenceDate];
 
     if (self.navigationController.visibleViewController != self || ![defs boolForKey:WALLET_NEEDS_BACKUP_KEY]
@@ -837,15 +837,15 @@
         return ret;
     }
 
-    BRBubbleView* tipView = self.tipView;
+    BRBubbleView *tipView = self.tipView;
 
     self.tipView = nil;
     [tipView popOut];
 
     if ([tipView.text hasPrefix:BALANCE_TIP]) {
-        BRWalletManager* manager = [BRWalletManager sharedInstance];
-        UINavigationBar* navBar = self.navigationController.navigationBar;
-        NSString* text =
+        BRWalletManager *manager = [BRWalletManager sharedInstance];
+        UINavigationBar *navBar = self.navigationController.navigationBar;
+        NSString *text =
             [NSString stringWithFormat:BITS_TIP, manager.format.currencySymbol, [manager stringForAmount:SATOSHIS]];
         CGRect r = [self.navigationItem.title boundingRectWithSize:navBar.bounds.size
                                                            options:0
@@ -873,10 +873,10 @@
 
 - (IBAction)tip:(id)sender
 {
-    BRWalletManager* manager = [BRWalletManager sharedInstance];
+    BRWalletManager *manager = [BRWalletManager sharedInstance];
 
     if (sender == self.receiveViewController) {
-        BRSendViewController* sendController = self.sendViewController;
+        BRSendViewController *sendController = self.sendViewController;
 
         [(id)self.pageViewController setViewControllers:@[ sendController ]
                                               direction:UIPageViewControllerNavigationDirectionReverse
@@ -906,8 +906,8 @@
         return;
     }
 
-    UINavigationBar* bar = self.navigationController.navigationBar;
-    NSString* tip = (self.percent.hidden) ? BALANCE_TIP
+    UINavigationBar *bar = self.navigationController.navigationBar;
+    NSString *tip = (self.percent.hidden) ? BALANCE_TIP
                                           : [NSString stringWithFormat:NSLocalizedString(@"block #%d of %d", nil),
                                                       [BRPeerManager sharedInstance].lastBlockHeight,
                                                       [BRPeerManager sharedInstance].estimatedBlockHeight];
@@ -925,7 +925,7 @@
 
 - (IBAction)unlock:(id)sender
 {
-    BRWalletManager* m = [BRWalletManager sharedInstance];
+    BRWalletManager *m = [BRWalletManager sharedInstance];
 
     if (sender && !m.didAuthenticate && ![m authenticateWithPrompt:nil andTouchId:YES])
         return;
@@ -960,7 +960,7 @@
 #if SNAPSHOT
 - (IBAction)nextScreen:(id)sender
 {
-    BRWalletManager* m = [BRWalletManager sharedInstance];
+    BRWalletManager *m = [BRWalletManager sharedInstance];
 
     if (self.navigationController.presentedViewController) {
         if (m.noWallet)
@@ -999,28 +999,28 @@
 
 #pragma mark - UIPageViewControllerDataSource
 
-- (UIViewController*)pageViewController:(UIPageViewController*)pageViewController
-     viewControllerBeforeViewController:(UIViewController*)viewController
+- (UIViewController *)pageViewController:(UIPageViewController *)pageViewController
+      viewControllerBeforeViewController:(UIViewController *)viewController
 {
     return (viewController == self.receiveViewController) ? self.sendViewController : nil;
 }
 
-- (UIViewController*)pageViewController:(UIPageViewController*)pageViewController
-      viewControllerAfterViewController:(UIViewController*)viewController
+- (UIViewController *)pageViewController:(UIPageViewController *)pageViewController
+       viewControllerAfterViewController:(UIViewController *)viewController
 {
     return (viewController == self.sendViewController) ? self.receiveViewController : nil;
 }
 
-- (NSInteger)presentationCountForPageViewController:(UIPageViewController*)pageViewController { return 2; }
+- (NSInteger)presentationCountForPageViewController:(UIPageViewController *)pageViewController { return 2; }
 
-- (NSInteger)presentationIndexForPageViewController:(UIPageViewController*)pageViewController
+- (NSInteger)presentationIndexForPageViewController:(UIPageViewController *)pageViewController
 {
     return (pageViewController.viewControllers.lastObject == self.receiveViewController) ? 1 : 0;
 }
 
 #pragma mark - UIScrollViewDelegate
 
-- (void)scrollViewDidScroll:(UIScrollView*)scrollView
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView
 {
     CGFloat off = scrollView.contentOffset.x + (scrollView.contentInset.left < 0 ? scrollView.contentInset.left : 0);
 
@@ -1030,7 +1030,7 @@
 
 #pragma mark - UIAlertViewDelegate
 
-- (void)alertView:(UIAlertView*)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
 {
     if (buttonIndex == alertView.cancelButtonIndex)
         return;
@@ -1052,7 +1052,7 @@
 
 #pragma mark - UIActionSheetDelegate
 
-- (void)actionSheet:(UIActionSheet*)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
+- (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
 {
     if (buttonIndex != actionSheet.destructiveButtonIndex)
         return;
@@ -1061,7 +1061,7 @@
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:WALLET_NEEDS_BACKUP_KEY];
     [[NSUserDefaults standardUserDefaults] synchronize];
 
-    UINavigationController* newWalletNavController =
+    UINavigationController *newWalletNavController =
         [self.storyboard instantiateViewControllerWithIdentifier:@"NewWalletNav"];
 
     [self.navigationController presentViewController:newWalletNavController animated:NO completion:nil];
@@ -1085,8 +1085,8 @@
 // This method can only be a nop if the transition is interactive and not a percentDriven interactive transition.
 - (void)animateTransition:(id<UIViewControllerContextTransitioning>)transitionContext
 {
-    BRWalletManager* manager = [BRWalletManager sharedInstance];
-    UIView* containerView = transitionContext.containerView;
+    BRWalletManager *manager = [BRWalletManager sharedInstance];
+    UIView *containerView = transitionContext.containerView;
     UIViewController *to = [transitionContext viewControllerForKey:UITransitionContextToViewControllerKey],
                      *from = [transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
 
@@ -1135,9 +1135,9 @@
         [containerView layoutIfNeeded];
         to.view.center = CGPointMake(to.view.center.x, containerView.frame.size.height * 3 / 2);
 
-        UINavigationItem* item = [(id)to topViewController].navigationItem;
-        UIView* titleView = item.titleView;
-        UIBarButtonItem* rightButton = item.rightBarButtonItem;
+        UINavigationItem *item = [(id)to topViewController].navigationItem;
+        UIView *titleView = item.titleView;
+        UIBarButtonItem *rightButton = item.rightBarButtonItem;
 
         item.title = nil;
         item.leftBarButtonItem.image = [UIImage imageNamed:@"none"];
@@ -1188,9 +1188,9 @@
         [self.navigationController.navigationBar.superview insertSubview:from.view
                                                             belowSubview:self.navigationController.navigationBar];
 
-        UINavigationItem* item = [(id)from topViewController].navigationItem;
-        UIView* titleView = item.titleView;
-        UIBarButtonItem* rightButton = item.rightBarButtonItem;
+        UINavigationItem *item = [(id)from topViewController].navigationItem;
+        UIView *titleView = item.titleView;
+        UIBarButtonItem *rightButton = item.rightBarButtonItem;
 
         item.title = nil;
         item.leftBarButtonItem.image = [UIImage imageNamed:@"none"];
@@ -1233,24 +1233,24 @@
 
 #pragma mark - UINavigationControllerDelegate
 
-- (id<UIViewControllerAnimatedTransitioning>)navigationController:(UINavigationController*)navigationController
+- (id<UIViewControllerAnimatedTransitioning>)navigationController:(UINavigationController *)navigationController
                                   animationControllerForOperation:(UINavigationControllerOperation)operation
-                                               fromViewController:(UIViewController*)fromVC
-                                                 toViewController:(UIViewController*)toVC
+                                               fromViewController:(UIViewController *)fromVC
+                                                 toViewController:(UIViewController *)toVC
 {
     return self;
 }
 
 #pragma mark - UIViewControllerTransitioningDelegate
 
-- (id<UIViewControllerAnimatedTransitioning>)animationControllerForPresentedController:(UIViewController*)presented
-                                                                  presentingController:(UIViewController*)presenting
-                                                                      sourceController:(UIViewController*)source
+- (id<UIViewControllerAnimatedTransitioning>)animationControllerForPresentedController:(UIViewController *)presented
+                                                                  presentingController:(UIViewController *)presenting
+                                                                      sourceController:(UIViewController *)source
 {
     return self;
 }
 
-- (id<UIViewControllerAnimatedTransitioning>)animationControllerForDismissedController:(UIViewController*)dismissed
+- (id<UIViewControllerAnimatedTransitioning>)animationControllerForDismissedController:(UIViewController *)dismissed
 {
     return self;
 }

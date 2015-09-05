@@ -31,7 +31,7 @@
 #define BLOOM_MAX_HASH_FUNCS 50
 
 // murmurHash3 (x86_32): http://code.google.com/p/smhasher/source/browse/trunk/MurmurHash3.cpp
-static uint32_t murmurHash3(const uint8_t* b, size_t len, uint32_t seed)
+static uint32_t murmurHash3(const uint8_t *b, size_t len, uint32_t seed)
 {
     static const uint32_t c1 = 0xcc9e2d51u, c2 = 0x1b873593u;
     uint32_t h1 = seed, k1 = 0, k2 = 0, blocks = ((uint32_t)len / 4) * 4;
@@ -64,21 +64,21 @@ static uint32_t murmurHash3(const uint8_t* b, size_t len, uint32_t seed)
 // bloom filters are explained in BIP37: https://github.com/bitcoin/bips/blob/master/bip-0037.mediawiki
 @interface BRBloomFilter ()
 
-@property (nonatomic, strong) NSMutableData* filter;
+@property (nonatomic, strong) NSMutableData *filter;
 @property (nonatomic, assign) uint32_t hashFuncs;
 
 @end
 
 @implementation BRBloomFilter
 
-+ (instancetype)filterWithMessage:(NSData*)message { return [[self alloc] initWithMessage:message]; }
++ (instancetype)filterWithMessage:(NSData *)message { return [[self alloc] initWithMessage:message]; }
 
 // a bloom filter that matches everything is useful if a full node wants to use the filtered block protocol, which
 // doesn't send transactions with blocks if the receiving node already received the tx prior to its inclusion in the
 // block, allowing a full node to operate while using about half the network traffic.
 + (instancetype)filterWithFullMatch { return [[self alloc] initWithFullMatch]; }
 
-- (instancetype)initWithMessage:(NSData*)message
+- (instancetype)initWithMessage:(NSData *)message
 {
     if (!(self = [self init]))
         return nil;
@@ -128,14 +128,14 @@ static uint32_t murmurHash3(const uint8_t* b, size_t len, uint32_t seed)
     return self;
 }
 
-- (uint32_t)hash:(NSData*)data hashNum:(uint32_t)hashNum
+- (uint32_t)hash:(NSData *)data hashNum:(uint32_t)hashNum
 {
     return murmurHash3(data.bytes, data.length, hashNum * 0xfba4c795u + self.tweak) % (self.filter.length * 8);
 }
 
-- (BOOL)containsData:(NSData*)data
+- (BOOL)containsData:(NSData *)data
 {
-    const uint8_t* b = self.filter.bytes;
+    const uint8_t *b = self.filter.bytes;
 
     for (uint32_t i = 0; i < self.hashFuncs; i++) {
         uint32_t idx = [self hash:data hashNum:i];
@@ -147,9 +147,9 @@ static uint32_t murmurHash3(const uint8_t* b, size_t len, uint32_t seed)
     return YES;
 }
 
-- (void)insertData:(NSData*)data
+- (void)insertData:(NSData *)data
 {
-    uint8_t* b = self.filter.mutableBytes;
+    uint8_t *b = self.filter.mutableBytes;
 
     for (uint32_t i = 0; i < self.hashFuncs; i++) {
         uint32_t idx = [self hash:data hashNum:i];
@@ -160,13 +160,13 @@ static uint32_t murmurHash3(const uint8_t* b, size_t len, uint32_t seed)
     _elementCount++;
 }
 
-- (void)updateWithTransaction:(BRTransaction*)tx
+- (void)updateWithTransaction:(BRTransaction *)tx
 {
-    NSMutableData* d = [NSMutableData data];
+    NSMutableData *d = [NSMutableData data];
     int n = 0;
 
-    for (NSData* script in tx.outputScripts) {
-        for (NSData* elem in [script scriptElements]) {
+    for (NSData *script in tx.outputScripts) {
+        for (NSData *elem in [script scriptElements]) {
             if ([elem intValue] > OP_PUSHDATA4 || [elem intValue] == 0 || ![self containsData:elem])
                 continue;
             d.length = 0;
@@ -186,9 +186,9 @@ static uint32_t murmurHash3(const uint8_t* b, size_t len, uint32_t seed)
     return pow(1 - pow(M_E, -1.0 * self.hashFuncs * self.elementCount / (self.filter.length * 8.0)), self.hashFuncs);
 }
 
-- (NSData*)toData
+- (NSData *)toData
 {
-    NSMutableData* d = [NSMutableData data];
+    NSMutableData *d = [NSMutableData data];
 
     [d appendVarInt:self.length];
     [d appendData:self.filter];

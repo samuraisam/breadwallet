@@ -32,8 +32,8 @@
 
 @interface BRBubbleView ()
 
-@property (nonatomic, strong) UILabel* label;
-@property (nonatomic, strong) CAShapeLayer* arrow;
+@property (nonatomic, strong) UILabel *label;
+@property (nonatomic, strong) CAShapeLayer *arrow;
 
 @end
 
@@ -51,18 +51,18 @@
         return NO;
 }
 
-+ (instancetype)viewWithText:(NSString*)text center:(CGPoint)center
++ (instancetype)viewWithText:(NSString *)text center:(CGPoint)center
 {
-    BRBubbleView* v =
+    BRBubbleView *v =
         [[self alloc] initWithFrame:CGRectMake(center.x - MARGIN_X, center.y - MARGIN_Y, MARGIN_X * 2, MARGIN_Y * 2)];
 
     v.text = text;
     return v;
 }
 
-+ (instancetype)viewWithText:(NSString*)text tipPoint:(CGPoint)point tipDirection:(BRBubbleTipDirection)direction
++ (instancetype)viewWithText:(NSString *)text tipPoint:(CGPoint)point tipDirection:(BRBubbleTipDirection)direction
 {
-    BRBubbleView* v = [[self alloc] initWithFrame:CGRectMake(0, 0, MARGIN_X * 2, MARGIN_Y * 2)];
+    BRBubbleView *v = [[self alloc] initWithFrame:CGRectMake(0, 0, MARGIN_X * 2, MARGIN_Y * 2)];
 
     v.text = text;
     v.tipDirection = direction;
@@ -93,21 +93,21 @@
 
 - (void)dealloc { [NSObject cancelPreviousPerformRequestsWithTarget:self]; }
 
-- (void)setText:(NSString*)text
+- (void)setText:(NSString *)text
 {
     self.label.text = text;
     [self setNeedsLayout];
 }
 
-- (NSString*)text { return self.label.text; }
+- (NSString *)text { return self.label.text; }
 
-- (void)setFont:(UIFont*)font
+- (void)setFont:(UIFont *)font
 {
     self.label.font = font;
     [self setNeedsLayout];
 }
 
-- (UIFont*)font { return self.label.font; }
+- (UIFont *)font { return self.label.font; }
 
 - (void)setTipPoint:(CGPoint)tipPoint
 {
@@ -121,7 +121,7 @@
     [self setNeedsLayout];
 }
 
-- (void)setCustomView:(UIView*)customView
+- (void)setCustomView:(UIView *)customView
 {
     if (_customView)
         [_customView removeFromSuperview];

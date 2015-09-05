@@ -32,11 +32,11 @@
 @interface BRSettingsViewController ()
 
 @property (nonatomic, assign) BOOL touchId;
-@property (nonatomic, strong) UITableViewController* selectorController;
-@property (nonatomic, strong) NSArray* selectorOptions;
+@property (nonatomic, strong) UITableViewController *selectorController;
+@property (nonatomic, strong) NSArray *selectorOptions;
 @property (nonatomic, strong) NSString *selectedOption, *noOptionsText;
 @property (nonatomic, assign) NSUInteger selectorType;
-@property (nonatomic, strong) UISwipeGestureRecognizer* navBarSwipe;
+@property (nonatomic, strong) UISwipeGestureRecognizer *navBarSwipe;
 @property (nonatomic, strong) id balanceObserver;
 
 @end
@@ -54,7 +54,7 @@
 {
     [super viewWillAppear:animated];
 
-    BRWalletManager* manager = [BRWalletManager sharedInstance];
+    BRWalletManager *manager = [BRWalletManager sharedInstance];
 
     if (self.navBarSwipe)
         [self.navigationController.navigationBar removeGestureRecognizer:self.navBarSwipe];
@@ -66,7 +66,7 @@
             addObserverForName:BRWalletBalanceChangedNotification
                         object:nil
                          queue:nil
-                    usingBlock:^(NSNotification* note) {
+                    usingBlock:^(NSNotification *note) {
                         if (self.selectorType == 0) {
                             self.selectorController.title =
                                 [NSString stringWithFormat:@"%@ = %@",
@@ -94,7 +94,7 @@
         [[NSNotificationCenter defaultCenter] removeObserver:self.balanceObserver];
 }
 
-- (UITableViewController*)selectorController
+- (UITableViewController *)selectorController
 {
     if (_selectorController)
         return _selectorController;
@@ -106,7 +106,7 @@
     return _selectorController;
 }
 
-- (void)setBackgroundForCell:(UITableViewCell*)cell tableView:(UITableView*)tableView indexPath:(NSIndexPath*)path
+- (void)setBackgroundForCell:(UITableViewCell *)cell tableView:(UITableView *)tableView indexPath:(NSIndexPath *)path
 {
     [cell viewWithTag:100].hidden = (path.row > 0);
     [cell viewWithTag:101].hidden = (path.row + 1 < [self tableView:tableView numberOfRowsInSection:path.section]);
@@ -124,7 +124,7 @@
 {
     aslmsg q = asl_new(ASL_TYPE_QUERY), m;
     aslresponse r = asl_search(NULL, q);
-    NSMutableString* s = [NSMutableString string];
+    NSMutableString *s = [NSMutableString string];
     time_t t;
     struct tm tm;
 
@@ -147,7 +147,7 @@
 
 - (IBAction)touchIdLimit:(id)sender
 {
-    BRWalletManager* manager = [BRWalletManager sharedInstance];
+    BRWalletManager *manager = [BRWalletManager sharedInstance];
 
     if ([manager authenticateWithPrompt:nil andTouchId:NO]) {
         self.selectorType = 1;
@@ -176,7 +176,7 @@
 
 - (IBAction)navBarSwipe:(id)sender
 {
-    BRWalletManager* manager = [BRWalletManager sharedInstance];
+    BRWalletManager *manager = [BRWalletManager sharedInstance];
     NSUInteger digits = (((manager.format.maximumFractionDigits - 2) / 3 + 1) % 3) * 3 + 2;
 
     manager.format.currencySymbol =
@@ -193,14 +193,14 @@
 
 #pragma mark - UITableViewDataSource
 
-- (NSInteger)numberOfSectionsInTableView:(UITableView*)tableView
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
     if (tableView == self.selectorController.tableView)
         return 1;
     return 3;
 }
 
-- (NSInteger)tableView:(UITableView*)tableView numberOfRowsInSection:(NSInteger)section
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
     if (tableView == self.selectorController.tableView)
         return self.selectorOptions.count;
@@ -217,12 +217,12 @@
     return 0;
 }
 
-- (UITableViewCell*)tableView:(UITableView*)tableView cellForRowAtIndexPath:(NSIndexPath*)indexPath
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     static NSString *disclosureIdent = @"DisclosureCell", *restoreIdent = @"RestoreCell", *actionIdent = @"ActionCell",
                     *selectorIdent = @"SelectorCell", *selectorOptionCell = @"SelectorOptionCell";
-    UITableViewCell* cell = nil;
-    BRWalletManager* manager = [BRWalletManager sharedInstance];
+    UITableViewCell *cell = nil;
+    BRWalletManager *manager = [BRWalletManager sharedInstance];
 
     if (tableView == self.selectorController.tableView) {
         cell = [self.tableView dequeueReusableCellWithIdentifier:selectorOptionCell];
@@ -290,7 +290,7 @@
     return cell;
 }
 
-- (NSString*)tableView:(UITableView*)tableView titleForHeaderInSection:(NSInteger)section
+- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
 {
     if (tableView == self.selectorController.tableView && self.selectorOptions.count == 0)
         return self.noOptionsText;
@@ -299,9 +299,9 @@
 
 #pragma mark - UITableViewDelegate
 
-- (CGFloat)tableView:(UITableView*)tableView heightForHeaderInSection:(NSInteger)section
+- (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
 {
-    NSString* sectionTitle = [self tableView:tableView titleForHeaderInSection:section];
+    NSString *sectionTitle = [self tableView:tableView titleForHeaderInSection:section];
 
     if (sectionTitle.length == 0)
         return 22.0;
@@ -315,12 +315,12 @@
     return textRect.size.height + 22.0 + 10.0;
 }
 
-- (UIView*)tableView:(UITableView*)tableView viewForHeaderInSection:(NSInteger)section
+- (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
 {
-    UIView* sectionHeader =
+    UIView *sectionHeader =
         [[UIView alloc] initWithFrame:CGRectMake(0.0, 0.0, self.view.frame.size.width,
                                           [self tableView:tableView heightForHeaderInSection:section])];
-    UILabel* titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(15.0, 0.0, sectionHeader.frame.size.width - 20.0,
+    UILabel *titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(15.0, 0.0, sectionHeader.frame.size.width - 20.0,
                                                              sectionHeader.frame.size.height - 22.0)];
 
     titleLabel.text = [self tableView:tableView titleForHeaderInSection:section];
@@ -336,14 +336,14 @@
     return sectionHeader;
 }
 
-- (CGFloat)tableView:(UITableView*)tableView heightForFooterInSection:(NSInteger)section
+- (CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section
 {
     return (section + 1 == [self numberOfSectionsInTableView:tableView]) ? 22.0 : 0.0;
 }
 
-- (UIView*)tableView:(UITableView*)tableView viewForFooterInSection:(NSInteger)section
+- (UIView *)tableView:(UITableView *)tableView viewForFooterInSection:(NSInteger)section
 {
-    UIView* sectionFooter =
+    UIView *sectionFooter =
         [[UIView alloc] initWithFrame:CGRectMake(0.0, 0.0, self.view.frame.size.width,
                                           [self tableView:tableView heightForFooterInSection:section])];
     sectionFooter.backgroundColor = [UIColor clearColor];
@@ -353,9 +353,9 @@
 - (void)showAbout
 {
     // TODO: XXXX add a link to support
-    UIViewController* c;
-    UILabel* l;
-    NSMutableAttributedString* s;
+    UIViewController *c;
+    UILabel *l;
+    NSMutableAttributedString *s;
     c = [self.storyboard instantiateViewControllerWithIdentifier:@"AboutViewController"];
     l = (id)[c.view viewWithTag:411];
     s = [[NSMutableAttributedString alloc] initWithAttributedString:l.attributedText];
@@ -369,7 +369,7 @@
     [l.superview.gestureRecognizers.firstObject addTarget:self action:@selector(about:)];
 #if DEBUG
     {
-        UIButton* b = nil;
+        UIButton *b = nil;
 
         b = (id)[c.view viewWithTag:413];
         [b addTarget:self action:@selector(copyLogs:) forControlEvents:UIControlEventTouchUpInside];
@@ -403,13 +403,13 @@
 - (void)showCurrencySelector
 {
     NSUInteger currencyCodeIndex = 0;
-    BRWalletManager* manager = [BRWalletManager sharedInstance];
+    BRWalletManager *manager = [BRWalletManager sharedInstance];
     double localPrice = manager.localCurrencyPrice;
-    NSMutableArray* options;
+    NSMutableArray *options;
     self.selectorType = 0;
     options = [NSMutableArray array];
 
-    for (NSString* code in manager.currencyCodes) {
+    for (NSString *code in manager.currencyCodes) {
         [options addObject:[NSString stringWithFormat:@"%@ - %@", code, manager.currencyNames[currencyCodeIndex++]]];
     }
 
@@ -442,10 +442,10 @@
     }
 }
 
-- (void)tableView:(UITableView*)tableView didSelectRowAtIndexPath:(NSIndexPath*)indexPath
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     // TODO: include an option to generate a new wallet and sweep old balance if backup may have been compromized
-    BRWalletManager* manager = [BRWalletManager sharedInstance];
+    BRWalletManager *manager = [BRWalletManager sharedInstance];
     NSUInteger currencyCodeIndex = 0;
 
     // if we are showing the local currency selector
@@ -520,14 +520,14 @@
 
 #pragma mark - UIAlertViewDelegate
 
-- (void)alertView:(UIAlertView*)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
 {
     if (buttonIndex == alertView.cancelButtonIndex) {
         [self.tableView deselectRowAtIndexPath:self.tableView.indexPathForSelectedRow animated:YES];
         return;
     }
 
-    BRSeedViewController* seedController =
+    BRSeedViewController *seedController =
         [self.storyboard instantiateViewControllerWithIdentifier:@"SeedViewController"];
 
     if (seedController.authSuccess) {

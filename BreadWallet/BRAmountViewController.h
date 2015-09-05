@@ -30,13 +30,13 @@
 @protocol BRAmountViewControllerDelegate <NSObject>
 @required
 
-- (void)amountViewController:(BRAmountViewController*)amountViewController selectedAmount:(uint64_t)amount;
+- (void)amountViewController:(BRAmountViewController *)amountViewController selectedAmount:(uint64_t)amount;
 
 @end
 
 @interface BRAmountViewController : UIViewController <UITextFieldDelegate, UIAlertViewDelegate>
 
 @property (nonatomic, assign) id<BRAmountViewControllerDelegate> delegate;
-@property (nonatomic, strong) NSString* to;
+@property (nonatomic, strong) NSString *to;
 
 @end

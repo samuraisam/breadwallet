@@ -41,16 +41,16 @@
 
 @interface NSString (Bitcoin)
 
-+ (NSString*)base58WithData:(NSData*)d;
-+ (NSString*)base58checkWithData:(NSData*)d;
-+ (NSString*)hexWithData:(NSData*)d;
-+ (NSString*)addressWithScriptPubKey:(NSData*)script;
-+ (NSString*)addressWithScriptSig:(NSData*)script;
++ (NSString *)base58WithData:(NSData *)d;
++ (NSString *)base58checkWithData:(NSData *)d;
++ (NSString *)hexWithData:(NSData *)d;
++ (NSString *)addressWithScriptPubKey:(NSData *)script;
++ (NSString *)addressWithScriptSig:(NSData *)script;
 
-- (NSData*)base58ToData;
-- (NSData*)base58checkToData;
-- (NSData*)hexToData;
-- (NSData*)addressToHash160;
+- (NSData *)base58ToData;
+- (NSData *)base58checkToData;
+- (NSData *)hexToData;
+- (NSData *)addressToHash160;
 
 - (BOOL)isValidBitcoinAddress;
 - (BOOL)isValidBitcoinPrivateKey;

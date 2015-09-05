@@ -29,14 +29,14 @@ typedef enum : NSInteger { BRBubbleTipDirectionDown = 0, BRBubbleTipDirectionUp 
 
 @interface BRBubbleView : UIView
 
-@property (nonatomic, strong) NSString* text;
-@property (nonatomic, strong) UIFont* font;
+@property (nonatomic, strong) NSString *text;
+@property (nonatomic, strong) UIFont *font;
 @property (nonatomic, assign) CGPoint tipPoint;
 @property (nonatomic, assign) BRBubbleTipDirection tipDirection;
-@property (nonatomic, strong) UIView* customView;
+@property (nonatomic, strong) UIView *customView;
 
-+ (instancetype)viewWithText:(NSString*)text center:(CGPoint)center;
-+ (instancetype)viewWithText:(NSString*)text tipPoint:(CGPoint)point tipDirection:(BRBubbleTipDirection)direction;
++ (instancetype)viewWithText:(NSString *)text center:(CGPoint)center;
++ (instancetype)viewWithText:(NSString *)text tipPoint:(CGPoint)point tipDirection:(BRBubbleTipDirection)direction;
 
 - (instancetype)popIn;
 - (instancetype)popOut;

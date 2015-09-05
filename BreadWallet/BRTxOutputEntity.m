@@ -39,7 +39,7 @@
 @dynamic spent;
 @dynamic transaction;
 
-- (instancetype)setAttributesFromTx:(BRTransaction*)tx outputIndex:(NSUInteger)index
+- (instancetype)setAttributesFromTx:(BRTransaction *)tx outputIndex:(NSUInteger)index
 {
     [self.managedObjectContext performBlockAndWait:^{
         UInt256 txHash = tx.txHash;

@@ -36,9 +36,9 @@
 
 #define TRANSACTION_CELL_HEIGHT 75
 
-static NSString* dateFormat(NSString* template)
+static NSString *dateFormat(NSString *template)
 {
-    NSString* format = [NSDateFormatter dateFormatFromTemplate:template options:0 locale:[NSLocale currentLocale]];
+    NSString *format = [NSDateFormatter dateFormatFromTemplate:template options:0 locale:[NSLocale currentLocale]];
 
     format = [format stringByReplacingOccurrencesOfString:@", " withString:@" "];
     format = [format stringByReplacingOccurrencesOfString:@" a" withString:@"a"];
@@ -56,15 +56,15 @@ static NSString* dateFormat(NSString* template)
 
 @interface BRTxHistoryViewController ()
 
-@property (nonatomic, strong) IBOutlet UIView* logo;
-@property (nonatomic, strong) IBOutlet UIBarButtonItem* lock;
+@property (nonatomic, strong) IBOutlet UIView *logo;
+@property (nonatomic, strong) IBOutlet UIBarButtonItem *lock;
 
-@property (nonatomic, strong) NSArray* transactions;
+@property (nonatomic, strong) NSArray *transactions;
 @property (nonatomic, assign) BOOL moreTx;
-@property (nonatomic, strong) NSMutableDictionary* txDates;
+@property (nonatomic, strong) NSMutableDictionary *txDates;
 @property (nonatomic, strong) id backgroundObserver, balanceObserver, txStatusObserver;
 @property (nonatomic, strong) id syncStartedObserver, syncFinishedObserver, syncFailedObserver;
-@property (nonatomic, strong) UIImageView* wallpaper;
+@property (nonatomic, strong) UIImageView *wallpaper;
 
 @end
 
@@ -89,14 +89,14 @@ static NSString* dateFormat(NSString* template)
     [super viewWillAppear:animated];
     [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDefault animated:YES];
 
-    BRWalletManager* manager = [BRWalletManager sharedInstance];
+    BRWalletManager *manager = [BRWalletManager sharedInstance];
 
     if (manager.didAuthenticate)
         [self unlock:nil];
     self.transactions = manager.wallet.recentTransactions;
 
 #if SNAPSHOT
-    BRTransaction* tx = [[BRTransaction alloc] initWithInputHashes:@[ uint256_obj(UINT256_ZERO) ]
+    BRTransaction *tx = [[BRTransaction alloc] initWithInputHashes:@[ uint256_obj(UINT256_ZERO) ]
                                                       inputIndexes:@[ @(0) ]
                                                       inputScripts:@[ [NSData data] ]
                                                    outputAddresses:@[ @"" ]
@@ -123,7 +123,7 @@ static NSString* dateFormat(NSString* template)
             [[NSNotificationCenter defaultCenter] addObserverForName:UIApplicationDidEnterBackgroundNotification
                                                               object:nil
                                                                queue:nil
-                                                          usingBlock:^(NSNotification* note) {
+                                                          usingBlock:^(NSNotification *note) {
                                                               self.moreTx = YES;
                                                               self.transactions = manager.wallet.recentTransactions;
                                                               [self.tableView reloadData];
@@ -137,8 +137,8 @@ static NSString* dateFormat(NSString* template)
             addObserverForName:BRWalletBalanceChangedNotification
                         object:nil
                          queue:nil
-                    usingBlock:^(NSNotification* note) {
-                        BRTransaction* tx = self.transactions.firstObject;
+                    usingBlock:^(NSNotification *note) {
+                        BRTransaction *tx = self.transactions.firstObject;
 
                         self.transactions = manager.wallet.recentTransactions;
 
@@ -164,7 +164,7 @@ static NSString* dateFormat(NSString* template)
             [[NSNotificationCenter defaultCenter] addObserverForName:BRPeerManagerTxStatusNotification
                                                               object:nil
                                                                queue:nil
-                                                          usingBlock:^(NSNotification* note) {
+                                                          usingBlock:^(NSNotification *note) {
                                                               [self.tableView reloadData];
                                                           }];
     }
@@ -174,7 +174,7 @@ static NSString* dateFormat(NSString* template)
             addObserverForName:BRPeerManagerSyncStartedNotification
                         object:nil
                          queue:nil
-                    usingBlock:^(NSNotification* note) {
+                    usingBlock:^(NSNotification *note) {
                         if ([[BRPeerManager sharedInstance]
                                 timestampForBlockHeight:[BRPeerManager sharedInstance].lastBlockHeight]
                                     + 60 * 60 * 24 * 7
@@ -191,7 +191,7 @@ static NSString* dateFormat(NSString* template)
             addObserverForName:BRPeerManagerSyncFinishedNotification
                         object:nil
                          queue:nil
-                    usingBlock:^(NSNotification* note) {
+                    usingBlock:^(NSNotification *note) {
                         if (!manager.didAuthenticate)
                             self.navigationItem.titleView = self.logo;
                         self.navigationItem.title =
@@ -205,7 +205,7 @@ static NSString* dateFormat(NSString* template)
             addObserverForName:BRPeerManagerSyncFailedNotification
                         object:nil
                          queue:nil
-                    usingBlock:^(NSNotification* note) {
+                    usingBlock:^(NSNotification *note) {
                         if (!manager.didAuthenticate)
                             self.navigationItem.titleView = self.logo;
                         self.navigationItem.title =
@@ -279,7 +279,7 @@ static NSString* dateFormat(NSString* template)
     return height;
 }
 
-- (void)setTransactions:(NSArray*)transactions
+- (void)setTransactions:(NSArray *)transactions
 {
     uint32_t height = self.blockHeight;
 
@@ -295,7 +295,7 @@ static NSString* dateFormat(NSString* template)
             self.moreTx = YES;
     }
     else {
-        for (BRTransaction* tx in _transactions) {
+        for (BRTransaction *tx in _transactions) {
             if (tx.blockHeight == TX_UNCONFIRMED || (tx.blockHeight > height - 5 && tx.blockHeight <= height))
                 continue;
             _transactions = [transactions subarrayWithRange:NSMakeRange(0, [transactions indexOfObject:tx])];
@@ -305,18 +305,18 @@ static NSString* dateFormat(NSString* template)
     }
 }
 
-- (void)setBackgroundForCell:(UITableViewCell*)cell tableView:(UITableView*)tableView indexPath:(NSIndexPath*)path
+- (void)setBackgroundForCell:(UITableViewCell *)cell tableView:(UITableView *)tableView indexPath:(NSIndexPath *)path
 {
     [cell viewWithTag:100].hidden = (path.row > 0);
     [cell viewWithTag:101].hidden = (path.row + 1 < [self tableView:tableView numberOfRowsInSection:path.section]);
 }
 
-- (NSString*)dateForTx:(BRTransaction*)tx
+- (NSString *)dateForTx:(BRTransaction *)tx
 {
-    static NSDateFormatter* f1 = nil;
-    static NSDateFormatter* f2 = nil;
-    static NSDateFormatter* monthDayFormatter = nil;
-    static NSDateFormatter* yearMonthDayFormatter = nil;
+    static NSDateFormatter *f1 = nil;
+    static NSDateFormatter *f2 = nil;
+    static NSDateFormatter *monthDayFormatter = nil;
+    static NSDateFormatter *yearMonthDayFormatter = nil;
 
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{ // BUG: need to watch for NSCurrentLocaleDidChangeNotification
@@ -330,7 +330,7 @@ static NSString* dateFormat(NSString* template)
         yearMonthDayFormatter.dateFormat = dateFormat(@"yyMd");
     });
 
-    NSString* date = self.txDates[uint256_obj(tx.txHash)];
+    NSString *date = self.txDates[uint256_obj(tx.txHash)];
     NSTimeInterval now = [[BRPeerManager sharedInstance] timestampForBlockHeight:TX_UNCONFIRMED];
     NSTimeInterval week = now - 6 * 24 * 60 * 60;
     NSTimeInterval year = now - 364 * 24 * 60 * 60;
@@ -342,7 +342,7 @@ static NSString* dateFormat(NSString* template)
     NSTimeInterval t = (tx.timestamp > 1)
         ? tx.timestamp
         : [[BRPeerManager sharedInstance] timestampForBlockHeight:tx.blockHeight] - 5 * 60;
-    NSDateFormatter* desiredFormatter = (t > year) ? f1 : f2;
+    NSDateFormatter *desiredFormatter = (t > year) ? f1 : f2;
 
     if (tx.timestamp <= 1 && t <= week) {
         desiredFormatter = (t > year) ? monthDayFormatter : yearMonthDayFormatter;
@@ -366,7 +366,7 @@ static NSString* dateFormat(NSString* template)
 
 - (IBAction)unlock:(id)sender
 {
-    BRWalletManager* manager = [BRWalletManager sharedInstance];
+    BRWalletManager *manager = [BRWalletManager sharedInstance];
 
     if (!manager.didAuthenticate && ![manager authenticateWithPrompt:nil andTouchId:YES])
         return;
@@ -387,13 +387,13 @@ static NSString* dateFormat(NSString* template)
 - (IBAction)scanQR:(id)sender
 {
     // TODO: show scanner in settings rather than dismissing
-    UINavigationController* nav = (id)self.navigationController.presentingViewController;
+    UINavigationController *nav = (id)self.navigationController.presentingViewController;
 
     nav.view.alpha = 0.0;
 
     [nav dismissViewControllerAnimated:NO
                             completion:^{
-                                [(id)((BRRootViewController*)nav.viewControllers.firstObject)
+                                [(id)((BRRootViewController *)nav.viewControllers.firstObject)
                                         .sendViewController scanQR:nil];
                                 [UIView animateWithDuration:0.1
                                                       delay:1.5
@@ -407,7 +407,7 @@ static NSString* dateFormat(NSString* template)
 
 - (IBAction)showTx:(id)sender
 {
-    BRTxDetailViewController* detailController =
+    BRTxDetailViewController *detailController =
         [self.storyboard instantiateViewControllerWithIdentifier:@"TxDetailViewController"];
     detailController.transaction = sender;
     detailController.txDateString = [self dateForTx:sender];
@@ -416,7 +416,7 @@ static NSString* dateFormat(NSString* template)
 
 - (IBAction)more:(id)sender
 {
-    BRWalletManager* manager = [BRWalletManager sharedInstance];
+    BRWalletManager *manager = [BRWalletManager sharedInstance];
     NSUInteger txCount = self.transactions.count;
 
     [self unlock:nil];
@@ -429,7 +429,7 @@ static NSString* dateFormat(NSString* template)
     self.moreTx = NO;
     self.transactions = manager.wallet.recentTransactions;
 
-    NSMutableArray* transactions = [NSMutableArray arrayWithCapacity:self.transactions.count];
+    NSMutableArray *transactions = [NSMutableArray arrayWithCapacity:self.transactions.count];
 
     while (txCount < self.transactions.count) {
         [transactions addObject:[NSIndexPath indexPathForRow:txCount++ inSection:0]];
@@ -441,9 +441,9 @@ static NSString* dateFormat(NSString* template)
 
 #pragma mark - UITableViewDataSource
 
-- (NSInteger)numberOfSectionsInTableView:(UITableView*)tableView { return 3; }
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView { return 3; }
 
-- (NSInteger)tableView:(UITableView*)tableView numberOfRowsInSection:(NSInteger)section
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
     switch (section) {
     case 0:
@@ -461,14 +461,14 @@ static NSString* dateFormat(NSString* template)
     return 0;
 }
 
-- (UITableViewCell*)tableView:(UITableView*)tableView cellForRowAtIndexPath:(NSIndexPath*)indexPath
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     static NSString *noTxIdent = @"NoTxCell", *transactionIdent = @"TransactionCell", *actionIdent = @"ActionCell",
                     *disclosureIdent = @"DisclosureCell";
-    UITableViewCell* cell = nil;
+    UITableViewCell *cell = nil;
     UILabel *textLabel, *unconfirmedLabel, *sentLabel, *localCurrencyLabel, *balanceLabel, *localBalanceLabel,
         *detailTextLabel;
-    BRWalletManager* manager = [BRWalletManager sharedInstance];
+    BRWalletManager *manager = [BRWalletManager sharedInstance];
 
     switch (indexPath.section) {
     case 0:
@@ -488,7 +488,7 @@ static NSString* dateFormat(NSString* template)
             balanceLabel = (id)[cell viewWithTag:7];
             localBalanceLabel = (id)[cell viewWithTag:8];
 
-            BRTransaction* tx = self.transactions[indexPath.row];
+            BRTransaction *tx = self.transactions[indexPath.row];
             uint64_t received = [manager.wallet amountReceivedFromTransaction:tx],
                      sent = [manager.wallet amountSentByTransaction:tx],
                      balance = [manager.wallet balanceAfterTransaction:tx];
@@ -609,7 +609,7 @@ static NSString* dateFormat(NSString* template)
     return cell;
 }
 
-- (NSString*)tableView:(UITableView*)tableView titleForHeaderInSection:(NSInteger)section
+- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
 {
     switch (section) {
     case 0:
@@ -629,7 +629,7 @@ static NSString* dateFormat(NSString* template)
 
 #pragma mark - UITableViewDelegate
 
-- (CGFloat)tableView:(UITableView*)tableView heightForRowAtIndexPath:(NSIndexPath*)indexPath
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     switch (indexPath.section) {
     case 0:
@@ -643,9 +643,9 @@ static NSString* dateFormat(NSString* template)
     return 44.0;
 }
 
-- (CGFloat)tableView:(UITableView*)tableView heightForHeaderInSection:(NSInteger)section
+- (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
 {
-    NSString* sectionTitle = [self tableView:tableView titleForHeaderInSection:section];
+    NSString *sectionTitle = [self tableView:tableView titleForHeaderInSection:section];
 
     if (sectionTitle.length == 0)
         return 22.0;
@@ -659,11 +659,11 @@ static NSString* dateFormat(NSString* template)
     return r.size.height + 22.0 + 10.0;
 }
 
-- (UIView*)tableView:(UITableView*)tableView viewForHeaderInSection:(NSInteger)section
+- (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
 {
-    UIView* v = [[UIView alloc] initWithFrame:CGRectMake(0.0, 0.0, self.view.frame.size.width,
+    UIView *v = [[UIView alloc] initWithFrame:CGRectMake(0.0, 0.0, self.view.frame.size.width,
                                                   [self tableView:tableView heightForHeaderInSection:section])];
-    UILabel* l =
+    UILabel *l =
         [[UILabel alloc] initWithFrame:CGRectMake(15.0, 0.0, v.frame.size.width - 20.0, v.frame.size.height - 22.0)];
 
     l.text = [self tableView:tableView titleForHeaderInSection:section];
@@ -679,23 +679,23 @@ static NSString* dateFormat(NSString* template)
     return v;
 }
 
-- (CGFloat)tableView:(UITableView*)tableView heightForFooterInSection:(NSInteger)section
+- (CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section
 {
     return (section + 1 == [self numberOfSectionsInTableView:tableView]) ? 22.0 : 0.0;
 }
 
-- (UIView*)tableView:(UITableView*)tableView viewForFooterInSection:(NSInteger)section
+- (UIView *)tableView:(UITableView *)tableView viewForFooterInSection:(NSInteger)section
 {
-    UIView* v = [[UIView alloc] initWithFrame:CGRectMake(0.0, 0.0, self.view.frame.size.width,
+    UIView *v = [[UIView alloc] initWithFrame:CGRectMake(0.0, 0.0, self.view.frame.size.width,
                                                   [self tableView:tableView heightForFooterInSection:section])];
     v.backgroundColor = [UIColor clearColor];
     return v;
 }
 
-- (void)tableView:(UITableView*)tableView didSelectRowAtIndexPath:(NSIndexPath*)indexPath
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     // TODO: include an option to generate a new wallet and sweep old balance if backup may have been compromized
-    UIViewController* destinationController = nil;
+    UIViewController *destinationController = nil;
 
     switch (indexPath.section) {
     case 0: // transaction
@@ -731,14 +731,14 @@ static NSString* dateFormat(NSString* template)
 
 #pragma mark - UIAlertViewDelegate
 
-- (void)alertView:(UIAlertView*)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
 {
     if (buttonIndex == alertView.cancelButtonIndex) {
         [self.tableView deselectRowAtIndexPath:self.tableView.indexPathForSelectedRow animated:YES];
         return;
     }
 
-    BRSeedViewController* c = [self.storyboard instantiateViewControllerWithIdentifier:@"SeedViewController"];
+    BRSeedViewController *c = [self.storyboard instantiateViewControllerWithIdentifier:@"SeedViewController"];
 
     if (c.authSuccess) {
         [self.navigationController pushViewController:c animated:YES];
@@ -756,7 +756,7 @@ static NSString* dateFormat(NSString* template)
 // This method can only be a nop if the transition is interactive and not a percentDriven interactive transition.
 - (void)animateTransition:(id<UIViewControllerContextTransitioning>)transitionContext
 {
-    UIView* containerView = transitionContext.containerView;
+    UIView *containerView = transitionContext.containerView;
     UIViewController *to = [transitionContext viewControllerForKey:UITransitionContextToViewControllerKey],
                      *from = [transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
     BOOL pop = (to == self || (from != self && [to isKindOfClass:[BRSettingsViewController class]])) ? YES : NO;
@@ -788,24 +788,24 @@ static NSString* dateFormat(NSString* template)
 
 #pragma mark - UINavigationControllerDelegate
 
-- (id<UIViewControllerAnimatedTransitioning>)navigationController:(UINavigationController*)navigationController
+- (id<UIViewControllerAnimatedTransitioning>)navigationController:(UINavigationController *)navigationController
                                   animationControllerForOperation:(UINavigationControllerOperation)operation
-                                               fromViewController:(UIViewController*)fromVC
-                                                 toViewController:(UIViewController*)toVC
+                                               fromViewController:(UIViewController *)fromVC
+                                                 toViewController:(UIViewController *)toVC
 {
     return self;
 }
 
 #pragma mark - UIViewControllerTransitioningDelegate
 
-- (id<UIViewControllerAnimatedTransitioning>)animationControllerForPresentedController:(UIViewController*)presented
-                                                                  presentingController:(UIViewController*)presenting
-                                                                      sourceController:(UIViewController*)source
+- (id<UIViewControllerAnimatedTransitioning>)animationControllerForPresentedController:(UIViewController *)presented
+                                                                  presentingController:(UIViewController *)presenting
+                                                                      sourceController:(UIViewController *)source
 {
     return self;
 }
 
-- (id<UIViewControllerAnimatedTransitioning>)animationControllerForDismissedController:(UIViewController*)dismissed
+- (id<UIViewControllerAnimatedTransitioning>)animationControllerForDismissedController:(UIViewController *)dismissed
 {
     return self;
 }

@@ -34,22 +34,22 @@
 
 @implementation BRBIP39Mnemonic
 
-- (NSString*)encodePhrase:(NSData*)data
+- (NSString *)encodePhrase:(NSData *)data
 {
     if (!data || (data.length % 4) != 0)
         return nil; // data length must be a multiple of 32 bits
 
-    NSArray* words = [NSArray arrayWithContentsOfFile:[[NSBundle mainBundle] pathForResource:WORDS ofType:@"plist"]];
+    NSArray *words = [NSArray arrayWithContentsOfFile:[[NSBundle mainBundle] pathForResource:WORDS ofType:@"plist"]];
     uint32_t n = (uint32_t)words.count, x;
-    NSMutableArray* a
+    NSMutableArray *a
         = CFBridgingRelease(CFArrayCreateMutable(SecureAllocator(), data.length * 3 / 4, &kCFTypeArrayCallBacks));
-    NSMutableData* d = [NSMutableData secureDataWithData:data];
+    NSMutableData *d = [NSMutableData secureDataWithData:data];
     UInt256 sha256 = data.SHA256;
 
     [d appendBytes:&sha256 length:sizeof(sha256)]; // append SHA256 checksum
 
     for (int i = 0; i < data.length * 3 / 4; i++) {
-        x = CFSwapInt32BigToHost(*(const uint32_t*)((const uint8_t*)d.bytes + i * 11 / 8));
+        x = CFSwapInt32BigToHost(*(const uint32_t *)((const uint8_t *)d.bytes + i * 11 / 8));
         [a addObject:words[(x >> (sizeof(x) * 8 - (11 + ((i * 11) % 8)))) % n]];
     }
 
@@ -57,12 +57,12 @@
     return CFBridgingRelease(CFStringCreateByCombiningStrings(SecureAllocator(), (CFArrayRef)a, CFSTR(" ")));
 }
 
-- (NSData*)decodePhrase:(NSString*)phrase
+- (NSData *)decodePhrase:(NSString *)phrase
 {
-    NSArray* words = [NSArray arrayWithContentsOfFile:[[NSBundle mainBundle] pathForResource:WORDS ofType:@"plist"]];
-    NSArray* a = CFBridgingRelease(CFStringCreateArrayBySeparatingStrings(
+    NSArray *words = [NSArray arrayWithContentsOfFile:[[NSBundle mainBundle] pathForResource:WORDS ofType:@"plist"]];
+    NSArray *a = CFBridgingRelease(CFStringCreateArrayBySeparatingStrings(
         SecureAllocator(), (CFStringRef)[self normalizePhrase:phrase], CFSTR(" ")));
-    NSMutableData* d = [NSMutableData secureDataWithCapacity:(a.count * 11 + 7) / 8];
+    NSMutableData *d = [NSMutableData secureDataWithCapacity:(a.count * 11 + 7) / 8];
     uint32_t n = (uint32_t)words.count, x, y;
     uint8_t b;
 
@@ -84,7 +84,7 @@
         [d appendBytes:&b length:1];
     }
 
-    b = *((const uint8_t*)d.bytes + a.count * 4 / 3) >> (8 - a.count / 3);
+    b = *((const uint8_t *)d.bytes + a.count * 4 / 3) >> (8 - a.count / 3);
     d.length = a.count * 4 / 3;
 
     if (b != (d.SHA256.u8[0] >> (8 - a.count / 3))) {
@@ -98,15 +98,15 @@
     return d;
 }
 
-- (BOOL)phraseIsValid:(NSString*)phrase { return ([self decodePhrase:phrase] == nil) ? NO : YES; }
+- (BOOL)phraseIsValid:(NSString *)phrase { return ([self decodePhrase:phrase] == nil) ? NO : YES; }
 
-- (NSString*)normalizePhrase:(NSString*)phrase
+- (NSString *)normalizePhrase:(NSString *)phrase
 {
     if (!phrase)
         return nil;
 
-    NSMutableString* s = CFBridgingRelease(CFStringCreateMutableCopy(SecureAllocator(), 0, (CFStringRef)phrase));
-    NSMutableCharacterSet* ws = [NSMutableCharacterSet whitespaceAndNewlineCharacterSet];
+    NSMutableString *s = CFBridgingRelease(CFStringCreateMutableCopy(SecureAllocator(), 0, (CFStringRef)phrase));
+    NSMutableCharacterSet *ws = [NSMutableCharacterSet whitespaceAndNewlineCharacterSet];
     CFRange r;
 
     CFStringNormalize((CFMutableStringRef)s, kCFStringNormalizationFormKD);
@@ -125,12 +125,12 @@
     return s;
 }
 
-- (NSData*)deriveKeyFromPhrase:(NSString*)phrase withPassphrase:(NSString*)passphrase
+- (NSData *)deriveKeyFromPhrase:(NSString *)phrase withPassphrase:(NSString *)passphrase
 {
     if (!phrase)
         return nil;
 
-    NSMutableData* key = [NSMutableData secureDataWithLength:sizeof(UInt512)];
+    NSMutableData *key = [NSMutableData secureDataWithLength:sizeof(UInt512)];
     NSData *password, *salt;
     CFMutableStringRef pw = CFStringCreateMutableCopy(SecureAllocator(), 0, (CFStringRef)phrase);
     CFMutableStringRef s = CFStringCreateMutableCopy(SecureAllocator(), 0, CFSTR("mnemonic"));

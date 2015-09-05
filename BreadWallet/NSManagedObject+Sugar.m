@@ -34,8 +34,8 @@ static NSUInteger _fetchBatchSize = 100;
 
 + (instancetype)managedObject
 {
-    __block NSEntityDescription* entity = nil;
-    __block NSManagedObject* obj = nil;
+    __block NSEntityDescription *entity = nil;
+    __block NSManagedObject *obj = nil;
 
     [self.context performBlockAndWait:^{
         entity = [NSEntityDescription entityForName:self.entityName inManagedObjectContext:self.context];
@@ -45,10 +45,10 @@ static NSUInteger _fetchBatchSize = 100;
     return obj;
 }
 
-+ (NSArray*)managedObjectArrayWithLength:(NSUInteger)length
++ (NSArray *)managedObjectArrayWithLength:(NSUInteger)length
 {
-    __block NSEntityDescription* entity = nil;
-    NSMutableArray* a = [NSMutableArray arrayWithCapacity:length];
+    __block NSEntityDescription *entity = nil;
+    NSMutableArray *a = [NSMutableArray arrayWithCapacity:length];
 
     [self.context performBlockAndWait:^{
         entity = [NSEntityDescription entityForName:self.entityName inManagedObjectContext:self.context];
@@ -63,11 +63,11 @@ static NSUInteger _fetchBatchSize = 100;
 
 #pragma mark - fetch existing objects
 
-+ (NSArray*)allObjects { return [self fetchObjects:self.fetchRequest]; }
++ (NSArray *)allObjects { return [self fetchObjects:self.fetchRequest]; }
 
-+ (NSArray*)objectsMatching:(NSString*)predicateFormat, ...
++ (NSArray *)objectsMatching:(NSString *)predicateFormat, ...
 {
-    NSArray* a;
+    NSArray *a;
     va_list args;
 
     va_start(args, predicateFormat);
@@ -76,22 +76,22 @@ static NSUInteger _fetchBatchSize = 100;
     return a;
 }
 
-+ (NSArray*)objectsMatching:(NSString*)predicateFormat arguments:(va_list)args
++ (NSArray *)objectsMatching:(NSString *)predicateFormat arguments:(va_list)args
 {
-    NSFetchRequest* request = self.fetchRequest;
+    NSFetchRequest *request = self.fetchRequest;
 
     request.predicate = [NSPredicate predicateWithFormat:predicateFormat arguments:args];
     return [self fetchObjects:request];
 }
 
-+ (NSArray*)objectsSortedBy:(NSString*)key ascending:(BOOL)ascending
++ (NSArray *)objectsSortedBy:(NSString *)key ascending:(BOOL)ascending
 {
     return [self objectsSortedBy:key ascending:ascending offset:0 limit:0];
 }
 
-+ (NSArray*)objectsSortedBy:(NSString*)key ascending:(BOOL)ascending offset:(NSUInteger)offset limit:(NSUInteger)limit
++ (NSArray *)objectsSortedBy:(NSString *)key ascending:(BOOL)ascending offset:(NSUInteger)offset limit:(NSUInteger)limit
 {
-    NSFetchRequest* request = self.fetchRequest;
+    NSFetchRequest *request = self.fetchRequest;
 
     request.sortDescriptors = @[ [NSSortDescriptor sortDescriptorWithKey:key ascending:ascending] ];
     request.fetchOffset = offset;
@@ -99,10 +99,10 @@ static NSUInteger _fetchBatchSize = 100;
     return [self fetchObjects:request];
 }
 
-+ (NSArray*)fetchObjects:(NSFetchRequest*)request
++ (NSArray *)fetchObjects:(NSFetchRequest *)request
 {
-    __block NSArray* a = nil;
-    __block NSError* error = nil;
+    __block NSArray *a = nil;
+    __block NSError *error = nil;
 
     [self.context performBlockAndWait:^{
         a = [self.context executeFetchRequest:request error:&error];
@@ -117,7 +117,7 @@ static NSUInteger _fetchBatchSize = 100;
 
 + (NSUInteger)countAllObjects { return [self countObjects:self.fetchRequest]; }
 
-+ (NSUInteger)countObjectsMatching:(NSString*)predicateFormat, ...
++ (NSUInteger)countObjectsMatching:(NSString *)predicateFormat, ...
 {
     NSUInteger count;
     va_list args;
@@ -128,18 +128,18 @@ static NSUInteger _fetchBatchSize = 100;
     return count;
 }
 
-+ (NSUInteger)countObjectsMatching:(NSString*)predicateFormat arguments:(va_list)args
++ (NSUInteger)countObjectsMatching:(NSString *)predicateFormat arguments:(va_list)args
 {
-    NSFetchRequest* request = self.fetchRequest;
+    NSFetchRequest *request = self.fetchRequest;
 
     request.predicate = [NSPredicate predicateWithFormat:predicateFormat arguments:args];
     return [self countObjects:request];
 }
 
-+ (NSUInteger)countObjects:(NSFetchRequest*)request
++ (NSUInteger)countObjects:(NSFetchRequest *)request
 {
     __block NSUInteger count = 0;
-    __block NSError* error = nil;
+    __block NSError *error = nil;
 
     [self.context performBlockAndWait:^{
         count = [self.context countForFetchRequest:request error:&error];
@@ -152,10 +152,10 @@ static NSUInteger _fetchBatchSize = 100;
 
 #pragma mark - delete objects
 
-+ (NSUInteger)deleteObjects:(NSArray*)objects
++ (NSUInteger)deleteObjects:(NSArray *)objects
 {
     [self.context performBlockAndWait:^{
-        for (NSManagedObject* obj in objects) {
+        for (NSManagedObject *obj in objects) {
             [self.context deleteObject:obj];
         }
     }];
@@ -173,20 +173,20 @@ static NSUInteger _fetchBatchSize = 100;
 
 // returns the managed object context for the application, or if the context doesn't already exist, creates it and binds
 // it to the persistent store coordinator for the application
-+ (NSManagedObjectContext*)context
++ (NSManagedObjectContext *)context
 {
     static dispatch_once_t onceToken = 0;
 
     dispatch_once(&onceToken, ^{
-        NSURL* docURL =
+        NSURL *docURL =
             [[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask].lastObject;
-        NSURL* modelURL = [NSBundle.mainBundle URLsForResourcesWithExtension:@"momd" subdirectory:nil].lastObject;
-        NSString* projName = modelURL.lastPathComponent.stringByDeletingPathExtension;
-        NSURL* storeURL = [[docURL URLByAppendingPathComponent:projName] URLByAppendingPathExtension:@"sqlite"];
-        NSManagedObjectModel* model = [[NSManagedObjectModel alloc] initWithContentsOfURL:modelURL];
-        NSPersistentStoreCoordinator* coordinator =
+        NSURL *modelURL = [NSBundle.mainBundle URLsForResourcesWithExtension:@"momd" subdirectory:nil].lastObject;
+        NSString *projName = modelURL.lastPathComponent.stringByDeletingPathExtension;
+        NSURL *storeURL = [[docURL URLByAppendingPathComponent:projName] URLByAppendingPathExtension:@"sqlite"];
+        NSManagedObjectModel *model = [[NSManagedObjectModel alloc] initWithContentsOfURL:modelURL];
+        NSPersistentStoreCoordinator *coordinator =
             [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:model];
-        NSError* error = nil;
+        NSError *error = nil;
 
         if ([coordinator addPersistentStoreWithType:NSSQLiteStoreType
                                       configuration:nil
@@ -232,13 +232,13 @@ static NSUInteger _fetchBatchSize = 100;
             [[NSNotificationCenter defaultCenter] addObserverForName:UIApplicationWillTerminateNotification
                                                               object:nil
                                                                queue:nil
-                                                          usingBlock:^(NSNotification* note) {
+                                                          usingBlock:^(NSNotification *note) {
                                                               [self saveContext];
                                                           }];
         }
     });
 
-    NSManagedObjectContext* context = objc_getAssociatedObject(self, @selector(context));
+    NSManagedObjectContext *context = objc_getAssociatedObject(self, @selector(context));
 
     if (!context && self != [NSManagedObject class]) {
         context = [NSManagedObject context];
@@ -249,7 +249,7 @@ static NSUInteger _fetchBatchSize = 100;
 }
 
 // sets a different context for NSManagedObject+Sugar methods to use for this type of entity
-+ (void)setContext:(NSManagedObjectContext*)context
++ (void)setContext:(NSManagedObjectContext *)context
 {
     objc_setAssociatedObject(
         self, @selector(context), (context ? context : [NSNull null]), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
@@ -262,7 +262,7 @@ static NSUInteger _fetchBatchSize = 100;
         return;
 
     [self.context performBlock:^{
-        NSError* error = nil;
+        NSError *error = nil;
 
         if (self.context.hasChanges && ![self.context save:&error]) { // save changes to writer context
             NSLog(@"%s: %@", __func__, error);
@@ -272,7 +272,7 @@ static NSUInteger _fetchBatchSize = 100;
         }
 
         [self.context.parentContext performBlock:^{
-            NSError* error = nil;
+            NSError *error = nil;
             NSUInteger taskId = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
             }];
 
@@ -292,17 +292,17 @@ static NSUInteger _fetchBatchSize = 100;
 #pragma mark - entity methods
 
 // override this if entity name differs from class name
-+ (NSString*)entityName { return NSStringFromClass([self class]); }
++ (NSString *)entityName { return NSStringFromClass([self class]); }
 
-+ (NSFetchRequest*)fetchRequest
++ (NSFetchRequest *)fetchRequest
 {
-    NSFetchRequest* request = [NSFetchRequest fetchRequestWithEntityName:self.entityName];
+    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:self.entityName];
 
     request.fetchBatchSize = _fetchBatchSize;
     return request;
 }
 
-+ (NSFetchedResultsController*)fetchedResultsController:(NSFetchRequest*)request
++ (NSFetchedResultsController *)fetchedResultsController:(NSFetchRequest *)request
 {
     return [[NSFetchedResultsController alloc] initWithFetchRequest:request
                                                managedObjectContext:self.context
@@ -316,7 +316,7 @@ static NSUInteger _fetchBatchSize = 100;
     __block id obj = nil;
 
     [self.managedObjectContext performBlockAndWait:^{
-        obj = [self valueForKey:(NSString*)key];
+        obj = [self valueForKey:(NSString *)key];
     }];
 
     return obj;
@@ -326,7 +326,7 @@ static NSUInteger _fetchBatchSize = 100;
 - (void)setObject:(id)obj forKeyedSubscript:(id<NSCopying>)key
 {
     [self.managedObjectContext performBlockAndWait:^{
-        [self setValue:obj forKey:(NSString*)key];
+        [self setValue:obj forKey:(NSString *)key];
     }];
 }
 

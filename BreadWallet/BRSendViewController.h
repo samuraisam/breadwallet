@@ -33,8 +33,8 @@
 
 - (IBAction)tip:(id)sender;
 
-- (void)handleURL:(NSURL*)url;
-- (void)handleFile:(NSData*)file;
+- (void)handleURL:(NSURL *)url;
+- (void)handleFile:(NSData *)file;
 - (void)updateClipboardText;
 
 @end

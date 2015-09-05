@@ -29,8 +29,8 @@
 @interface BRScanViewController : UIViewController
 
 @property (nonatomic, assign) id<AVCaptureMetadataOutputObjectsDelegate> delegate;
-@property (nonatomic, strong) IBOutlet UILabel* message;
-@property (nonatomic, strong) IBOutlet UIImageView* cameraGuide;
+@property (nonatomic, strong) IBOutlet UILabel *message;
+@property (nonatomic, strong) IBOutlet UIImageView *cameraGuide;
 
 - (IBAction)flash:(id)sender;
 

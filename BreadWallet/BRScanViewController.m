@@ -27,11 +27,11 @@
 
 @interface BRScanViewController ()
 
-@property (nonatomic, strong) IBOutlet UIView* cameraView;
-@property (nonatomic, strong) IBOutlet UIToolbar* toolbar;
+@property (nonatomic, strong) IBOutlet UIView *cameraView;
+@property (nonatomic, strong) IBOutlet UIToolbar *toolbar;
 
-@property (nonatomic, strong) AVCaptureSession* session;
-@property (nonatomic, strong) AVCaptureVideoPreviewLayer* preview;
+@property (nonatomic, strong) AVCaptureSession *session;
+@property (nonatomic, strong) AVCaptureVideoPreviewLayer *preview;
 @property (nonatomic, assign) UIStatusBarStyle barStyle;
 
 @end
@@ -43,7 +43,7 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view.
 
-    AVCaptureDevice* device = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
+    AVCaptureDevice *device = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
 
     if (!device.hasTorch)
         self.toolbar.items = @[ self.toolbar.items[0] ];
@@ -74,10 +74,10 @@
         return;
     }
 
-    NSError* error = nil;
-    AVCaptureDevice* device = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
-    AVCaptureDeviceInput* input = [AVCaptureDeviceInput deviceInputWithDevice:device error:&error];
-    AVCaptureMetadataOutput* output = [AVCaptureMetadataOutput new];
+    NSError *error = nil;
+    AVCaptureDevice *device = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
+    AVCaptureDeviceInput *input = [AVCaptureDeviceInput deviceInputWithDevice:device error:&error];
+    AVCaptureMetadataOutput *output = [AVCaptureMetadataOutput new];
 
     if (error)
         NSLog(@"%@", error.localizedDescription);
@@ -137,8 +137,8 @@
 
 - (IBAction)flash:(id)sender
 {
-    NSError* error = nil;
-    AVCaptureDevice* device = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
+    NSError *error = nil;
+    AVCaptureDevice *device = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
 
     if ([device lockForConfiguration:&error]) {
         device.torchMode = (device.torchActive) ? AVCaptureTorchModeOff : AVCaptureTorchModeOn;

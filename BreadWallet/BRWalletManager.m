@@ -69,14 +69,14 @@
 #define PIN_FAIL_HEIGHT_KEY @"pinfailheight"
 #define SEED_KEY @"seed" // depreceated
 
-static BOOL setKeychainData(NSData* data, NSString* key, BOOL authenticated)
+static BOOL setKeychainData(NSData *data, NSString *key, BOOL authenticated)
 {
     if (!key)
         return NO;
 
     id accessible = (authenticated) ? (__bridge id)kSecAttrAccessibleWhenUnlockedThisDeviceOnly
                                     : (__bridge id)kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly;
-    NSDictionary* query = @{
+    NSDictionary *query = @{
         (__bridge id)kSecClass : (__bridge id)kSecClassGenericPassword, (__bridge id)
         kSecAttrService : SEC_ATTR_SERVICE, (__bridge id)
         kSecAttrAccount : key
@@ -86,7 +86,7 @@ static BOOL setKeychainData(NSData* data, NSString* key, BOOL authenticated)
         if (!data)
             return YES;
 
-        NSDictionary* item = @{
+        NSDictionary *item = @{
             (__bridge id)kSecClass : (__bridge id)kSecClassGenericPassword, (__bridge id)
             kSecAttrService : SEC_ATTR_SERVICE, (__bridge id)
             kSecAttrAccount : key, (__bridge id)
@@ -110,7 +110,7 @@ static BOOL setKeychainData(NSData* data, NSString* key, BOOL authenticated)
         return NO;
     }
 
-    NSDictionary* update = @{ (__bridge id)kSecAttrAccessible : accessible, (__bridge id)kSecValueData : data };
+    NSDictionary *update = @{ (__bridge id)kSecAttrAccessible : accessible, (__bridge id)kSecValueData : data };
     OSStatus status = SecItemUpdate((__bridge CFDictionaryRef)query, (__bridge CFDictionaryRef)update);
 
     if (status == noErr)
@@ -119,16 +119,16 @@ static BOOL setKeychainData(NSData* data, NSString* key, BOOL authenticated)
     return NO;
 }
 
-static NSData* getKeychainData(NSString* key, NSError** error)
+static NSData *getKeychainData(NSString *key, NSError **error)
 {
-    NSDictionary* query = @{
+    NSDictionary *query = @{
         (__bridge id)kSecClass : (__bridge id)kSecClassGenericPassword, (__bridge id)
         kSecAttrService : SEC_ATTR_SERVICE, (__bridge id)
         kSecAttrAccount : key, (__bridge id)
         kSecReturnData : @YES
     };
     CFDataRef result = nil;
-    OSStatus status = SecItemCopyMatching((__bridge CFDictionaryRef)query, (CFTypeRef*)&result);
+    OSStatus status = SecItemCopyMatching((__bridge CFDictionaryRef)query, (CFTypeRef *)&result);
 
     if (status == errSecItemNotFound)
         return nil;
@@ -143,32 +143,32 @@ static NSData* getKeychainData(NSString* key, NSError** error)
     return nil;
 }
 
-static BOOL setKeychainInt(int64_t i, NSString* key, BOOL authenticated)
+static BOOL setKeychainInt(int64_t i, NSString *key, BOOL authenticated)
 {
     @autoreleasepool
     {
-        NSMutableData* d = [NSMutableData secureDataWithLength:sizeof(int64_t)];
+        NSMutableData *d = [NSMutableData secureDataWithLength:sizeof(int64_t)];
 
-        *(int64_t*)d.mutableBytes = i;
+        *(int64_t *)d.mutableBytes = i;
         return setKeychainData(d, key, authenticated);
     }
 }
 
-static int64_t getKeychainInt(NSString* key, NSError** error)
+static int64_t getKeychainInt(NSString *key, NSError **error)
 {
     @autoreleasepool
     {
-        NSData* d = getKeychainData(key, error);
+        NSData *d = getKeychainData(key, error);
 
-        return (d.length == sizeof(int64_t)) ? *(int64_t*)d.bytes : 0;
+        return (d.length == sizeof(int64_t)) ? *(int64_t *)d.bytes : 0;
     }
 }
 
-static BOOL setKeychainString(NSString* s, NSString* key, BOOL authenticated)
+static BOOL setKeychainString(NSString *s, NSString *key, BOOL authenticated)
 {
     @autoreleasepool
     {
-        NSData* d = (s) ? CFBridgingRelease(CFStringCreateExternalRepresentation(
+        NSData *d = (s) ? CFBridgingRelease(CFStringCreateExternalRepresentation(
                               SecureAllocator(), (CFStringRef)s, kCFStringEncodingUTF8, 0))
                         : nil;
 
@@ -176,11 +176,11 @@ static BOOL setKeychainString(NSString* s, NSString* key, BOOL authenticated)
     }
 }
 
-static NSString* getKeychainString(NSString* key, NSError** error)
+static NSString *getKeychainString(NSString *key, NSError **error)
 {
     @autoreleasepool
     {
-        NSData* d = getKeychainData(key, error);
+        NSData *d = getKeychainData(key, error);
 
         return (d) ? CFBridgingRelease(CFStringCreateFromExternalRepresentation(
                          SecureAllocator(), (CFDataRef)d, kCFStringEncodingUTF8))
@@ -190,16 +190,16 @@ static NSString* getKeychainString(NSString* key, NSError** error)
 
 @interface BRWalletManager ()
 
-@property (nonatomic, strong) BRWallet* wallet;
-@property (nonatomic, strong) Reachability* reachability;
-@property (nonatomic, strong) NSArray* currencyPrices;
-@property (nonatomic, strong) NSNumber* localPrice;
+@property (nonatomic, strong) BRWallet *wallet;
+@property (nonatomic, strong) Reachability *reachability;
+@property (nonatomic, strong) NSArray *currencyPrices;
+@property (nonatomic, strong) NSNumber *localPrice;
 @property (nonatomic, assign) BOOL sweepFee, didPresent;
-@property (nonatomic, strong) NSString* sweepKey;
-@property (nonatomic, strong) void (^sweepCompletion)(BRTransaction* tx, uint64_t fee, NSError* error);
-@property (nonatomic, strong) UIAlertView* alertView;
-@property (nonatomic, strong) UITextField* pinField;
-@property (nonatomic, strong) NSMutableSet* failedPins;
+@property (nonatomic, strong) NSString *sweepKey;
+@property (nonatomic, strong) void (^sweepCompletion)(BRTransaction *tx, uint64_t fee, NSError *error);
+@property (nonatomic, strong) UIAlertView *alertView;
+@property (nonatomic, strong) UITextField *pinField;
+@property (nonatomic, strong) NSMutableSet *failedPins;
 @property (nonatomic, strong) id protectedObserver;
 
 @end
@@ -250,7 +250,7 @@ static NSString* getKeychainString(NSString* key, NSError** error)
         [[NSNotificationCenter defaultCenter] addObserverForName:UIApplicationProtectedDataDidBecomeAvailable
                                                           object:nil
                                                            queue:nil
-                                                      usingBlock:^(NSNotification* note) {
+                                                      usingBlock:^(NSNotification *note) {
                                                           [self protectedInit];
                                                       }];
 
@@ -261,7 +261,7 @@ static NSString* getKeychainString(NSString* key, NSError** error)
 
 - (void)protectedInit
 {
-    NSUserDefaults* defs = [NSUserDefaults standardUserDefaults];
+    NSUserDefaults *defs = [NSUserDefaults standardUserDefaults];
 
     if (self.protectedObserver)
         [[NSNotificationCenter defaultCenter] removeObserver:self.protectedObserver];
@@ -282,7 +282,7 @@ static NSString* getKeychainString(NSString* key, NSError** error)
     [NSObject cancelPreviousPerformRequestsWithTarget:self];
 }
 
-- (BRWallet*)wallet
+- (BRWallet *)wallet
 {
     if (_wallet)
         return _wallet;
@@ -290,7 +290,7 @@ static NSString* getKeychainString(NSString* key, NSError** error)
     if (getKeychainData(SEED_KEY, nil)) { // upgrade from old keychain scheme
         @autoreleasepool
         {
-            NSString* seedPhrase = getKeychainString(MNEMONIC_KEY, nil);
+            NSString *seedPhrase = getKeychainString(MNEMONIC_KEY, nil);
 
             NSLog(@"upgrading to authenticated keychain scheme");
             if (!setKeychainData(
@@ -304,7 +304,7 @@ static NSString* getKeychainString(NSString* key, NSError** error)
     }
 
     uint64_t feePerKb = 0;
-    NSData* mpk = self.masterPublicKey;
+    NSData *mpk = self.masterPublicKey;
 
     if (!mpk)
         return _wallet;
@@ -317,7 +317,7 @@ static NSString* getKeychainString(NSString* key, NSError** error)
         _wallet = [[BRWallet alloc] initWithContext:[NSManagedObject context]
                                            sequence:self.sequence
                                     masterPublicKey:mpk
-                                               seed:^NSData*(NSString* authprompt, uint64_t amount) {
+                                               seed:^NSData *(NSString *authprompt, uint64_t amount) {
                                                    return [self seedWithPrompt:authprompt forAmount:amount];
                                                }];
 
@@ -328,7 +328,7 @@ static NSString* getKeychainString(NSString* key, NSError** error)
 
         // verify that keychain matches core data, with different access and backup policies it's possible to diverge
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-            BRKey* k = [BRKey keyWithPublicKey:[self.sequence publicKey:0 internal:NO masterPublicKey:mpk]];
+            BRKey *k = [BRKey keyWithPublicKey:[self.sequence publicKey:0 internal:NO masterPublicKey:mpk]];
 
             if (_wallet.addresses.count > 0 && ![_wallet containsAddress:k.address]) {
                 NSLog(@"wallet doesn't contain address: %@", k.address);
@@ -359,7 +359,7 @@ static NSString* getKeychainString(NSString* key, NSError** error)
 // true if keychain is available and we know that no wallet exists on it
 - (BOOL)noWallet
 {
-    NSError* error = nil;
+    NSError *error = nil;
 
     if (_wallet)
         return NO;
@@ -371,12 +371,12 @@ static NSString* getKeychainString(NSString* key, NSError** error)
 }
 
 // master public key used to generate wallet addresses
-- (NSData*)masterPublicKey { return getKeychainData(MASTER_PUBKEY_KEY, nil); }
+- (NSData *)masterPublicKey { return getKeychainData(MASTER_PUBKEY_KEY, nil); }
 
 // requesting seedPhrase will trigger authentication
-- (NSString*)seedPhrase { return [self seedPhraseWithPrompt:nil]; }
+- (NSString *)seedPhrase { return [self seedPhraseWithPrompt:nil]; }
 
-- (void)setSeedPhrase:(NSString*)seedPhrase
+- (void)setSeedPhrase:(NSString *)seedPhrase
 {
     @autoreleasepool
     { // @autoreleasepool ensures sensitive data will be dealocated immediately
@@ -402,7 +402,7 @@ static NSString* getKeychainString(NSString* key, NSError** error)
             if (seedPhrase) {
                 [[[UIAlertView alloc] initWithTitle:@"couldn't create wallet"
                                             message:@"error adding master private key to iOS keychain, make sure app "
-                                                    @"has keychain entitlements"
+                                            @"has keychain entitlements"
                                            delegate:self
                                   cancelButtonTitle:@"abort"
                                   otherButtonTitles:nil] show];
@@ -411,7 +411,7 @@ static NSString* getKeychainString(NSString* key, NSError** error)
             return;
         }
 
-        NSData* masterPubKey = (seedPhrase)
+        NSData *masterPubKey = (seedPhrase)
             ? [self.sequence masterPublicKeyFromSeed:[self.mnemonic deriveKeyFromPhrase:seedPhrase withPassphrase:nil]]
             : nil;
 
@@ -428,9 +428,9 @@ static NSString* getKeychainString(NSString* key, NSError** error)
 // interval since refrence date, 00:00:00 01/01/01 GMT
 - (NSTimeInterval)seedCreationTime
 {
-    NSData* d = getKeychainData(CREATION_TIME_KEY, nil);
+    NSData *d = getKeychainData(CREATION_TIME_KEY, nil);
 
-    return (d.length < sizeof(NSTimeInterval)) ? BIP39_CREATION_TIME : *(const NSTimeInterval*)d.bytes;
+    return (d.length < sizeof(NSTimeInterval)) ? BIP39_CREATION_TIME : *(const NSTimeInterval *)d.bytes;
 }
 
 // true if touch id is enabled
@@ -445,7 +445,7 @@ static NSString* getKeychainString(NSString* key, NSError** error)
 // true if device passcode is enabled
 - (BOOL)isPasscodeEnabled
 {
-    NSError* error = nil;
+    NSError *error = nil;
 
     if (![LAContext class])
         return YES; // we can only check for passcode on iOS 8 and above
@@ -455,16 +455,16 @@ static NSString* getKeychainString(NSString* key, NSError** error)
 }
 
 // generates a random seed, saves to keychain and returns the associated seedPhrase
-- (NSString*)generateRandomSeed
+- (NSString *)generateRandomSeed
 {
     @autoreleasepool
     {
-        NSMutableData* entropy = [NSMutableData secureDataWithLength:SEED_ENTROPY_LENGTH];
+        NSMutableData *entropy = [NSMutableData secureDataWithLength:SEED_ENTROPY_LENGTH];
         NSTimeInterval time = [NSDate timeIntervalSinceReferenceDate];
 
         SecRandomCopyBytes(kSecRandomDefault, entropy.length, entropy.mutableBytes);
 
-        NSString* phrase = [self.mnemonic encodePhrase:entropy];
+        NSString *phrase = [self.mnemonic encodePhrase:entropy];
 
         self.seedPhrase = phrase;
 
@@ -475,7 +475,7 @@ static NSString* getKeychainString(NSString* key, NSError** error)
 }
 
 // authenticates user and returns seed
-- (NSData*)seedWithPrompt:(NSString*)authprompt forAmount:(uint64_t)amount
+- (NSData *)seedWithPrompt:(NSString *)authprompt forAmount:(uint64_t)amount
 {
     BOOL touchid = (self.wallet.totalSent + amount < getKeychainInt(SPEND_LIMIT_KEY, nil)) ? YES : NO;
 
@@ -488,7 +488,7 @@ static NSString* getKeychainString(NSString* key, NSError** error)
 }
 
 // authenticates user and returns seedPhrase
-- (NSString*)seedPhraseWithPrompt:(NSString*)authprompt
+- (NSString *)seedPhraseWithPrompt:(NSString *)authprompt
 {
     return ([self authenticateWithPrompt:authprompt andTouchId:NO]) ? getKeychainString(MNEMONIC_KEY, nil) : nil;
 }
@@ -496,11 +496,11 @@ static NSString* getKeychainString(NSString* key, NSError** error)
 #pragma mark - authentication
 
 // prompts user to authenticate with touch id or passcode
-- (BOOL)authenticateWithPrompt:(NSString*)authprompt andTouchId:(BOOL)touchId
+- (BOOL)authenticateWithPrompt:(NSString *)authprompt andTouchId:(BOOL)touchId
 {
     if (touchId && [LAContext class]) { // check if touch id framework is available
-        LAContext* context = [LAContext new];
-        NSError* error = nil;
+        LAContext *context = [LAContext new];
+        NSError *error = nil;
         __block NSInteger authcode = 0;
 
         if ([context canEvaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics error:&error]
@@ -509,7 +509,7 @@ static NSString* getKeychainString(NSString* key, NSError** error)
 
             [context evaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics
                     localizedReason:(authprompt.length > 0 ? authprompt : @" ")
-                              reply:^(BOOL success, NSError* error) {
+                              reply:^(BOOL success, NSError *error) {
                                   authcode = (success) ? 1 : error.code;
                               }];
 
@@ -542,7 +542,7 @@ static NSString* getKeychainString(NSString* key, NSError** error)
         return NO;
 }
 
-- (UITextField*)pinField
+- (UITextField *)pinField
 {
     if (_pinField)
         return _pinField;
@@ -555,10 +555,10 @@ static NSString* getKeychainString(NSString* key, NSError** error)
     return _pinField;
 }
 
-- (BOOL)authenticatePinWithTitle:(NSString*)title message:(NSString*)message
+- (BOOL)authenticatePinWithTitle:(NSString *)title message:(NSString *)message
 {
-    NSError* error = nil;
-    NSString* pin = getKeychainString(PIN_KEY, &error);
+    NSError *error = nil;
+    NSString *pin = getKeychainString(PIN_KEY, &error);
 
     if (error)
         return NO; // error reading pin from keychain
@@ -574,7 +574,7 @@ static NSString* getKeychainString(NSString* key, NSError** error)
         if (self.secureTime + NSTimeIntervalSince1970 < failHeight + pow(6, failCount - 3) * 60.0) { // locked out
             NSTimeInterval wait
                 = (failHeight + pow(6, failCount - 3) * 60.0 - (self.secureTime + NSTimeIntervalSince1970)) / 60.0;
-            NSString* unit = NSLocalizedString(@"minutes", nil);
+            NSString *unit = NSLocalizedString(@"minutes", nil);
 
             if (wait < 2.0)
                 wait = 1.0, unit = NSLocalizedString(@"minute", nil);
@@ -672,7 +672,7 @@ static NSString* getKeychainString(NSString* key, NSError** error)
         self.pinField.text = nil;
 
         // walking the view hierarchy is prone to breaking, but it's still functional even if the animation doesn't work
-        UIView* v = self.pinField.superview.superview.superview;
+        UIView *v = self.pinField.superview.superview.superview;
         CGPoint p = v.center;
 
         [UIView animateWithDuration:0.05
@@ -704,9 +704,9 @@ static NSString* getKeychainString(NSString* key, NSError** error)
 // prompts the user to set or change their wallet pin and returns true if the pin was successfully set
 - (BOOL)setPin
 {
-    NSError* error = nil;
-    NSString* pin = getKeychainString(PIN_KEY, &error);
-    NSString* title =
+    NSError *error = nil;
+    NSString *pin = getKeychainString(PIN_KEY, &error);
+    NSString *title =
         [NSString stringWithFormat:CIRCLE @"\t" CIRCLE @"\t" CIRCLE @"\t" CIRCLE @"\n%@",
                   [NSString stringWithFormat:NSLocalizedString(@"choose passcode for %@", nil), DISPLAY_NAME]];
 
@@ -717,7 +717,7 @@ static NSString* getKeychainString(NSString* key, NSError** error)
         if (![self authenticatePinWithTitle:NSLocalizedString(@"enter old passcode", nil) message:nil])
             return NO;
 
-        UIView* v = self.pinField.superview.superview.superview;
+        UIView *v = self.pinField.superview.superview.superview;
         CGPoint p = v.center;
 
         [UIView animateWithDuration:0.1
@@ -764,7 +764,7 @@ static NSString* getKeychainString(NSString* key, NSError** error)
         pin = self.pinField.text;
         self.pinField.text = nil;
 
-        UIView* v = self.pinField.superview.superview.superview;
+        UIView *v = self.pinField.superview.superview.superview;
         CGPoint p = v.center;
 
         [UIView animateWithDuration:0.1
@@ -856,7 +856,7 @@ static NSString* getKeychainString(NSString* key, NSError** error)
 // the keyboard can take a second or more to dismiss, this hides it quickly to improve perceived response time
 - (void)hideKeyboard
 {
-    for (UIWindow* w in [UIApplication sharedApplication].windows) {
+    for (UIWindow *w in [UIApplication sharedApplication].windows) {
         if (w.windowLevel == UIWindowLevelNormal || w.windowLevel == UIWindowLevelAlert
             || w.windowLevel == UIWindowLevelStatusBar)
             continue;
@@ -876,9 +876,9 @@ static NSString* getKeychainString(NSString* key, NSError** error)
 - (double)localCurrencyPrice { return self.localPrice.doubleValue; }
 
 // local currency ISO code
-- (void)setLocalCurrencyCode:(NSString*)code
+- (void)setLocalCurrencyCode:(NSString *)code
 {
-    NSUserDefaults* defs = [NSUserDefaults standardUserDefaults];
+    NSUserDefaults *defs = [NSUserDefaults standardUserDefaults];
     NSUInteger i = [_currencyCodes indexOfObject:code];
 
     if (i == NSNotFound)
@@ -916,25 +916,25 @@ static NSString* getKeychainString(NSString* key, NSError** error)
     if (self.reachability.currentReachabilityStatus == NotReachable)
         return;
 
-    NSURLRequest* req = [NSURLRequest requestWithURL:[NSURL URLWithString:TICKER_URL]
+    NSURLRequest *req = [NSURLRequest requestWithURL:[NSURL URLWithString:TICKER_URL]
                                          cachePolicy:NSURLRequestReloadIgnoringCacheData
                                      timeoutInterval:10.0];
 
     [[[NSURLSession sharedSession]
         dataTaskWithRequest:req
-          completionHandler:^(NSData* data, NSURLResponse* response, NSError* error) {
+          completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
               if (error) {
                   NSLog(@"%@", error);
                   return;
               }
 
-              NSUserDefaults* defs = [NSUserDefaults standardUserDefaults];
-              NSDictionary* json = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
+              NSUserDefaults *defs = [NSUserDefaults standardUserDefaults];
+              NSDictionary *json = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
               NSMutableArray *codes = [NSMutableArray array], *names = [NSMutableArray array],
                              *rates = [NSMutableArray array];
 
               if ([response isKindOfClass:[NSHTTPURLResponse class]]) { // store server timestamp
-                  NSString* date = ((NSHTTPURLResponse*)response).allHeaderFields[@"Date"];
+                  NSString *date = ((NSHTTPURLResponse *)response).allHeaderFields[@"Date"];
                   NSTimeInterval now = [[[NSDataDetector dataDetectorWithTypes:NSTextCheckingTypeDate error:nil]
                                             matchesInString:date
                                                     options:0
@@ -953,7 +953,7 @@ static NSString* getKeychainString(NSString* key, NSError** error)
                   return;
               }
 
-              for (NSDictionary* d in json[@"data"]) {
+              for (NSDictionary *d in json[@"data"]) {
                   if (![d isKindOfClass:[NSDictionary class]] || ![d[@"code"] isKindOfClass:[NSString class]]
                       || ![d[@"name"] isKindOfClass:[NSString class]] || ![d[@"rate"] isKindOfClass:[NSNumber class]]) {
                       NSLog(@"unexpected response from %@:\n%@", req.URL.host,
@@ -990,18 +990,18 @@ static NSString* getKeychainString(NSString* key, NSError** error)
     if (self.reachability.currentReachabilityStatus == NotReachable)
         return;
 
-    NSURLRequest* req = [NSURLRequest requestWithURL:[NSURL URLWithString:FEE_PER_KB_URL]
+    NSURLRequest *req = [NSURLRequest requestWithURL:[NSURL URLWithString:FEE_PER_KB_URL]
                                          cachePolicy:NSURLRequestReloadIgnoringCacheData
                                      timeoutInterval:10.0];
 
     [[[NSURLSession sharedSession] dataTaskWithRequest:req
-                                     completionHandler:^(NSData* data, NSURLResponse* response, NSError* error) {
+                                     completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
                                          if (error) {
                                              NSLog(@"%@", error);
                                              return;
                                          }
 
-                                         NSDictionary* json =
+                                         NSDictionary *json =
                                              [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
 
                                          if (error || ![json isKindOfClass:[NSDictionary class]]
@@ -1024,25 +1024,25 @@ static NSString* getKeychainString(NSString* key, NSError** error)
 #pragma mark - query unspent outputs
 
 // queries chain.com and calls the completion block with unspent outputs for the given address
-- (void)utxosForAddress:(NSString*)address
-             completion:(void (^)(NSArray* utxos, NSArray* amounts, NSArray* scripts, NSError* error))completion
+- (void)utxosForAddress:(NSString *)address
+             completion:(void (^)(NSArray *utxos, NSArray *amounts, NSArray *scripts, NSError *error))completion
 {
-    NSURL* u = [NSURL URLWithString:[NSString stringWithFormat:UNSPENT_URL, @"bitcoin", address]];
+    NSURL *u = [NSURL URLWithString:[NSString stringWithFormat:UNSPENT_URL, @"bitcoin", address]];
 #if BITCOIN_TESTNET
     u = [NSURL URLWithString:[NSString stringWithFormat:UNSPENT_URL, @"testnet3", address]];
 #endif
-    NSURLRequest* req =
+    NSURLRequest *req =
         [NSURLRequest requestWithURL:u cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:20.0];
 
     [[[NSURLSession sharedSession]
         dataTaskWithRequest:req
-          completionHandler:^(NSData* data, NSURLResponse* response, NSError* error) {
+          completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
               if (error) {
                   completion(nil, nil, nil, error);
                   return;
               }
 
-              NSDictionary* json = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
+              NSDictionary *json = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
               NSMutableArray *utxos = [NSMutableArray array], *amounts = [NSMutableArray array],
                              *scripts = [NSMutableArray array];
               BRUTXO o;
@@ -1064,7 +1064,7 @@ static NSString* getKeychainString(NSString* key, NSError** error)
                   return;
               }
 
-              for (NSDictionary* utxo in json) {
+              for (NSDictionary *utxo in json) {
                   if (![utxo isKindOfClass:[NSDictionary class]]
                       || ![utxo[@"transaction_hash"] isKindOfClass:[NSString class]]
                       || [utxo[@"transaction_hash"] hexToData].length != sizeof(UInt256)
@@ -1087,7 +1087,7 @@ static NSString* getKeychainString(NSString* key, NSError** error)
 
                   if (![utxo[@"script_type"] isEqual:@"pubkeyhash"] && ![utxo[@"script_type"] isEqual:@"pubkey"])
                       continue;
-                  o.hash = *(const UInt256*)[[utxo[@"transaction_hash"] hexToData] reverse].bytes;
+                  o.hash = *(const UInt256 *)[[utxo[@"transaction_hash"] hexToData] reverse].bytes;
                   o.n = [utxo[@"output_index"] unsignedIntValue];
                   [utxos addObject:brutxo_obj(o)];
                   [amounts addObject:utxo[@"value"]];
@@ -1100,15 +1100,15 @@ static NSString* getKeychainString(NSString* key, NSError** error)
 
 // given a private key, queries chain.com for unspent outputs and calls the completion block with a signed transaction
 // that will sweep the balance into the wallet (doesn't publish the tx)
-- (void)sweepPrivateKey:(NSString*)privKey
+- (void)sweepPrivateKey:(NSString *)privKey
                 withFee:(BOOL)fee
-             completion:(void (^)(BRTransaction* tx, uint64_t fee, NSError* error))completion
+             completion:(void (^)(BRTransaction *tx, uint64_t fee, NSError *error))completion
 {
     if (!completion)
         return;
 
     if ([privKey isValidBitcoinBIP38Key]) {
-        UIAlertView* v = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"password protected key", nil)
+        UIAlertView *v = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"password protected key", nil)
                                                     message:nil
                                                    delegate:self
                                           cancelButtonTitle:NSLocalizedString(@"cancel", nil)
@@ -1124,7 +1124,7 @@ static NSString* getKeychainString(NSString* key, NSError** error)
         return;
     }
 
-    BRKey* key = [BRKey keyWithPrivateKey:privKey];
+    BRKey *key = [BRKey keyWithPrivateKey:privKey];
 
     if (!key.address) {
         completion(
@@ -1147,8 +1147,8 @@ static NSString* getKeychainString(NSString* key, NSError** error)
     }
 
     [self utxosForAddress:key.address
-               completion:^(NSArray* utxos, NSArray* amounts, NSArray* scripts, NSError* error) {
-                   BRTransaction* tx = [BRTransaction new];
+               completion:^(NSArray *utxos, NSArray *amounts, NSArray *scripts, NSError *error) {
+                   BRTransaction *tx = [BRTransaction new];
                    uint64_t balance = 0, feeAmount = 0;
                    NSUInteger i = 0;
 
@@ -1158,7 +1158,7 @@ static NSString* getKeychainString(NSString* key, NSError** error)
                    }
 
                    // TODO: make sure not to create a transaction larger than TX_MAX_SIZE
-                   for (NSValue* output in utxos) {
+                   for (NSValue *output in utxos) {
                        BRUTXO o;
 
                        [output getValue:&o];
@@ -1214,7 +1214,7 @@ static NSString* getKeychainString(NSString* key, NSError** error)
 
 #pragma mark - string helpers
 
-- (int64_t)amountForString:(NSString*)string
+- (int64_t)amountForString:(NSString *)string
 {
     if (!string.length)
         return 0;
@@ -1223,7 +1223,7 @@ static NSString* getKeychainString(NSString* key, NSError** error)
         .longLongValue;
 }
 
-- (NSString*)stringForAmount:(int64_t)amount
+- (NSString *)stringForAmount:(int64_t)amount
 {
     return [self.format stringFromNumber:[(id)[NSDecimalNumber numberWithLongLong:amount]
                                              decimalNumberByMultiplyingByPowerOf10:-self.format.maximumFractionDigits]];
@@ -1231,12 +1231,12 @@ static NSString* getKeychainString(NSString* key, NSError** error)
 
 // NOTE: For now these local currency methods assume that a satoshi has a smaller value than the smallest unit of any
 // local currency. They will need to be revisited when that is no longer a safe assumption.
-- (int64_t)amountForLocalCurrencyString:(NSString*)string
+- (int64_t)amountForLocalCurrencyString:(NSString *)string
 {
     if ([string hasPrefix:@"<"])
         string = [string substringFromIndex:1];
 
-    NSNumber* n = [self.localFormat numberFromString:string];
+    NSNumber *n = [self.localFormat numberFromString:string];
     int64_t price = [[NSDecimalNumber decimalNumberWithDecimal:self.localPrice.decimalValue]
                         decimalNumberByMultiplyingByPowerOf10:self.localFormat.maximumFractionDigits]
                         .longLongValue,
@@ -1263,7 +1263,7 @@ static NSString* getKeychainString(NSString* key, NSError** error)
     return (local < 0) ? -(amount / p) * p : (amount / p) * p;
 }
 
-- (NSString*)localCurrencyStringForAmount:(int64_t)amount
+- (NSString *)localCurrencyStringForAmount:(int64_t)amount
 {
     if (amount == 0)
         return [self.localFormat stringFromNumber:@(0)];
@@ -1286,9 +1286,9 @@ static NSString* getKeychainString(NSString* key, NSError** error)
 
 #pragma mark - UITextFieldDelegate
 
-- (BOOL)textField:(UITextField*)textField
+- (BOOL)textField:(UITextField *)textField
     shouldChangeCharactersInRange:(NSRange)range
-                replacementString:(NSString*)string
+                replacementString:(NSString *)string
 {
     NSUInteger l = textField.text.length + string.length - range.length;
 
@@ -1299,7 +1299,7 @@ static NSString* getKeychainString(NSString* key, NSError** error)
 }
 
 // iOS 7 doesn't adjust the alertView position to account for the keyboard when using an accessoryView
-- (void)textFieldDidBeginEditing:(UITextField*)textField
+- (void)textFieldDidBeginEditing:(UITextField *)textField
 {
     if ([LAContext class])
         return; // fix is needed for iOS 7 only
@@ -1309,12 +1309,12 @@ static NSString* getKeychainString(NSString* key, NSError** error)
 
 #pragma mark - UITextViewDelegate
 
-- (void)textViewDidChange:(UITextView*)textView
+- (void)textViewDidChange:(UITextView *)textView
 {
     @autoreleasepool
     { // @autoreleasepool ensures sensitive data will be dealocated immediately
         if ([textView.text rangeOfString:@"\n"].location != NSNotFound) {
-            NSString* phrase = [self.mnemonic normalizePhrase:textView.text];
+            NSString *phrase = [self.mnemonic normalizePhrase:textView.text];
 
             if (![[self.sequence masterPublicKeyFromSeed:[self.mnemonic deriveKeyFromPhrase:phrase withPassphrase:nil]]
                     isEqual:self.masterPublicKey]) {
@@ -1335,7 +1335,7 @@ static NSString* getKeychainString(NSString* key, NSError** error)
     }
 }
 
-- (void)textViewDidBeginEditing:(UITextView*)textView
+- (void)textViewDidBeginEditing:(UITextView *)textView
 {
     if ([LAContext class])
         return; // fix is needed for iOS 7 only
@@ -1345,14 +1345,14 @@ static NSString* getKeychainString(NSString* key, NSError** error)
 
 #pragma mark - UIAlertViewDelegate
 
-- (void)didPresentAlertView:(UIAlertView*)alertView
+- (void)didPresentAlertView:(UIAlertView *)alertView
 {
     self.didPresent = YES;
     if (_pinField && !_pinField.isFirstResponder)
         [_pinField becomeFirstResponder]; // fix for iOS 7 missing keyboard
 }
 
-- (void)alertView:(UIAlertView*)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex
+- (void)alertView:(UIAlertView *)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex
 {
     [NSObject cancelPreviousPerformRequestsWithTarget:alertView];
     if (alertView == self.alertView)
@@ -1370,13 +1370,13 @@ static NSString* getKeychainString(NSString* key, NSError** error)
         self.sweepCompletion = nil;
     }
     else if (self.sweepKey && self.sweepCompletion) {
-        NSString* passphrase = [alertView textFieldAtIndex:0].text;
+        NSString *passphrase = [alertView textFieldAtIndex:0].text;
 
         dispatch_async(dispatch_get_main_queue(), ^{
-            BRKey* key = [BRKey keyWithBIP38Key:self.sweepKey andPassphrase:passphrase];
+            BRKey *key = [BRKey keyWithBIP38Key:self.sweepKey andPassphrase:passphrase];
 
             if (!key) {
-                UIAlertView* v = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"password protected key", nil)
+                UIAlertView *v = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"password protected key", nil)
                                                             message:NSLocalizedString(@"bad password, try again", nil)
                                                            delegate:self
                                                   cancelButtonTitle:NSLocalizedString(@"cancel", nil)
@@ -1396,7 +1396,7 @@ static NSString* getKeychainString(NSString* key, NSError** error)
     }
     else if (buttonIndex >= 0
         && [[alertView buttonTitleAtIndex:buttonIndex] isEqual:NSLocalizedString(@"reset", nil)]) {
-        UITextView* t = [[UITextView alloc] initWithFrame:CGRectMake(0, 0, 260, 180)];
+        UITextView *t = [[UITextView alloc] initWithFrame:CGRectMake(0, 0, 260, 180)];
 
         t.keyboardType = UIKeyboardTypeASCIICapable;
         t.returnKeyType = UIReturnKeyDone;

@@ -27,7 +27,7 @@
 
 @interface BRCopyLabel ()
 
-@property (nonatomic, strong) UIView* highlight;
+@property (nonatomic, strong) UIView *highlight;
 @property (nonatomic, readonly) CGRect copyableFrame;
 @property (nonatomic, strong) id menuHideObserver;
 
@@ -60,7 +60,7 @@
 
 - (BOOL)canPerformAction:(SEL)action withSender:(id)sender { return (action == @selector(copy:)); }
 
-- (NSString*)copyableText { return (_copyableText) ? _copyableText : self.text; }
+- (NSString *)copyableText { return (_copyableText) ? _copyableText : self.text; }
 
 - (CGRect)copyableFrame
 {
@@ -86,7 +86,7 @@
         start.size.width, 0, self.bounds.size.width - (start.size.width + end.size.width), self.bounds.size.height);
 }
 
-- (void)setSelectedColor:(UIColor*)selectedColor
+- (void)setSelectedColor:(UIColor *)selectedColor
 {
     _selectedColor = selectedColor;
     self.highlight.backgroundColor = selectedColor;
@@ -124,13 +124,13 @@
             [[NSNotificationCenter defaultCenter] addObserverForName:UIMenuControllerWillHideMenuNotification
                                                               object:nil
                                                                queue:nil
-                                                          usingBlock:^(NSNotification* note) {
+                                                          usingBlock:^(NSNotification *note) {
                                                               [self resignFirstResponder];
                                                           }];
     }
 }
 
-- (void)touchesEnded:(NSSet*)touches withEvent:(UIEvent*)event
+- (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
 {
     [self toggleCopyMenu];
     [super touchesEnded:touches withEvent:event];

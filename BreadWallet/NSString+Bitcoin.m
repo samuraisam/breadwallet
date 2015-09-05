@@ -33,14 +33,14 @@ static const UniChar base58chars[] = { '1', '2', '3', '4', '5', '6', '7', '8', '
 
 @implementation NSString (Bitcoin)
 
-+ (NSString*)base58WithData:(NSData*)d
++ (NSString *)base58WithData:(NSData *)d
 {
     if (!d)
         return nil;
 
     size_t i, z = 0;
 
-    while (z < d.length && ((const uint8_t*)d.bytes)[z] == 0)
+    while (z < d.length && ((const uint8_t *)d.bytes)[z] == 0)
         z++; // count leading zeroes
 
     uint8_t buf[(d.length - z) * 138 / 100 + 1]; // log(256)/log(58), rounded up
@@ -48,7 +48,7 @@ static const UniChar base58chars[] = { '1', '2', '3', '4', '5', '6', '7', '8', '
     memset(buf, 0, sizeof(buf));
 
     for (i = z; i < d.length; i++) {
-        uint32_t carry = ((const uint8_t*)d.bytes)[i];
+        uint32_t carry = ((const uint8_t *)d.bytes)[i];
 
         for (size_t j = sizeof(buf); j > 0; j--) {
             carry += (uint32_t)buf[j - 1] << 8;
@@ -73,24 +73,24 @@ static const UniChar base58chars[] = { '1', '2', '3', '4', '5', '6', '7', '8', '
     return CFBridgingRelease(s);
 }
 
-+ (NSString*)base58checkWithData:(NSData*)d
++ (NSString *)base58checkWithData:(NSData *)d
 {
     if (!d)
         return nil;
 
-    NSMutableData* data = [NSMutableData secureDataWithData:d];
+    NSMutableData *data = [NSMutableData secureDataWithData:d];
 
     [data appendBytes:d.SHA256_2.u32 length:4];
     return [self base58WithData:data];
 }
 
-+ (NSString*)hexWithData:(NSData*)d
++ (NSString *)hexWithData:(NSData *)d
 {
     if (!d)
         return nil;
 
-    const uint8_t* bytes = d.bytes;
-    NSMutableString* hex = CFBridgingRelease(CFStringCreateMutable(SecureAllocator(), d.length * 2));
+    const uint8_t *bytes = d.bytes;
+    NSMutableString *hex = CFBridgingRelease(CFStringCreateMutable(SecureAllocator(), d.length * 2));
 
     for (NSUInteger i = 0; i < d.length; i++) {
         [hex appendFormat:@"%02x", bytes[i]];
@@ -103,14 +103,14 @@ static const UniChar base58chars[] = { '1', '2', '3', '4', '5', '6', '7', '8', '
 // miss a receive transaction, only that transaction's funds are missed, however if we accept a receive transaction that
 // we are unable to correctly sign later, then the entire wallet balance after that point would become stuck with the
 // current coin selection code
-+ (NSString*)addressWithScriptPubKey:(NSData*)script
++ (NSString *)addressWithScriptPubKey:(NSData *)script
 {
     if (script == (id)[NSNull null])
         return nil;
 
-    NSArray* elem = [script scriptElements];
+    NSArray *elem = [script scriptElements];
     NSUInteger l = elem.count;
-    NSMutableData* d = [NSMutableData data];
+    NSMutableData *d = [NSMutableData data];
     uint8_t v = BITCOIN_PUBKEY_ADDRESS;
 
 #if BITCOIN_TESTNET
@@ -143,14 +143,14 @@ static const UniChar base58chars[] = { '1', '2', '3', '4', '5', '6', '7', '8', '
     return [self base58checkWithData:d];
 }
 
-+ (NSString*)addressWithScriptSig:(NSData*)script
++ (NSString *)addressWithScriptSig:(NSData *)script
 {
     if (script == (id)[NSNull null])
         return nil;
 
-    NSArray* elem = [script scriptElements];
+    NSArray *elem = [script scriptElements];
     NSUInteger l = elem.count;
-    NSMutableData* d = [NSMutableData data];
+    NSMutableData *d = [NSMutableData data];
     uint8_t v = BITCOIN_PUBKEY_ADDRESS;
 
 #if BITCOIN_TESTNET
@@ -182,7 +182,7 @@ static const UniChar base58chars[] = { '1', '2', '3', '4', '5', '6', '7', '8', '
     return [self base58checkWithData:d];
 }
 
-- (NSData*)base58ToData
+- (NSData *)base58ToData
 {
     size_t i, z = 0;
 
@@ -293,7 +293,7 @@ static const UniChar base58chars[] = { '1', '2', '3', '4', '5', '6', '7', '8', '
     while (i < sizeof(buf) && buf[i] == 0)
         i++; // skip leading zeroes
 
-    NSMutableData* d = [NSMutableData secureDataWithCapacity:z + sizeof(buf) - i];
+    NSMutableData *d = [NSMutableData secureDataWithCapacity:z + sizeof(buf) - i];
 
     d.length = z;
     [d appendBytes:&buf[i] length:sizeof(buf) - i];
@@ -301,27 +301,27 @@ static const UniChar base58chars[] = { '1', '2', '3', '4', '5', '6', '7', '8', '
     return d;
 }
 
-- (NSData*)base58checkToData
+- (NSData *)base58checkToData
 {
-    NSData* d = self.base58ToData;
+    NSData *d = self.base58ToData;
 
     if (d.length < 4)
         return nil;
 
-    NSData* data = CFBridgingRelease(CFDataCreate(SecureAllocator(), d.bytes, d.length - 4));
+    NSData *data = CFBridgingRelease(CFDataCreate(SecureAllocator(), d.bytes, d.length - 4));
 
     // verify checksum
-    if (*(uint32_t*)((const uint8_t*)d.bytes + d.length - 4) != data.SHA256_2.u32[0])
+    if (*(uint32_t *)((const uint8_t *)d.bytes + d.length - 4) != data.SHA256_2.u32[0])
         return nil;
     return data;
 }
 
-- (NSData*)hexToData
+- (NSData *)hexToData
 {
     if (self.length % 2)
         return nil;
 
-    NSMutableData* d = [NSMutableData secureDataWithCapacity:self.length / 2];
+    NSMutableData *d = [NSMutableData secureDataWithCapacity:self.length / 2];
     uint8_t b = 0;
 
     for (NSUInteger i = 0; i < self.length; i++) {
@@ -376,21 +376,21 @@ static const UniChar base58chars[] = { '1', '2', '3', '4', '5', '6', '7', '8', '
     return d;
 }
 
-- (NSData*)addressToHash160
+- (NSData *)addressToHash160
 {
-    NSData* d = self.base58checkToData;
+    NSData *d = self.base58checkToData;
 
     return (d.length == 160 / 8 + 1) ? [d subdataWithRange:NSMakeRange(1, d.length - 1)] : nil;
 }
 
 - (BOOL)isValidBitcoinAddress
 {
-    NSData* d = self.base58checkToData;
+    NSData *d = self.base58checkToData;
 
     if (d.length != 21)
         return NO;
 
-    uint8_t version = *(const uint8_t*)d.bytes;
+    uint8_t version = *(const uint8_t *)d.bytes;
 
 #if BITCOIN_TESTNET
     return (version == BITCOIN_PUBKEY_ADDRESS_TEST || version == BITCOIN_SCRIPT_ADDRESS_TEST) ? YES : NO;
@@ -401,17 +401,17 @@ static const UniChar base58chars[] = { '1', '2', '3', '4', '5', '6', '7', '8', '
 
 - (BOOL)isValidBitcoinPrivateKey
 {
-    NSData* d = self.base58checkToData;
+    NSData *d = self.base58checkToData;
 
     if (d.length == 33 || d.length == 34) { // wallet import format: https://en.bitcoin.it/wiki/Wallet_import_format
 #if BITCOIN_TESTNET
-        return (*(const uint8_t*)d.bytes == BITCOIN_PRIVKEY_TEST) ? YES : NO;
+        return (*(const uint8_t *)d.bytes == BITCOIN_PRIVKEY_TEST) ? YES : NO;
 #else
-        return (*(const uint8_t*)d.bytes == BITCOIN_PRIVKEY) ? YES : NO;
+        return (*(const uint8_t *)d.bytes == BITCOIN_PRIVKEY) ? YES : NO;
 #endif
     }
     else if ((self.length == 30 || self.length == 22) && [self characterAtIndex:0] == 'S') { // mini private key format
-        NSMutableData* d = [NSMutableData secureDataWithCapacity:self.length + 1];
+        NSMutableData *d = [NSMutableData secureDataWithCapacity:self.length + 1];
 
         d.length = self.length;
         [self getBytes:d.mutableBytes
@@ -431,13 +431,13 @@ static const UniChar base58chars[] = { '1', '2', '3', '4', '5', '6', '7', '8', '
 // BIP38 encrypted keys: https://github.com/bitcoin/bips/blob/master/bip-0038.mediawiki
 - (BOOL)isValidBitcoinBIP38Key
 {
-    NSData* d = self.base58checkToData;
+    NSData *d = self.base58checkToData;
 
     if (d.length != 39)
         return NO; // invalid length
 
-    uint16_t prefix = CFSwapInt16BigToHost(*(const uint16_t*)d.bytes);
-    uint8_t flag = ((const uint8_t*)d.bytes)[2];
+    uint16_t prefix = CFSwapInt16BigToHost(*(const uint16_t *)d.bytes);
+    uint8_t flag = ((const uint8_t *)d.bytes)[2];
 
     if (prefix == BIP38_NOEC_PREFIX) { // non EC multiplied key
         return ((flag & BIP38_NOEC_FLAG) == BIP38_NOEC_FLAG && (flag & BIP38_LOTSEQUENCE_FLAG) == 0

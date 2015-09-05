@@ -67,9 +67,9 @@
 @implementation BRMerkleBlock
 
 // message can be either a merkleblock or header message
-+ (instancetype)blockWithMessage:(NSData*)message { return [[self alloc] initWithMessage:message]; }
++ (instancetype)blockWithMessage:(NSData *)message { return [[self alloc] initWithMessage:message]; }
 
-- (instancetype)initWithMessage:(NSData*)message
+- (instancetype)initWithMessage:(NSData *)message
 {
     if (!(self = [self init]))
         return nil;
@@ -78,7 +78,7 @@
         return nil;
 
     NSUInteger off = 0, l = 0, len = 0;
-    NSMutableData* d = [NSMutableData data];
+    NSMutableData *d = [NSMutableData data];
 
     _version = [message UInt32AtOffset:off];
     off += sizeof(uint32_t);
@@ -120,8 +120,8 @@
                            target:(uint32_t)target
                             nonce:(uint32_t)nonce
                 totalTransactions:(uint32_t)totalTransactions
-                           hashes:(NSData*)hashes
-                            flags:(NSData*)flags
+                           hashes:(NSData *)hashes
+                            flags:(NSData *)flags
                            height:(uint32_t)height
 {
     if (!(self = [self init]))
@@ -151,10 +151,10 @@
     // bit is the sign, and the remaining 23bits is the value after having been right shifted by (size - 3)*8 bits
     static const uint32_t maxsize = MAX_PROOF_OF_WORK >> 24, maxtarget = MAX_PROOF_OF_WORK & 0x00ffffffu;
     const uint32_t size = _target >> 24, target = _target & 0x00ffffffu;
-    NSMutableData* d = [NSMutableData data];
+    NSMutableData *d = [NSMutableData data];
     UInt256 merkleRoot, t = UINT256_ZERO;
     int hashIdx = 0, flagIdx = 0;
-    NSValue* root = [self _walk:&
+    NSValue *root = [self _walk:&
         hashIdx:&
         flagIdx:
         0:^id(id hash, BOOL flag) {
@@ -186,7 +186,7 @@
         return NO;
 
     if (size > 3)
-        *(uint32_t*)&t.u8[size - 3] = CFSwapInt32HostToLittle(target);
+        *(uint32_t *)&t.u8[size - 3] = CFSwapInt32HostToLittle(target);
     else
         t.u32[0] = CFSwapInt32HostToLittle(target >> (3 - size) * 8);
 
@@ -200,9 +200,9 @@
     return YES;
 }
 
-- (NSData*)toData
+- (NSData *)toData
 {
-    NSMutableData* d = [NSMutableData data];
+    NSMutableData *d = [NSMutableData data];
 
     [d appendUInt32:_version];
     [d appendBytes:&_prevBlock length:sizeof(_prevBlock)];
@@ -234,10 +234,10 @@
 }
 
 // returns an array of the matched tx hashes
-- (NSArray*)txHashes
+- (NSArray *)txHashes
 {
     int hashIdx = 0, flagIdx = 0;
-    NSArray* txHashes = [self _walk:&
+    NSArray *txHashes = [self _walk:&
         hashIdx:&
         flagIdx:
         0:^id(id hash, BOOL flag) {
@@ -259,7 +259,7 @@
 // targeted time between transitions (14*24*60*60 seconds). If the new difficulty is more than 4x or less than 1/4 of
 // the previous difficulty, the change is limited to either 4x or 1/4. There is also a minimum difficulty value
 // intuitively named MAX_PROOF_OF_WORK... since larger values are less difficult.
-- (BOOL)verifyDifficultyFromPreviousBlock:(BRMerkleBlock*)previous andTransitionTime:(uint32_t)time
+- (BOOL)verifyDifficultyFromPreviousBlock:(BRMerkleBlock *)previous andTransitionTime:(uint32_t)time
 {
     if (!uint256_eq(_prevBlock, previous.blockHash) || _height != previous.height + 1)
         return NO;
@@ -304,12 +304,12 @@
 
 // recursively walks the merkle tree in depth first order, calling leaf(hash, flag) for each stored hash, and
 // branch(left, right) with the result from each branch
-- (id)_walk:(int*)hashIdx:(int*)flagIdx:(int)depth:(id (^)(id, BOOL))leaf:(id (^)(id, id))branch
+- (id)_walk:(int *)hashIdx:(int *)flagIdx:(int)depth:(id (^)(id, BOOL))leaf:(id (^)(id, id))branch
 {
     if ((*flagIdx) / 8 >= _flags.length || (*hashIdx + 1) * sizeof(UInt256) > _hashes.length)
         return leaf(nil, NO);
 
-    BOOL flag = (((const uint8_t*)_flags.bytes)[*flagIdx / 8] & (1 << (*flagIdx % 8)));
+    BOOL flag = (((const uint8_t *)_flags.bytes)[*flagIdx / 8] & (1 << (*flagIdx % 8)));
 
     (*flagIdx)++;
 
@@ -330,7 +330,7 @@
 {
     if (uint256_is_zero(_blockHash))
         return super.hash;
-    return *(const NSUInteger*)&_blockHash;
+    return *(const NSUInteger *)&_blockHash;
 }
 
 - (BOOL)isEqual:(id)obj

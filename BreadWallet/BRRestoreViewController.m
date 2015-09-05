@@ -34,10 +34,10 @@
 
 @interface BRRestoreViewController ()
 
-@property (nonatomic, strong) IBOutlet UITextView* textView;
-@property (nonatomic, strong) IBOutlet NSLayoutConstraint* textViewYBottom;
-@property (nonatomic, strong) NSArray* words;
-@property (nonatomic, strong) NSMutableSet* allWords;
+@property (nonatomic, strong) IBOutlet UITextView *textView;
+@property (nonatomic, strong) IBOutlet NSLayoutConstraint *textViewYBottom;
+@property (nonatomic, strong) NSArray *words;
+@property (nonatomic, strong) NSMutableSet *allWords;
 @property (nonatomic, strong) id keyboardObserver, resignActiveObserver;
 
 @end
@@ -52,7 +52,7 @@
     self.words = [NSArray arrayWithContentsOfFile:[[NSBundle mainBundle] pathForResource:WORDS ofType:@"plist"]];
     self.allWords = [NSMutableSet set];
 
-    for (NSString* lang in [NSBundle mainBundle].localizations) {
+    for (NSString *lang in [NSBundle mainBundle].localizations) {
         [self.allWords
             addObjectsFromArray:[NSArray arrayWithContentsOfFile:[[NSBundle mainBundle] pathForResource:WORDS
                                                                                                  ofType:@"plist"
@@ -69,7 +69,7 @@
         addObserverForName:UIKeyboardWillShowNotification
                     object:nil
                      queue:nil
-                usingBlock:^(NSNotification* note) {
+                usingBlock:^(NSNotification *note) {
                     [UIView animateWithDuration:[note.userInfo[UIKeyboardAnimationDurationUserInfoKey] floatValue]
                                           delay:0.0
                                         options:[note.userInfo[UIKeyboardAnimationCurveUserInfoKey] integerValue]
@@ -86,7 +86,7 @@
         [[NSNotificationCenter defaultCenter] addObserverForName:UIApplicationWillResignActiveNotification
                                                           object:nil
                                                            queue:nil
-                                                      usingBlock:^(NSNotification* note) {
+                                                      usingBlock:^(NSNotification *note) {
                                                           self.textView.text = nil;
                                                       }];
 
@@ -119,11 +119,11 @@
         [[NSNotificationCenter defaultCenter] removeObserver:self.resignActiveObserver];
 }
 
-- (void)wipeWithPhrase:(NSString*)phrase
+- (void)wipeWithPhrase:(NSString *)phrase
 {
     @autoreleasepool
     {
-        BRWalletManager* m = [BRWalletManager sharedInstance];
+        BRWalletManager *m = [BRWalletManager sharedInstance];
 
         if ([phrase isEqual:@"wipe"])
             phrase = m.seedPhrase; // this triggers authentication request
@@ -157,13 +157,13 @@
 
 #pragma mark - UITextViewDelegate
 
-- (void)textViewDidChange:(UITextView*)textView
+- (void)textViewDidChange:(UITextView *)textView
 {
-    static NSCharacterSet* invalid = nil;
+    static NSCharacterSet *invalid = nil;
     static dispatch_once_t onceToken = 0;
 
     dispatch_once(&onceToken, ^{
-        NSMutableCharacterSet* set = [NSMutableCharacterSet letterCharacterSet];
+        NSMutableCharacterSet *set = [NSMutableCharacterSet letterCharacterSet];
 
         [set formUnionWithCharacterSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
         invalid = set.invertedSet;
@@ -171,8 +171,8 @@
 
     @autoreleasepool
     { // @autoreleasepool ensures sensitive data will be dealocated immediately
-        BRWalletManager* m = [BRWalletManager sharedInstance];
-        NSMutableString* s
+        BRWalletManager *m = [BRWalletManager sharedInstance];
+        NSMutableString *s
             = CFBridgingRelease(CFStringCreateMutableCopy(SecureAllocator(), 0, (CFStringRef)textView.text));
         BOOL done = ([s rangeOfString:@"\n"].location != NSNotFound) ? YES : NO;
 
@@ -193,16 +193,16 @@
 
         BOOL isLocal = YES;
         NSString *phrase = [m.mnemonic normalizePhrase:s], *incorrect = nil;
-        NSArray* a = CFBridgingRelease(
+        NSArray *a = CFBridgingRelease(
             CFStringCreateArrayBySeparatingStrings(SecureAllocator(), (CFStringRef)phrase, CFSTR(" ")));
 
-        for (NSString* word in a) { // add spaces between words for ideographic langauges
+        for (NSString *word in a) { // add spaces between words for ideographic langauges
             if (word.length < 1 || [word characterAtIndex:0] < 0x3000 || [self.allWords containsObject:word])
                 continue;
 
             for (NSUInteger i = 0; i < word.length; i++) {
                 for (NSUInteger j = (word.length - i > 8) ? 8 : word.length - i; j; j--) {
-                    NSString* w = [word substringWithRange:NSMakeRange(i, j)];
+                    NSString *w = [word substringWithRange:NSMakeRange(i, j)];
 
                     if (![self.allWords containsObject:w])
                         continue;
@@ -228,7 +228,7 @@
         a = CFBridgingRelease(
             CFStringCreateArrayBySeparatingStrings(SecureAllocator(), (CFStringRef)phrase, CFSTR(" ")));
 
-        for (NSString* word in a) {
+        for (NSString *word in a) {
             if (![self.words containsObject:word])
                 isLocal = NO;
             if ([self.allWords containsObject:word])
@@ -290,7 +290,7 @@
 
 #pragma mark - UIActionSheetDelegate
 
-- (void)actionSheet:(UIActionSheet*)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
+- (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
 {
     if (buttonIndex != actionSheet.destructiveButtonIndex) {
         [self.textView becomeFirstResponder];
@@ -302,7 +302,7 @@
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:WALLET_NEEDS_BACKUP_KEY];
     [[NSUserDefaults standardUserDefaults] synchronize];
 
-    UIViewController* p = self.navigationController.presentingViewController.presentingViewController;
+    UIViewController *p = self.navigationController.presentingViewController.presentingViewController;
 
     [p dismissViewControllerAnimated:NO
                            completion:^{

@@ -71,17 +71,17 @@ typedef union _UInt128 UInt128;
 @protocol BRPeerDelegate <NSObject>
 @required
 
-- (void)peerConnected:(BRPeer*)peer;
-- (void)peer:(BRPeer*)peer disconnectedWithError:(NSError*)error;
-- (void)peer:(BRPeer*)peer relayedPeers:(NSArray*)peers;
-- (void)peer:(BRPeer*)peer relayedTransaction:(BRTransaction*)transaction;
-- (void)peer:(BRPeer*)peer hasTransaction:(UInt256)txHash;
-- (void)peer:(BRPeer*)peer rejectedTransaction:(UInt256)txHash withCode:(uint8_t)code;
+- (void)peerConnected:(BRPeer *)peer;
+- (void)peer:(BRPeer *)peer disconnectedWithError:(NSError *)error;
+- (void)peer:(BRPeer *)peer relayedPeers:(NSArray *)peers;
+- (void)peer:(BRPeer *)peer relayedTransaction:(BRTransaction *)transaction;
+- (void)peer:(BRPeer *)peer hasTransaction:(UInt256)txHash;
+- (void)peer:(BRPeer *)peer rejectedTransaction:(UInt256)txHash withCode:(uint8_t)code;
 
 // called when the peer relays either a merkleblock or a block header, headers will have 0 totalTransactions
-- (void)peer:(BRPeer*)peer relayedBlock:(BRMerkleBlock*)block;
+- (void)peer:(BRPeer *)peer relayedBlock:(BRMerkleBlock *)block;
 
-- (BRTransaction*)peer:(BRPeer*)peer requestedTransaction:(UInt256)txHash;
+- (BRTransaction *)peer:(BRPeer *)peer requestedTransaction:(UInt256)txHash;
 
 @end
 
@@ -96,13 +96,13 @@ typedef enum : NSInteger { BRPeerStatusDisconnected = 0, BRPeerStatusConnecting,
 @property (nonatomic, assign) NSTimeInterval earliestKeyTime;
 
 @property (nonatomic, readonly) BRPeerStatus status;
-@property (nonatomic, readonly) NSString* host;
+@property (nonatomic, readonly) NSString *host;
 @property (nonatomic, readonly) UInt128 address;
 @property (nonatomic, readonly) uint16_t port;
 @property (nonatomic, readonly) uint64_t services;
 @property (nonatomic, readonly) uint32_t version;
 @property (nonatomic, readonly) uint64_t nonce;
-@property (nonatomic, readonly) NSString* useragent;
+@property (nonatomic, readonly) NSString *useragent;
 @property (nonatomic, readonly) uint32_t lastblock;
 @property (nonatomic, readonly) NSTimeInterval pingTime;
 @property (nonatomic, assign) NSTimeInterval timestamp; // last seen time (interval since refrence date)
@@ -122,13 +122,13 @@ typedef enum : NSInteger { BRPeerStatusDisconnected = 0, BRPeerStatusConnecting,
 - (void)setDelegate:(id<BRPeerDelegate>)delegate queue:(dispatch_queue_t)delegateQueue;
 - (void)connect;
 - (void)disconnect;
-- (void)sendMessage:(NSData*)message type:(NSString*)type;
-- (void)sendFilterloadMessage:(NSData*)filter;
+- (void)sendMessage:(NSData *)message type:(NSString *)type;
+- (void)sendFilterloadMessage:(NSData *)filter;
 - (void)sendMempoolMessage;
-- (void)sendGetheadersMessageWithLocators:(NSArray*)locators andHashStop:(UInt256)hashStop;
-- (void)sendGetblocksMessageWithLocators:(NSArray*)locators andHashStop:(UInt256)hashStop;
-- (void)sendInvMessageWithTxHashes:(NSArray*)txHashes;
-- (void)sendGetdataMessageWithTxHashes:(NSArray*)txHashes andBlockHashes:(NSArray*)blockHashes;
+- (void)sendGetheadersMessageWithLocators:(NSArray *)locators andHashStop:(UInt256)hashStop;
+- (void)sendGetblocksMessageWithLocators:(NSArray *)locators andHashStop:(UInt256)hashStop;
+- (void)sendInvMessageWithTxHashes:(NSArray *)txHashes;
+- (void)sendGetdataMessageWithTxHashes:(NSArray *)txHashes andBlockHashes:(NSArray *)blockHashes;
 - (void)sendGetaddrMessage;
 - (void)sendPingMessageWithPongHandler:(void (^)(BOOL success))pongHandler;
 - (void)rerequestBlocksFrom:(UInt256)blockHash; // useful to get additional transactions after a bloom filter update

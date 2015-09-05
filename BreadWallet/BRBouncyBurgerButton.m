@@ -52,7 +52,7 @@
     return self;
 }
 
-- (instancetype)initWithCoder:(NSCoder*)aDecoder
+- (instancetype)initWithCoder:(NSCoder *)aDecoder
 {
     if (!(self = [super initWithCoder:aDecoder]))
         return nil;
@@ -96,7 +96,7 @@
         }];
 }
 
-- (void)setTitleColor:(UIColor*)color forState:(UIControlState)state
+- (void)setTitleColor:(UIColor *)color forState:(UIControlState)state
 {
     [super setTitleColor:color forState:state];
     self.bar1.backgroundColor = self.bar2.backgroundColor = self.bar3.backgroundColor = self.currentTitleColor;

@@ -95,14 +95,14 @@ typedef union _UInt128 {
 #define OP_HASH160 0xa9
 #define OP_CHECKSIG 0xac
 
-void SHA1(const void* data, size_t len, void* md);
-void SHA256(const void* data, size_t len, void* md);
-void SHA512(const void* data, size_t len, void* md);
-void RMD160(const void* data, size_t len, void* md);
-void HMAC(void (*hash)(const void*, size_t, void*), int hlen, const void* key, size_t klen, const void* data,
-    size_t dlen, void* md);
-void PBKDF2(void (*hash)(const void*, size_t, void*), int hlen, const void* pw, size_t pwlen, const void* salt,
-    size_t slen, unsigned rounds, void* dk, size_t dklen);
+void SHA1(const void *data, size_t len, void *md);
+void SHA256(const void *data, size_t len, void *md);
+void SHA512(const void *data, size_t len, void *md);
+void RMD160(const void *data, size_t len, void *md);
+void HMAC(void (*hash)(const void *, size_t, void *), int hlen, const void *key, size_t klen, const void *data,
+    size_t dlen, void *md);
+void PBKDF2(void (*hash)(const void *, size_t, void *), int hlen, const void *pw, size_t pwlen, const void *salt,
+    size_t slen, unsigned rounds, void *dk, size_t dklen);
 
 @interface NSData (Bitcoin)
 
@@ -112,18 +112,18 @@ void PBKDF2(void (*hash)(const void*, size_t, void*), int hlen, const void* pw, 
 - (UInt512)SHA512;
 - (UInt160)RMD160;
 - (UInt160)hash160;
-- (NSData*)reverse;
+- (NSData *)reverse;
 
 - (uint8_t)UInt8AtOffset:(NSUInteger)offset;
 - (uint16_t)UInt16AtOffset:(NSUInteger)offset;
 - (uint32_t)UInt32AtOffset:(NSUInteger)offset;
 - (uint64_t)UInt64AtOffset:(NSUInteger)offset;
-- (uint64_t)varIntAtOffset:(NSUInteger)offset length:(NSUInteger*)length;
+- (uint64_t)varIntAtOffset:(NSUInteger)offset length:(NSUInteger *)length;
 - (UInt256)hashAtOffset:(NSUInteger)offset;
-- (NSString*)stringAtOffset:(NSUInteger)offset length:(NSUInteger*)length;
-- (NSData*)dataAtOffset:(NSUInteger)offset length:(NSUInteger*)length;
+- (NSString *)stringAtOffset:(NSUInteger)offset length:(NSUInteger *)length;
+- (NSData *)dataAtOffset:(NSUInteger)offset length:(NSUInteger *)length;
 
-- (NSArray*)scriptElements; // an array of NSNumber and NSData objects representing each script element
+- (NSArray *)scriptElements; // an array of NSNumber and NSData objects representing each script element
 - (int)intValue; // returns the opcode used to store the receiver in a script (i.e. OP_PUSHDATA1)
 
 @end

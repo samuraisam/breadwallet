@@ -46,19 +46,19 @@ typedef enum : uint32_t { error = 0, tx, block, merkleblock } inv;
 
 @property (nonatomic, assign) id<BRPeerDelegate> delegate;
 @property (nonatomic, strong) dispatch_queue_t delegateQueue;
-@property (nonatomic, strong) NSInputStream* inputStream;
-@property (nonatomic, strong) NSOutputStream* outputStream;
+@property (nonatomic, strong) NSInputStream *inputStream;
+@property (nonatomic, strong) NSOutputStream *outputStream;
 @property (nonatomic, strong) NSMutableData *msgHeader, *msgPayload, *outputBuffer;
 @property (nonatomic, assign) BOOL sentVerack, gotVerack, sentFilter, sentGetAddr;
-@property (nonatomic, strong) Reachability* reachability;
+@property (nonatomic, strong) Reachability *reachability;
 @property (nonatomic, strong) id reachabilityObserver;
 @property (nonatomic, assign) uint64_t localNonce;
 @property (nonatomic, assign) NSTimeInterval startTime;
-@property (nonatomic, strong) BRMerkleBlock* currentBlock;
+@property (nonatomic, strong) BRMerkleBlock *currentBlock;
 @property (nonatomic, strong) NSMutableOrderedSet *knownBlockHashes, *knownTxHashes, *currentBlockTxHashes;
-@property (nonatomic, strong) NSData* lastBlockHash;
-@property (nonatomic, strong) NSMutableArray* pongHandlers;
-@property (nonatomic, strong) NSRunLoop* runLoop;
+@property (nonatomic, strong) NSData *lastBlockHash;
+@property (nonatomic, strong) NSMutableArray *pongHandlers;
+@property (nonatomic, strong) NSRunLoop *runLoop;
 
 @end
 
@@ -108,7 +108,7 @@ typedef enum : uint32_t { error = 0, tx, block, merkleblock } inv;
     _delegateQueue = (delegateQueue) ? delegateQueue : dispatch_get_main_queue();
 }
 
-- (NSString*)host
+- (NSString *)host
 {
     char s[INET6_ADDRSTRLEN];
 
@@ -137,7 +137,7 @@ typedef enum : uint32_t { error = 0, tx, block, merkleblock } inv;
                     [[NSNotificationCenter defaultCenter] addObserverForName:kReachabilityChangedNotification
                                                                       object:nil
                                                                        queue:nil
-                                                                  usingBlock:^(NSNotification* note) {
+                                                                  usingBlock:^(NSNotification *note) {
                                                                       if (self.reachabilityObserver
                                                                           && self.reachability.currentReachabilityStatus
                                                                               != NotReachable) {
@@ -168,7 +168,7 @@ typedef enum : uint32_t { error = 0, tx, block, merkleblock } inv;
     self.currentBlock = nil;
     self.currentBlockTxHashes = nil;
 
-    NSString* label = [NSString stringWithFormat:@"peer.%@:%u", self.host, self.port];
+    NSString *label = [NSString stringWithFormat:@"peer.%@:%u", self.host, self.port];
 
     // use a private serial queue for processing socket io
     dispatch_async(dispatch_queue_create(label.UTF8String, NULL), ^{
@@ -202,7 +202,7 @@ typedef enum : uint32_t { error = 0, tx, block, merkleblock } inv;
 
 - (void)disconnect { [self disconnectWithError:nil]; }
 
-- (void)disconnectWithError:(NSError*)error
+- (void)disconnectWithError:(NSError *)error
 {
     [NSObject cancelPreviousPerformRequestsWithTarget:self]; // cancel connect timeout
 
@@ -241,7 +241,7 @@ typedef enum : uint32_t { error = 0, tx, block, merkleblock } inv;
     CFRunLoopWakeUp([self.runLoop getCFRunLoop]);
 }
 
-- (void)error:(NSString*)message, ... NS_FORMAT_FUNCTION(1, 2)
+- (void)error:(NSString *)message, ... NS_FORMAT_FUNCTION(1, 2)
 {
     va_list args;
 
@@ -271,7 +271,7 @@ typedef enum : uint32_t { error = 0, tx, block, merkleblock } inv;
 
 #pragma mark - send
 
-- (void)sendMessage:(NSData*)message type:(NSString*)type
+- (void)sendMessage:(NSData *)message type:(NSString *)type
 {
     if (message.length > MAX_MSG_LENGTH) {
         NSLog(@"%@:%u failed to send %@, length %u is too long", self.host, self.port, type, (int)message.length);
@@ -302,7 +302,7 @@ typedef enum : uint32_t { error = 0, tx, block, merkleblock } inv;
 
 - (void)sendVersionMessage
 {
-    NSMutableData* msg = [NSMutableData data];
+    NSMutableData *msg = [NSMutableData data];
     uint16_t port = CFSwapInt16HostToBig(self.port);
 
     [msg appendUInt32:PROTOCOL_VERSION]; // version
@@ -328,7 +328,7 @@ typedef enum : uint32_t { error = 0, tx, block, merkleblock } inv;
     [self didConnect];
 }
 
-- (void)sendFilterloadMessage:(NSData*)filter
+- (void)sendFilterloadMessage:(NSData *)filter
 {
     self.sentFilter = YES;
     [self sendMessage:filter type:MSG_FILTERLOAD];
@@ -338,7 +338,7 @@ typedef enum : uint32_t { error = 0, tx, block, merkleblock } inv;
 
 - (void)sendAddrMessage
 {
-    NSMutableData* msg = [NSMutableData data];
+    NSMutableData *msg = [NSMutableData data];
 
     // TODO: send peer addresses we know about
     [msg appendVarInt:0];
@@ -373,15 +373,15 @@ typedef enum : uint32_t { error = 0, tx, block, merkleblock } inv;
 //   are generated and local peer sends filterload with an updated bloom filter
 // - after filterload is sent, getdata is sent to re-request recent blocks that may contain new tx matching the filter
 
-- (void)sendGetheadersMessageWithLocators:(NSArray*)locators andHashStop:(UInt256)hashStop
+- (void)sendGetheadersMessageWithLocators:(NSArray *)locators andHashStop:(UInt256)hashStop
 {
-    NSMutableData* msg = [NSMutableData data];
+    NSMutableData *msg = [NSMutableData data];
     UInt256 h;
 
     [msg appendUInt32:PROTOCOL_VERSION];
     [msg appendVarInt:locators.count];
 
-    for (NSValue* hash in locators) {
+    for (NSValue *hash in locators) {
         [hash getValue:&h];
         [msg appendBytes:&h length:sizeof(h)];
     }
@@ -392,15 +392,15 @@ typedef enum : uint32_t { error = 0, tx, block, merkleblock } inv;
     [self sendMessage:msg type:MSG_GETHEADERS];
 }
 
-- (void)sendGetblocksMessageWithLocators:(NSArray*)locators andHashStop:(UInt256)hashStop
+- (void)sendGetblocksMessageWithLocators:(NSArray *)locators andHashStop:(UInt256)hashStop
 {
-    NSMutableData* msg = [NSMutableData data];
+    NSMutableData *msg = [NSMutableData data];
     UInt256 h;
 
     [msg appendUInt32:PROTOCOL_VERSION];
     [msg appendVarInt:locators.count];
 
-    for (NSValue* hash in locators) {
+    for (NSValue *hash in locators) {
         [hash getValue:&h];
         [msg appendBytes:&h length:sizeof(h)];
     }
@@ -409,10 +409,10 @@ typedef enum : uint32_t { error = 0, tx, block, merkleblock } inv;
     [self sendMessage:msg type:MSG_GETBLOCKS];
 }
 
-- (void)sendInvMessageWithTxHashes:(NSArray*)txHashes
+- (void)sendInvMessageWithTxHashes:(NSArray *)txHashes
 {
-    NSMutableOrderedSet* hashes = [NSMutableOrderedSet orderedSetWithArray:txHashes];
-    NSMutableData* msg = [NSMutableData data];
+    NSMutableOrderedSet *hashes = [NSMutableOrderedSet orderedSetWithArray:txHashes];
+    NSMutableData *msg = [NSMutableData data];
     UInt256 h;
 
     [hashes minusOrderedSet:self.knownTxHashes];
@@ -420,7 +420,7 @@ typedef enum : uint32_t { error = 0, tx, block, merkleblock } inv;
         return;
     [msg appendVarInt:hashes.count];
 
-    for (NSValue* hash in hashes) {
+    for (NSValue *hash in hashes) {
         [msg appendUInt32:tx];
         [hash getValue:&h];
         [msg appendBytes:&h length:sizeof(h)];
@@ -430,7 +430,7 @@ typedef enum : uint32_t { error = 0, tx, block, merkleblock } inv;
     [self.knownTxHashes unionOrderedSet:hashes];
 }
 
-- (void)sendGetdataMessageWithTxHashes:(NSArray*)txHashes andBlockHashes:(NSArray*)blockHashes
+- (void)sendGetdataMessageWithTxHashes:(NSArray *)txHashes andBlockHashes:(NSArray *)blockHashes
 {
     if (txHashes.count + blockHashes.count > MAX_GETDATA_HASHES) { // limit total hash count to MAX_GETDATA_HASHES
         NSLog(@"%@:%u couldn't send getdata, %u is too many items, max is %u", self.host, self.port,
@@ -440,18 +440,18 @@ typedef enum : uint32_t { error = 0, tx, block, merkleblock } inv;
     else if (txHashes.count + blockHashes.count == 0)
         return;
 
-    NSMutableData* msg = [NSMutableData data];
+    NSMutableData *msg = [NSMutableData data];
     UInt256 h;
 
     [msg appendVarInt:txHashes.count + blockHashes.count];
 
-    for (NSValue* hash in txHashes) {
+    for (NSValue *hash in txHashes) {
         [msg appendUInt32:tx];
         [hash getValue:&h];
         [msg appendBytes:&h length:sizeof(h)];
     }
 
-    for (NSValue* hash in blockHashes) {
+    for (NSValue *hash in blockHashes) {
         [msg appendUInt32:merkleblock];
         [hash getValue:&h];
         [msg appendBytes:&h length:sizeof(h)];
@@ -468,7 +468,7 @@ typedef enum : uint32_t { error = 0, tx, block, merkleblock } inv;
 
 - (void)sendPingMessageWithPongHandler:(void (^)(BOOL success))pongHandler;
 {
-    NSMutableData* msg = [NSMutableData data];
+    NSMutableData *msg = [NSMutableData data];
 
     dispatch_async(self.delegateQueue, ^{
         if (!self.pongHandlers)
@@ -495,7 +495,7 @@ typedef enum : uint32_t { error = 0, tx, block, merkleblock } inv;
 
 #pragma mark - accept
 
-- (void)acceptMessage:(NSData*)message type:(NSString*)type
+- (void)acceptMessage:(NSData *)message type:(NSString *)type
 {
     CFRunLoopPerformBlock([self.runLoop getCFRunLoop], kCFRunLoopCommonModes, ^{
         if (self.currentBlock && ![MSG_TX isEqual:type]) { // if we receive a non-tx message, the merkleblock is done
@@ -538,7 +538,7 @@ typedef enum : uint32_t { error = 0, tx, block, merkleblock } inv;
     CFRunLoopWakeUp([self.runLoop getCFRunLoop]);
 }
 
-- (void)acceptVersionMessage:(NSData*)message
+- (void)acceptVersionMessage:(NSData *)message
 {
     NSUInteger l = 0;
 
@@ -568,7 +568,7 @@ typedef enum : uint32_t { error = 0, tx, block, merkleblock } inv;
     [self sendVerackMessage];
 }
 
-- (void)acceptVerackMessage:(NSData*)message
+- (void)acceptVerackMessage:(NSData *)message
 {
     if (self.gotVerack) {
         NSLog(@"%@:%u got unexpected verack", self.host, self.port);
@@ -584,7 +584,7 @@ typedef enum : uint32_t { error = 0, tx, block, merkleblock } inv;
 }
 
 // TODO: relay addresses
-- (void)acceptAddrMessage:(NSData*)message
+- (void)acceptAddrMessage:(NSData *)message
 {
     if (message.length > 0 && [message UInt8AtOffset:0] == 0) {
         NSLog(@"%@:%u got addr with 0 addresses", self.host, self.port);
@@ -599,7 +599,7 @@ typedef enum : uint32_t { error = 0, tx, block, merkleblock } inv;
 
     NSTimeInterval now = [NSDate timeIntervalSinceReferenceDate];
     NSUInteger l, count = (NSUInteger)[message varIntAtOffset:0 length:&l];
-    NSMutableArray* peers = [NSMutableArray array];
+    NSMutableArray *peers = [NSMutableArray array];
 
     if (count > 1000) {
         NSLog(@"%@:%u dropping addr message, %u is too many addresses (max 1000)", self.host, self.port, (int)count);
@@ -616,8 +616,8 @@ typedef enum : uint32_t { error = 0, tx, block, merkleblock } inv;
     for (NSUInteger off = l; off < l + 30 * count; off += 30) {
         NSTimeInterval timestamp = [message UInt32AtOffset:off] - NSTimeIntervalSince1970;
         uint64_t services = [message UInt64AtOffset:off + sizeof(uint32_t)];
-        UInt128 address = *(UInt128*)((const uint8_t*)message.bytes + off + sizeof(uint32_t) + sizeof(uint64_t));
-        uint16_t port = CFSwapInt16BigToHost(*(const uint16_t*)((const uint8_t*)message.bytes + off + sizeof(uint32_t)
+        UInt128 address = *(UInt128 *)((const uint8_t *)message.bytes + off + sizeof(uint32_t) + sizeof(uint64_t));
+        uint16_t port = CFSwapInt16BigToHost(*(const uint16_t *)((const uint8_t *)message.bytes + off + sizeof(uint32_t)
                                                  + sizeof(uint64_t) + sizeof(UInt128)));
 
         if (!(services & SERVICES_NODE_NETWORK))
@@ -641,7 +641,7 @@ typedef enum : uint32_t { error = 0, tx, block, merkleblock } inv;
     });
 }
 
-- (void)acceptInvMessage:(NSData*)message
+- (void)acceptInvMessage:(NSData *)message
 {
     NSUInteger l, count = (NSUInteger)[message varIntAtOffset:0 length:&l];
     NSMutableOrderedSet *txHashes = [NSMutableOrderedSet orderedSet], *blockHashes = [NSMutableOrderedSet orderedSet];
@@ -714,7 +714,7 @@ typedef enum : uint32_t { error = 0, tx, block, merkleblock } inv;
     }
 
     if ([txHashes intersectsOrderedSet:self.knownTxHashes]) { // remove transactions we already have
-        for (NSValue* hash in txHashes) {
+        for (NSValue *hash in txHashes) {
             UInt256 h;
 
             if (![self.knownTxHashes containsObject:hash])
@@ -744,9 +744,9 @@ typedef enum : uint32_t { error = 0, tx, block, merkleblock } inv;
     }
 }
 
-- (void)acceptTxMessage:(NSData*)message
+- (void)acceptTxMessage:(NSData *)message
 {
-    BRTransaction* tx = [BRTransaction transactionWithMessage:message];
+    BRTransaction *tx = [BRTransaction transactionWithMessage:message];
 
     if (!tx) {
         [self error:@"malformed tx message: %@", message];
@@ -767,7 +767,7 @@ typedef enum : uint32_t { error = 0, tx, block, merkleblock } inv;
         [self.currentBlockTxHashes removeObject:uint256_obj(tx.txHash)];
 
         if (self.currentBlockTxHashes.count == 0) { // we received the entire block including all matched tx
-            BRMerkleBlock* block = self.currentBlock;
+            BRMerkleBlock *block = self.currentBlock;
 
             self.currentBlock = nil;
             self.currentBlockTxHashes = nil;
@@ -779,7 +779,7 @@ typedef enum : uint32_t { error = 0, tx, block, merkleblock } inv;
     }
 }
 
-- (void)acceptHeadersMessage:(NSData*)message
+- (void)acceptHeadersMessage:(NSData *)message
 {
     NSUInteger l, count = (NSUInteger)[message varIntAtOffset:0 length:&l], off;
 
@@ -821,7 +821,7 @@ typedef enum : uint32_t { error = 0, tx, block, merkleblock } inv;
     }
 
     for (NSUInteger off = l; off < l + 81 * count; off += 81) {
-        BRMerkleBlock* block = [BRMerkleBlock blockWithMessage:[message subdataWithRange:NSMakeRange(off, 81)]];
+        BRMerkleBlock *block = [BRMerkleBlock blockWithMessage:[message subdataWithRange:NSMakeRange(off, 81)]];
 
         if (!block.valid) {
             [self error:@"invalid block header %@", uint256_obj(block.blockHash)];
@@ -834,13 +834,13 @@ typedef enum : uint32_t { error = 0, tx, block, merkleblock } inv;
     }
 }
 
-- (void)acceptGetaddrMessage:(NSData*)message
+- (void)acceptGetaddrMessage:(NSData *)message
 {
     NSLog(@"%@:%u got getaddr", self.host, self.port);
     [self sendAddrMessage];
 }
 
-- (void)acceptGetdataMessage:(NSData*)message
+- (void)acceptGetdataMessage:(NSData *)message
 {
     NSUInteger l, count = (NSUInteger)[message varIntAtOffset:0 length:&l];
 
@@ -858,12 +858,12 @@ typedef enum : uint32_t { error = 0, tx, block, merkleblock } inv;
     NSLog(@"%@:%u got getdata with %u items", self.host, self.port, (int)count);
 
     dispatch_async(self.delegateQueue, ^{
-        NSMutableData* notfound = [NSMutableData data];
+        NSMutableData *notfound = [NSMutableData data];
 
         for (NSUInteger off = l; off < l + count * 36; off += 36) {
             inv type = [message UInt32AtOffset:off];
             UInt256 hash = [message hashAtOffset:off + sizeof(uint32_t)];
-            BRTransaction* transaction = nil;
+            BRTransaction *transaction = nil;
 
             if (uint256_is_zero(hash))
                 continue;
@@ -886,7 +886,7 @@ typedef enum : uint32_t { error = 0, tx, block, merkleblock } inv;
         }
 
         if (notfound.length > 0) {
-            NSMutableData* msg = [NSMutableData data];
+            NSMutableData *msg = [NSMutableData data];
 
             [msg appendVarInt:notfound.length / 36];
             [msg appendData:notfound];
@@ -895,7 +895,7 @@ typedef enum : uint32_t { error = 0, tx, block, merkleblock } inv;
     });
 }
 
-- (void)acceptNotfoundMessage:(NSData*)message
+- (void)acceptNotfoundMessage:(NSData *)message
 {
     NSUInteger l, count = (NSUInteger)[message varIntAtOffset:0 length:&l];
 
@@ -908,7 +908,7 @@ typedef enum : uint32_t { error = 0, tx, block, merkleblock } inv;
     NSLog(@"%@:%u got notfound with %u items", self.host, self.port, (int)count);
 }
 
-- (void)acceptPingMessage:(NSData*)message
+- (void)acceptPingMessage:(NSData *)message
 {
     if (message.length < sizeof(uint64_t)) {
         [self error:@"malformed ping message, length is %u, should be 4", (int)message.length];
@@ -919,7 +919,7 @@ typedef enum : uint32_t { error = 0, tx, block, merkleblock } inv;
     [self sendMessage:message type:MSG_PONG];
 }
 
-- (void)acceptPongMessage:(NSData*)message
+- (void)acceptPongMessage:(NSData *)message
 {
     if (message.length < sizeof(uint64_t)) {
         [self error:@"malformed pong message, length is %u, should be 4", (int)message.length];
@@ -953,12 +953,12 @@ typedef enum : uint32_t { error = 0, tx, block, merkleblock } inv;
     });
 }
 
-- (void)acceptMerkleblockMessage:(NSData*)message
+- (void)acceptMerkleblockMessage:(NSData *)message
 {
     // Bitcoin nodes don't support querying arbitrary transactions, only transactions not yet accepted in a block. After
     // a merkleblock message, the remote node is expected to send tx messages for the tx referenced in the block. When a
     // non-tx message is received we should have all the tx in the merkleblock.
-    BRMerkleBlock* block = [BRMerkleBlock blockWithMessage:message];
+    BRMerkleBlock *block = [BRMerkleBlock blockWithMessage:message];
 
     if (!block.valid) {
         [self error:@"invalid merkleblock: %@", uint256_obj(block.blockHash)];
@@ -970,7 +970,7 @@ typedef enum : uint32_t { error = 0, tx, block, merkleblock } inv;
     }
     // else NSLog(@"%@:%u got merkleblock %@", self.host, self.port, block.blockHash);
 
-    NSMutableOrderedSet* txHashes = [NSMutableOrderedSet orderedSetWithArray:block.txHashes];
+    NSMutableOrderedSet *txHashes = [NSMutableOrderedSet orderedSetWithArray:block.txHashes];
 
     [txHashes minusOrderedSet:self.knownTxHashes];
 
@@ -986,12 +986,12 @@ typedef enum : uint32_t { error = 0, tx, block, merkleblock } inv;
 }
 
 // described in BIP61: https://github.com/bitcoin/bips/blob/master/bip-0061.mediawiki
-- (void)acceptRejectMessage:(NSData*)message
+- (void)acceptRejectMessage:(NSData *)message
 {
     NSUInteger off = 0, l = 0;
-    NSString* type = [message stringAtOffset:0 length:&off];
+    NSString *type = [message stringAtOffset:0 length:&off];
     uint8_t code = [message UInt8AtOffset:off++];
-    NSString* reason = [message stringAtOffset:off length:&l];
+    NSString *reason = [message stringAtOffset:off length:&l];
     UInt256 txHash = ([MSG_TX isEqual:type]) ? [message hashAtOffset:off + l] : UINT256_ZERO;
 
     NSLog(@"%@:%u rejected %@ code: 0x%x reason: \"%@\"%@%@", self.host, self.port, type, code, reason,
@@ -1027,15 +1027,15 @@ typedef enum : uint32_t { error = 0, tx, block, merkleblock } inv;
 // two peer objects are equal if they share an ip address and port number
 - (BOOL)isEqual:(id)object
 {
-    return (self == object || ([object isKindOfClass:[BRPeer class]] && _port == ((BRPeer*)object).port
-                                  && uint128_eq(_address, [(BRPeer*)object address])))
+    return (self == object || ([object isKindOfClass:[BRPeer class]] && _port == ((BRPeer *)object).port
+                                  && uint128_eq(_address, [(BRPeer *)object address])))
         ? YES
         : NO;
 }
 
 #pragma mark - NSStreamDelegate
 
-- (void)stream:(NSStream*)aStream handleEvent:(NSStreamEvent)eventCode
+- (void)stream:(NSStream *)aStream handleEvent:(NSStreamEvent)eventCode
 {
     switch (eventCode) {
     case NSStreamEventOpenCompleted:
@@ -1075,14 +1075,14 @@ typedef enum : uint32_t { error = 0, tx, block, merkleblock } inv;
             return;
 
         while (self.inputStream.hasBytesAvailable) {
-            NSData* message = nil;
-            NSString* type = nil;
+            NSData *message = nil;
+            NSString *type = nil;
             NSInteger headerLen = self.msgHeader.length, payloadLen = self.msgPayload.length, l = 0;
             uint32_t length = 0, checksum = 0;
 
             if (headerLen < HEADER_LENGTH) { // read message header
                 self.msgHeader.length = HEADER_LENGTH;
-                l = [self.inputStream read:(uint8_t*)self.msgHeader.mutableBytes + headerLen
+                l = [self.inputStream read:(uint8_t *)self.msgHeader.mutableBytes + headerLen
                                  maxLength:self.msgHeader.length - headerLen];
 
                 if (l < 0) {
@@ -1096,7 +1096,7 @@ typedef enum : uint32_t { error = 0, tx, block, merkleblock } inv;
                 while (self.msgHeader.length >= sizeof(uint32_t)
                     && [self.msgHeader UInt32AtOffset:0] != BITCOIN_MAGIC_NUMBER) {
 #if DEBUG
-                    printf("%c", *(const char*)self.msgHeader.bytes);
+                    printf("%c", *(const char *)self.msgHeader.bytes);
 #endif
                     [self.msgHeader replaceBytesInRange:NSMakeRange(0, 1) withBytes:NULL length:0];
                 }
@@ -1110,7 +1110,7 @@ typedef enum : uint32_t { error = 0, tx, block, merkleblock } inv;
                 goto reset;
             }
 
-            type = @((const char*)self.msgHeader.bytes + 4);
+            type = @((const char *)self.msgHeader.bytes + 4);
             length = [self.msgHeader UInt32AtOffset:16];
             checksum = [self.msgHeader UInt32AtOffset:20];
 
@@ -1121,7 +1121,7 @@ typedef enum : uint32_t { error = 0, tx, block, merkleblock } inv;
 
             if (payloadLen < length) { // read message payload
                 self.msgPayload.length = length;
-                l = [self.inputStream read:(uint8_t*)self.msgPayload.mutableBytes + payloadLen
+                l = [self.inputStream read:(uint8_t *)self.msgPayload.mutableBytes + payloadLen
                                  maxLength:self.msgPayload.length - payloadLen];
 
                 if (l < 0) {

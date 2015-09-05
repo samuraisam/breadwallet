@@ -31,7 +31,7 @@
 
 @property (nonatomic, assign) BOOL hasAppeared, animating;
 @property (nonatomic, strong) id foregroundObserver, backgroundObserver;
-@property (nonatomic, strong) UINavigationController* seedNav;
+@property (nonatomic, strong) UINavigationController *seedNav;
 
 @property (nonatomic, strong) IBOutlet UIView *paralax, *wallpaper;
 @property (nonatomic, strong) IBOutlet UILabel *startLabel, *recoverLabel, *warningLabel;
@@ -63,7 +63,7 @@
         [[NSNotificationCenter defaultCenter] addObserverForName:UIApplicationWillEnterForegroundNotification
                                                           object:nil
                                                            queue:nil
-                                                      usingBlock:^(NSNotification* note) {
+                                                      usingBlock:^(NSNotification *note) {
                                                           [self animateWallpaper];
                                                       }];
 
@@ -71,7 +71,7 @@
         [[NSNotificationCenter defaultCenter] addObserverForName:UIApplicationDidEnterBackgroundNotification
                                                           object:nil
                                                            queue:nil
-                                                      usingBlock:^(NSNotification* note) {
+                                                      usingBlock:^(NSNotification *note) {
                                                           self.wallpaperXLeft.constant = 0;
                                                           [self.wallpaper.superview layoutIfNeeded];
                                                       }];
@@ -167,7 +167,7 @@
     });
 }
 
-- (void)prepareForSegue:(UIStoryboardSegue*)segue sender:(id)sender
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
 {
     [super prepareForSegue:segue sender:sender];
 
@@ -191,7 +191,7 @@
 
     if (self.warningLabel) {
         NSTextAttachment *noEye = [NSTextAttachment new], *noKey = [NSTextAttachment new];
-        NSMutableAttributedString* s =
+        NSMutableAttributedString *s =
             [[NSMutableAttributedString alloc] initWithAttributedString:self.warningLabel.attributedText];
 
         noEye.image = [UIImage imageNamed:@"no-eye"];
@@ -291,7 +291,7 @@
 // This method can only be a nop if the transition is interactive and not a percentDriven interactive transition.
 - (void)animateTransition:(id<UIViewControllerContextTransitioning>)transitionContext
 {
-    UIView* v = transitionContext.containerView;
+    UIView *v = transitionContext.containerView;
     UIViewController *to = [transitionContext viewControllerForKey:UITransitionContextToViewControllerKey],
                      *from = [transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
 
@@ -320,10 +320,10 @@
 
 #pragma mark - UINavigationControllerDelegate
 
-- (id<UIViewControllerAnimatedTransitioning>)navigationController:(UINavigationController*)navigationController
+- (id<UIViewControllerAnimatedTransitioning>)navigationController:(UINavigationController *)navigationController
                                   animationControllerForOperation:(UINavigationControllerOperation)operation
-                                               fromViewController:(UIViewController*)fromVC
-                                                 toViewController:(UIViewController*)toVC
+                                               fromViewController:(UIViewController *)fromVC
+                                                 toViewController:(UIViewController *)toVC
 {
     return self;
 }
@@ -332,14 +332,14 @@
 
 #pragma mark - UIViewControllerTransitioningDelegate
 
-- (id<UIViewControllerAnimatedTransitioning>)animationControllerForPresentedController:(UIViewController*)presented
-                                                                  presentingController:(UIViewController*)presenting
-                                                                      sourceController:(UIViewController*)source
+- (id<UIViewControllerAnimatedTransitioning>)animationControllerForPresentedController:(UIViewController *)presented
+                                                                  presentingController:(UIViewController *)presenting
+                                                                      sourceController:(UIViewController *)source
 {
     return self;
 }
 
-- (id<UIViewControllerAnimatedTransitioning>)animationControllerForDismissedController:(UIViewController*)dismissed
+- (id<UIViewControllerAnimatedTransitioning>)animationControllerForDismissedController:(UIViewController *)dismissed
 {
     return self;
 }

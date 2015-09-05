@@ -42,7 +42,7 @@
 @dynamic hashes;
 @dynamic flags;
 
-- (instancetype)setAttributesFromBlock:(BRMerkleBlock*)block;
+- (instancetype)setAttributesFromBlock:(BRMerkleBlock *)block;
 {
     [self.managedObjectContext performBlockAndWait:^{
         self.blockHash = [NSData dataWithBytes:block.blockHash.u8 length:sizeof(UInt256)];
@@ -61,9 +61,9 @@
     return self;
 }
 
-- (BRMerkleBlock*)merkleBlock
+- (BRMerkleBlock *)merkleBlock
 {
-    __block BRMerkleBlock* block = nil;
+    __block BRMerkleBlock *block = nil;
 
     [self.managedObjectContext performBlockAndWait:^{
         NSData *blockHash = self.blockHash, *prevBlock = self.prevBlock, *merkleRoot = self.merkleRoot;
