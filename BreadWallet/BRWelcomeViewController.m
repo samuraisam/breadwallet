@@ -29,14 +29,14 @@
 
 @interface BRWelcomeViewController ()
 
-@property(nonatomic, assign) BOOL hasAppeared, animating;
-@property(nonatomic, strong) id foregroundObserver, backgroundObserver;
-@property(nonatomic, strong) UINavigationController *seedNav;
+@property (nonatomic, assign) BOOL hasAppeared, animating;
+@property (nonatomic, strong) id foregroundObserver, backgroundObserver;
+@property (nonatomic, strong) UINavigationController *seedNav;
 
-@property(nonatomic, strong) IBOutlet UIView *paralax, *wallpaper;
-@property(nonatomic, strong) IBOutlet UILabel *startLabel, *recoverLabel, *warningLabel;
-@property(nonatomic, strong) IBOutlet UIButton *newwalletButton, *recoverButton, *generateButton, *showButton;
-@property(nonatomic, strong) IBOutlet NSLayoutConstraint *logoXCenter, *walletXCenter, *restoreXCenter, *paralaxXLeft,
+@property (nonatomic, strong) IBOutlet UIView *paralax, *wallpaper;
+@property (nonatomic, strong) IBOutlet UILabel *startLabel, *recoverLabel, *warningLabel;
+@property (nonatomic, strong) IBOutlet UIButton *newwalletButton, *recoverButton, *generateButton, *showButton;
+@property (nonatomic, strong) IBOutlet NSLayoutConstraint *logoXCenter, *walletXCenter, *restoreXCenter, *paralaxXLeft,
     *wallpaperXLeft;
 
 @end

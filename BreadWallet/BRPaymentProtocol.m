@@ -175,8 +175,8 @@ typedef enum : NSUInteger { ack_payment = 1, ack_memo = 2 } ack_key;
 
 @interface BRPaymentProtocolDetails ()
 
-@property(nonatomic, strong) NSString *network;
-@property(nonatomic, strong) NSArray *outputAmounts;
+@property (nonatomic, strong) NSString *network;
+@property (nonatomic, strong) NSArray *outputAmounts;
 
 @end
 
@@ -296,8 +296,8 @@ typedef enum : NSUInteger { ack_payment = 1, ack_memo = 2 } ack_key;
 
 @interface BRPaymentProtocolRequest ()
 
-@property(nonatomic, assign) uint32_t version;
-@property(nonatomic, strong) NSString *pkiType;
+@property (nonatomic, assign) uint32_t version;
+@property (nonatomic, strong) NSString *pkiType;
 
 @end
 
@@ -468,7 +468,7 @@ typedef enum : NSUInteger { ack_payment = 1, ack_memo = 2 } ack_key;
 
 @interface BRPaymentProtocolPayment ()
 
-@property(nonatomic, strong) NSArray *refundToAmounts;
+@property (nonatomic, strong) NSArray *refundToAmounts;
 
 @end
 

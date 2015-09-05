@@ -30,16 +30,17 @@
 // BIP21 bitcoin payment request URI https://github.com/bitcoin/bips/blob/master/bip-0021.mediawiki
 @interface BRPaymentRequest : NSObject
 
-@property(nonatomic, strong) NSString *paymentAddress;
-@property(nonatomic, strong) NSString *label;
-@property(nonatomic, strong) NSString *message;
-@property(nonatomic, assign) uint64_t amount;
-@property(nonatomic, strong) NSString *r;  // BIP72 URI: https://github.com/bitcoin/bips/blob/master/bip-0072.mediawiki
-@property(nonatomic, strong) NSString *string;
-@property(nonatomic, strong) NSData *data;
-@property(nonatomic, strong) NSURL *url;
-@property(nonatomic, readonly) BOOL isValid;
-@property(nonatomic, readonly) BRPaymentProtocolRequest *protocolRequest;  // receiver converted to BIP70 request object
+@property (nonatomic, strong) NSString *paymentAddress;
+@property (nonatomic, strong) NSString *label;
+@property (nonatomic, strong) NSString *message;
+@property (nonatomic, assign) uint64_t amount;
+@property (nonatomic, strong) NSString *r;  // BIP72 URI: https://github.com/bitcoin/bips/blob/master/bip-0072.mediawiki
+@property (nonatomic, strong) NSString *string;
+@property (nonatomic, strong) NSData *data;
+@property (nonatomic, strong) NSURL *url;
+@property (nonatomic, readonly) BOOL isValid;
+@property (nonatomic, readonly)
+    BRPaymentProtocolRequest *protocolRequest;  // receiver converted to BIP70 request object
 
 + (instancetype)requestWithString:(NSString *)string;
 + (instancetype)requestWithData:(NSData *)data;

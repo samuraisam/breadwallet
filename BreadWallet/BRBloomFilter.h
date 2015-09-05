@@ -37,12 +37,12 @@
 
 @interface BRBloomFilter : NSObject
 
-@property(nonatomic, readonly) uint32_t tweak;
-@property(nonatomic, readonly) uint8_t flags;
-@property(nonatomic, readonly, getter=toData) NSData *data;
-@property(nonatomic, readonly) NSUInteger elementCount;
-@property(nonatomic, readonly) double falsePositiveRate;
-@property(nonatomic, readonly) NSUInteger length;
+@property (nonatomic, readonly) uint32_t tweak;
+@property (nonatomic, readonly) uint8_t flags;
+@property (nonatomic, readonly, getter=toData) NSData *data;
+@property (nonatomic, readonly) NSUInteger elementCount;
+@property (nonatomic, readonly) double falsePositiveRate;
+@property (nonatomic, readonly) NSUInteger length;
 
 + (instancetype)filterWithMessage:(NSData *)message;
 + (instancetype)filterWithFullMatch;

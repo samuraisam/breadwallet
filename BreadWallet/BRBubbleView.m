@@ -32,8 +32,8 @@
 
 @interface BRBubbleView ()
 
-@property(nonatomic, strong) UILabel *label;
-@property(nonatomic, strong) CAShapeLayer *arrow;
+@property (nonatomic, strong) UILabel *label;
+@property (nonatomic, strong) CAShapeLayer *arrow;
 
 @end
 

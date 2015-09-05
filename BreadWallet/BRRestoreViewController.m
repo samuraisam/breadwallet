@@ -34,11 +34,11 @@
 
 @interface BRRestoreViewController ()
 
-@property(nonatomic, strong) IBOutlet UITextView *textView;
-@property(nonatomic, strong) IBOutlet NSLayoutConstraint *textViewYBottom;
-@property(nonatomic, strong) NSArray *words;
-@property(nonatomic, strong) NSMutableSet *allWords;
-@property(nonatomic, strong) id keyboardObserver, resignActiveObserver;
+@property (nonatomic, strong) IBOutlet UITextView *textView;
+@property (nonatomic, strong) IBOutlet NSLayoutConstraint *textViewYBottom;
+@property (nonatomic, strong) NSArray *words;
+@property (nonatomic, strong) NSMutableSet *allWords;
+@property (nonatomic, strong) id keyboardObserver, resignActiveObserver;
 
 @end
 

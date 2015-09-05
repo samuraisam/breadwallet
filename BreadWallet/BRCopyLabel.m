@@ -27,9 +27,9 @@
 
 @interface BRCopyLabel ()
 
-@property(nonatomic, strong) UIView *highlight;
-@property(nonatomic, readonly) CGRect copyableFrame;
-@property(nonatomic, strong) id menuHideObserver;
+@property (nonatomic, strong) UIView *highlight;
+@property (nonatomic, readonly) CGRect copyableFrame;
+@property (nonatomic, strong) id menuHideObserver;
 
 @end
 

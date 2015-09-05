@@ -42,16 +42,16 @@ typedef struct _BRUTXO {
 
 @interface BRWallet : NSObject
 
-@property(nonatomic, readonly) uint64_t balance;  // current wallet balance excluding transactions known to be invalid
-@property(nonatomic, readonly) NSString *receiveAddress;     // returns the first unused external address
-@property(nonatomic, readonly) NSString *changeAddress;      // returns the first unused internal address
-@property(nonatomic, readonly) NSSet *addresses;             // all previously generated internal and external addresses
-@property(nonatomic, readonly) NSArray *unspentOutputs;      // NSValue objects containing UTXO structs
-@property(nonatomic, readonly) NSArray *recentTransactions;  // BRTransaction objects sorted by date, most recent first
-@property(nonatomic, readonly) NSSet *txHashes;              // hashes of all wallet transactions
-@property(nonatomic, readonly) uint64_t totalSent;      // the total amount spent from the wallet (excluding change)
-@property(nonatomic, readonly) uint64_t totalReceived;  // the total amount received by the wallet (excluding change)
-@property(nonatomic, assign) uint64_t feePerKb;         // fee per kb of transaction size to use when including tx fee
+@property (nonatomic, readonly) uint64_t balance;  // current wallet balance excluding transactions known to be invalid
+@property (nonatomic, readonly) NSString *receiveAddress;  // returns the first unused external address
+@property (nonatomic, readonly) NSString *changeAddress;   // returns the first unused internal address
+@property (nonatomic, readonly) NSSet *addresses;          // all previously generated internal and external addresses
+@property (nonatomic, readonly) NSArray *unspentOutputs;   // NSValue objects containing UTXO structs
+@property (nonatomic, readonly) NSArray *recentTransactions;  // BRTransaction objects sorted by date, most recent first
+@property (nonatomic, readonly) NSSet *txHashes;              // hashes of all wallet transactions
+@property (nonatomic, readonly) uint64_t totalSent;      // the total amount spent from the wallet (excluding change)
+@property (nonatomic, readonly) uint64_t totalReceived;  // the total amount received by the wallet (excluding change)
+@property (nonatomic, assign) uint64_t feePerKb;         // fee per kb of transaction size to use when including tx fee
 
 - (instancetype)initWithContext:(NSManagedObjectContext *)context
                        sequence:(id<BRKeySequence>)sequence

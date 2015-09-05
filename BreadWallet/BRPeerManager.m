@@ -104,19 +104,19 @@ static const char *dns_seeds[] = {"seed.bitcoin.sipa.be.", "dnsseed.bluematt.me.
 
 @interface BRPeerManager ()
 
-@property(nonatomic, strong) NSMutableOrderedSet *peers;
-@property(nonatomic, strong) NSMutableSet *connectedPeers, *misbehavinPeers;
-@property(nonatomic, strong) BRPeer *downloadPeer;
-@property(nonatomic, assign) uint32_t tweak, syncStartHeight, filterUpdateHeight;
-@property(nonatomic, strong) BRBloomFilter *bloomFilter;
-@property(nonatomic, assign) double fpRate;
-@property(nonatomic, assign) NSUInteger taskId, connectFailures, misbehavinCount;
-@property(nonatomic, assign) NSTimeInterval earliestKeyTime, lastRelayTime;
-@property(nonatomic, strong) NSMutableDictionary *blocks, *orphans, *checkpoints, *txRelays;
-@property(nonatomic, strong) NSMutableDictionary *publishedTx, *publishedCallback;
-@property(nonatomic, strong) BRMerkleBlock *lastBlock, *lastOrphan;
-@property(nonatomic, strong) dispatch_queue_t q;
-@property(nonatomic, strong) id backgroundObserver, seedObserver;
+@property (nonatomic, strong) NSMutableOrderedSet *peers;
+@property (nonatomic, strong) NSMutableSet *connectedPeers, *misbehavinPeers;
+@property (nonatomic, strong) BRPeer *downloadPeer;
+@property (nonatomic, assign) uint32_t tweak, syncStartHeight, filterUpdateHeight;
+@property (nonatomic, strong) BRBloomFilter *bloomFilter;
+@property (nonatomic, assign) double fpRate;
+@property (nonatomic, assign) NSUInteger taskId, connectFailures, misbehavinCount;
+@property (nonatomic, assign) NSTimeInterval earliestKeyTime, lastRelayTime;
+@property (nonatomic, strong) NSMutableDictionary *blocks, *orphans, *checkpoints, *txRelays;
+@property (nonatomic, strong) NSMutableDictionary *publishedTx, *publishedCallback;
+@property (nonatomic, strong) BRMerkleBlock *lastBlock, *lastOrphan;
+@property (nonatomic, strong) dispatch_queue_t q;
+@property (nonatomic, strong) id backgroundObserver, seedObserver;
 
 @end
 

@@ -40,10 +40,10 @@ int secp256k1_point_mul(void *r, const void *p, UInt256 i,
 
 @interface BRKey : NSObject
 
-@property(nonatomic, readonly) NSString *privateKey;
-@property(nonatomic, readonly) NSData *publicKey;
-@property(nonatomic, readonly) NSString *address;
-@property(nonatomic, readonly) UInt160 hash160;
+@property (nonatomic, readonly) NSString *privateKey;
+@property (nonatomic, readonly) NSData *publicKey;
+@property (nonatomic, readonly) NSString *address;
+@property (nonatomic, readonly) UInt160 hash160;
 
 + (instancetype)keyWithPrivateKey:(NSString *)privateKey;
 + (instancetype)keyWithSecret:(UInt256)secret compressed:(BOOL)compressed;

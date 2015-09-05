@@ -31,18 +31,18 @@
 
 @interface BRAmountViewController ()
 
-@property(nonatomic, strong) IBOutlet UITextField *amountField;
-@property(nonatomic, strong) IBOutlet UILabel *localCurrencyLabel, *addressLabel;
-@property(nonatomic, strong) IBOutlet UIBarButtonItem *payButton, *lock;
-@property(nonatomic, strong) IBOutlet UIButton *delButton, *decimalButton;
-@property(nonatomic, strong) IBOutlet UIImageView *wallpaper;
-@property(nonatomic, strong) IBOutlet UIView *logo;
+@property (nonatomic, strong) IBOutlet UITextField *amountField;
+@property (nonatomic, strong) IBOutlet UILabel *localCurrencyLabel, *addressLabel;
+@property (nonatomic, strong) IBOutlet UIBarButtonItem *payButton, *lock;
+@property (nonatomic, strong) IBOutlet UIButton *delButton, *decimalButton;
+@property (nonatomic, strong) IBOutlet UIImageView *wallpaper;
+@property (nonatomic, strong) IBOutlet UIView *logo;
 
-@property(nonatomic, assign) uint64_t amount;
-@property(nonatomic, strong) NSCharacterSet *charset;
-@property(nonatomic, strong) UILabel *swapLeftLabel, *swapRightLabel;
-@property(nonatomic, assign) BOOL swapped;
-@property(nonatomic, strong) id balanceObserver, backgroundObserver;
+@property (nonatomic, assign) uint64_t amount;
+@property (nonatomic, strong) NSCharacterSet *charset;
+@property (nonatomic, strong) UILabel *swapLeftLabel, *swapRightLabel;
+@property (nonatomic, assign) BOOL swapped;
+@property (nonatomic, strong) id balanceObserver, backgroundObserver;
 
 @end
 

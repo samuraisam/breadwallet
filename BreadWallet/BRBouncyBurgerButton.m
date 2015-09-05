@@ -30,7 +30,7 @@
 
 @interface BRBouncyBurgerButton ()
 
-@property(nonatomic, strong) UIView *bar1, *bar2, *bar3;
+@property (nonatomic, strong) UIView *bar1, *bar2, *bar3;
 
 @end
 

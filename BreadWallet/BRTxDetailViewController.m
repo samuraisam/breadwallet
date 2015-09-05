@@ -35,9 +35,9 @@
 
 @interface BRTxDetailViewController ()
 
-@property(nonatomic, strong) NSArray *outputText, *outputDetail, *outputAmount;
-@property(nonatomic, assign) int64_t sent, received;
-@property(nonatomic, strong) id txStatusObserver;
+@property (nonatomic, strong) NSArray *outputText, *outputDetail, *outputAmount;
+@property (nonatomic, assign) int64_t sent, received;
+@property (nonatomic, strong) id txStatusObserver;
 
 @end
 

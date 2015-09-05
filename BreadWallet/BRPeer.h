@@ -89,28 +89,30 @@ typedef enum : NSInteger { BRPeerStatusDisconnected = 0, BRPeerStatusConnecting,
 
 @interface BRPeer : NSObject<NSStreamDelegate>
 
-@property(nonatomic, readonly) id<BRPeerDelegate> delegate;
-@property(nonatomic, readonly) dispatch_queue_t delegateQueue;
+@property (nonatomic, readonly) id<BRPeerDelegate> delegate;
+@property (nonatomic, readonly) dispatch_queue_t delegateQueue;
 
 // set this to the timestamp when the wallet was created to improve initial sync time (interval since refrence date)
-@property(nonatomic, assign) NSTimeInterval earliestKeyTime;
+@property (nonatomic, assign) NSTimeInterval earliestKeyTime;
 
-@property(nonatomic, readonly) BRPeerStatus status;
-@property(nonatomic, readonly) NSString *host;
-@property(nonatomic, readonly) UInt128 address;
-@property(nonatomic, readonly) uint16_t port;
-@property(nonatomic, readonly) uint64_t services;
-@property(nonatomic, readonly) uint32_t version;
-@property(nonatomic, readonly) uint64_t nonce;
-@property(nonatomic, readonly) NSString *useragent;
-@property(nonatomic, readonly) uint32_t lastblock;
-@property(nonatomic, readonly) NSTimeInterval pingTime;
-@property(nonatomic, assign) NSTimeInterval timestamp;  // last seen time (interval since refrence date)
-@property(nonatomic, assign) int16_t misbehavin;
+@property (nonatomic, readonly) BRPeerStatus status;
+@property (nonatomic, readonly) NSString *host;
+@property (nonatomic, readonly) UInt128 address;
+@property (nonatomic, readonly) uint16_t port;
+@property (nonatomic, readonly) uint64_t services;
+@property (nonatomic, readonly) uint32_t version;
+@property (nonatomic, readonly) uint64_t nonce;
+@property (nonatomic, readonly) NSString *useragent;
+@property (nonatomic, readonly) uint32_t lastblock;
+@property (nonatomic, readonly) NSTimeInterval pingTime;
+@property (nonatomic, assign) NSTimeInterval timestamp;  // last seen time (interval since refrence date)
+@property (nonatomic, assign) int16_t misbehavin;
 
-@property(nonatomic, assign) BOOL needsFilterUpdate;  // set this when wallet addresses need to be added to bloom filter
-@property(nonatomic, assign) uint32_t currentBlockHeight;  // set this to local block height (helps detect tarpit nodes)
-@property(nonatomic, assign) BOOL synced;                  // use this to keep track of peer state
+@property (nonatomic, assign)
+    BOOL needsFilterUpdate;  // set this when wallet addresses need to be added to bloom filter
+@property (nonatomic, assign)
+    uint32_t currentBlockHeight;            // set this to local block height (helps detect tarpit nodes)
+@property (nonatomic, assign) BOOL synced;  // use this to keep track of peer state
 
 + (instancetype)peerWithAddress:(UInt128)address andPort:(uint16_t)port;
 

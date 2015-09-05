@@ -60,7 +60,7 @@
 
 @interface BRMerkleBlock ()
 
-@property(nonatomic, assign) UInt256 blockHash;
+@property (nonatomic, assign) UInt256 blockHash;
 
 @end
 

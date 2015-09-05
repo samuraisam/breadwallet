@@ -44,21 +44,21 @@ typedef enum : uint32_t { error = 0, tx, block, merkleblock } inv;
 
 @interface BRPeer ()
 
-@property(nonatomic, assign) id<BRPeerDelegate> delegate;
-@property(nonatomic, strong) dispatch_queue_t delegateQueue;
-@property(nonatomic, strong) NSInputStream *inputStream;
-@property(nonatomic, strong) NSOutputStream *outputStream;
-@property(nonatomic, strong) NSMutableData *msgHeader, *msgPayload, *outputBuffer;
-@property(nonatomic, assign) BOOL sentVerack, gotVerack, sentFilter, sentGetAddr;
-@property(nonatomic, strong) Reachability *reachability;
-@property(nonatomic, strong) id reachabilityObserver;
-@property(nonatomic, assign) uint64_t localNonce;
-@property(nonatomic, assign) NSTimeInterval startTime;
-@property(nonatomic, strong) BRMerkleBlock *currentBlock;
-@property(nonatomic, strong) NSMutableOrderedSet *knownBlockHashes, *knownTxHashes, *currentBlockTxHashes;
-@property(nonatomic, strong) NSData *lastBlockHash;
-@property(nonatomic, strong) NSMutableArray *pongHandlers;
-@property(nonatomic, strong) NSRunLoop *runLoop;
+@property (nonatomic, assign) id<BRPeerDelegate> delegate;
+@property (nonatomic, strong) dispatch_queue_t delegateQueue;
+@property (nonatomic, strong) NSInputStream *inputStream;
+@property (nonatomic, strong) NSOutputStream *outputStream;
+@property (nonatomic, strong) NSMutableData *msgHeader, *msgPayload, *outputBuffer;
+@property (nonatomic, assign) BOOL sentVerack, gotVerack, sentFilter, sentGetAddr;
+@property (nonatomic, strong) Reachability *reachability;
+@property (nonatomic, strong) id reachabilityObserver;
+@property (nonatomic, assign) uint64_t localNonce;
+@property (nonatomic, assign) NSTimeInterval startTime;
+@property (nonatomic, strong) BRMerkleBlock *currentBlock;
+@property (nonatomic, strong) NSMutableOrderedSet *knownBlockHashes, *knownTxHashes, *currentBlockTxHashes;
+@property (nonatomic, strong) NSData *lastBlockHash;
+@property (nonatomic, strong) NSMutableArray *pongHandlers;
+@property (nonatomic, strong) NSRunLoop *runLoop;
 
 @end
 

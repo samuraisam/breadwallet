@@ -173,17 +173,17 @@ static NSString *getKeychainString(NSString *key, NSError **error) {
 
 @interface BRWalletManager ()
 
-@property(nonatomic, strong) BRWallet *wallet;
-@property(nonatomic, strong) Reachability *reachability;
-@property(nonatomic, strong) NSArray *currencyPrices;
-@property(nonatomic, strong) NSNumber *localPrice;
-@property(nonatomic, assign) BOOL sweepFee, didPresent;
-@property(nonatomic, strong) NSString *sweepKey;
-@property(nonatomic, strong) void (^sweepCompletion)(BRTransaction *tx, uint64_t fee, NSError *error);
-@property(nonatomic, strong) UIAlertView *alertView;
-@property(nonatomic, strong) UITextField *pinField;
-@property(nonatomic, strong) NSMutableSet *failedPins;
-@property(nonatomic, strong) id protectedObserver;
+@property (nonatomic, strong) BRWallet *wallet;
+@property (nonatomic, strong) Reachability *reachability;
+@property (nonatomic, strong) NSArray *currencyPrices;
+@property (nonatomic, strong) NSNumber *localPrice;
+@property (nonatomic, assign) BOOL sweepFee, didPresent;
+@property (nonatomic, strong) NSString *sweepKey;
+@property (nonatomic, strong) void (^sweepCompletion)(BRTransaction *tx, uint64_t fee, NSError *error);
+@property (nonatomic, strong) UIAlertView *alertView;
+@property (nonatomic, strong) UITextField *pinField;
+@property (nonatomic, strong) NSMutableSet *failedPins;
+@property (nonatomic, strong) id protectedObserver;
 
 @end
 

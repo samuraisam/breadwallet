@@ -124,9 +124,9 @@ int secp256k1_point_mul(void *r, const void *p, UInt256 i, int compressed) {
 
 @interface BRKey ()
 
-@property(nonatomic, assign) UInt256 seckey;
-@property(nonatomic, strong) NSData *pubkey;
-@property(nonatomic, assign) BOOL compressed;
+@property (nonatomic, assign) UInt256 seckey;
+@property (nonatomic, strong) NSData *pubkey;
+@property (nonatomic, assign) BOOL compressed;
 
 @end
 

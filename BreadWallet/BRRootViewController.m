@@ -49,25 +49,25 @@
 
 @interface BRRootViewController ()
 
-@property(nonatomic, strong) IBOutlet UIProgressView *progress, *pulse;
-@property(nonatomic, strong) IBOutlet UILabel *percent;
-@property(nonatomic, strong) IBOutlet UIView *errorBar, *wallpaper, *splash, *logo, *blur;
-@property(nonatomic, strong) IBOutlet UIGestureRecognizer *navBarTap;
-@property(nonatomic, strong) IBOutlet UIBarButtonItem *lock;
-@property(nonatomic, strong) IBOutlet BRBouncyBurgerButton *burger;
+@property (nonatomic, strong) IBOutlet UIProgressView *progress, *pulse;
+@property (nonatomic, strong) IBOutlet UILabel *percent;
+@property (nonatomic, strong) IBOutlet UIView *errorBar, *wallpaper, *splash, *logo, *blur;
+@property (nonatomic, strong) IBOutlet UIGestureRecognizer *navBarTap;
+@property (nonatomic, strong) IBOutlet UIBarButtonItem *lock;
+@property (nonatomic, strong) IBOutlet BRBouncyBurgerButton *burger;
 
-@property(nonatomic, strong) UIScrollView *scrollView;
-@property(nonatomic, strong) BRBubbleView *tipView;
-@property(nonatomic, assign) BOOL showTips, inNextTip, didAppear;
-@property(nonatomic, assign) uint64_t balance;
-@property(nonatomic, strong) NSURL *url;
-@property(nonatomic, strong) NSData *file;
-@property(nonatomic, strong) Reachability *reachability;
-@property(nonatomic, strong) id urlObserver, fileObserver, foregroundObserver, backgroundObserver, balanceObserver;
-@property(nonatomic, strong) id reachabilityObserver, syncStartedObserver, syncFinishedObserver, syncFailedObserver;
-@property(nonatomic, strong) id activeObserver, resignActiveObserver, protectedObserver, seedObserver;
-@property(nonatomic, assign) NSTimeInterval timeout, start;
-@property(nonatomic, assign) SystemSoundID pingsound;
+@property (nonatomic, strong) UIScrollView *scrollView;
+@property (nonatomic, strong) BRBubbleView *tipView;
+@property (nonatomic, assign) BOOL showTips, inNextTip, didAppear;
+@property (nonatomic, assign) uint64_t balance;
+@property (nonatomic, strong) NSURL *url;
+@property (nonatomic, strong) NSData *file;
+@property (nonatomic, strong) Reachability *reachability;
+@property (nonatomic, strong) id urlObserver, fileObserver, foregroundObserver, backgroundObserver, balanceObserver;
+@property (nonatomic, strong) id reachabilityObserver, syncStartedObserver, syncFinishedObserver, syncFailedObserver;
+@property (nonatomic, strong) id activeObserver, resignActiveObserver, protectedObserver, seedObserver;
+@property (nonatomic, assign) NSTimeInterval timeout, start;
+@property (nonatomic, assign) SystemSoundID pingsound;
 
 @end
 

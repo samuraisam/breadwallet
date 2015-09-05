@@ -55,15 +55,15 @@ static NSString *dateFormat(NSString *template) {
 
 @interface BRTxHistoryViewController ()
 
-@property(nonatomic, strong) IBOutlet UIView *logo;
-@property(nonatomic, strong) IBOutlet UIBarButtonItem *lock;
+@property (nonatomic, strong) IBOutlet UIView *logo;
+@property (nonatomic, strong) IBOutlet UIBarButtonItem *lock;
 
-@property(nonatomic, strong) NSArray *transactions;
-@property(nonatomic, assign) BOOL moreTx;
-@property(nonatomic, strong) NSMutableDictionary *txDates;
-@property(nonatomic, strong) id backgroundObserver, balanceObserver, txStatusObserver;
-@property(nonatomic, strong) id syncStartedObserver, syncFinishedObserver, syncFailedObserver;
-@property(nonatomic, strong) UIImageView *wallpaper;
+@property (nonatomic, strong) NSArray *transactions;
+@property (nonatomic, assign) BOOL moreTx;
+@property (nonatomic, strong) NSMutableDictionary *txDates;
+@property (nonatomic, strong) id backgroundObserver, balanceObserver, txStatusObserver;
+@property (nonatomic, strong) id syncStartedObserver, syncFinishedObserver, syncFailedObserver;
+@property (nonatomic, strong) UIImageView *wallpaper;
 
 @end
 

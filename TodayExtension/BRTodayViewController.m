@@ -34,13 +34,13 @@
 
 @interface BRTodayViewController ()<NCWidgetProviding>
 
-@property(nonatomic, weak) IBOutlet UIImageView *qrImage, *qrOverlay;
-@property(nonatomic, weak) IBOutlet UILabel *addressLabel;
-@property(nonatomic, weak) IBOutlet UIView *noDataViewContainer;
-@property(nonatomic, weak) IBOutlet UIView *topViewContainer;
-@property(nonatomic, strong) NSData *qrCodeData;
-@property(nonatomic, strong) NSUserDefaults *appGroupUserDefault;
-@property(nonatomic, strong) BRBubbleView *bubbleView;
+@property (nonatomic, weak) IBOutlet UIImageView *qrImage, *qrOverlay;
+@property (nonatomic, weak) IBOutlet UILabel *addressLabel;
+@property (nonatomic, weak) IBOutlet UIView *noDataViewContainer;
+@property (nonatomic, weak) IBOutlet UIView *topViewContainer;
+@property (nonatomic, strong) NSData *qrCodeData;
+@property (nonatomic, strong) NSUserDefaults *appGroupUserDefault;
+@property (nonatomic, strong) BRBubbleView *bubbleView;
 
 @end
 

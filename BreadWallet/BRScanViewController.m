@@ -27,12 +27,12 @@
 
 @interface BRScanViewController ()
 
-@property(nonatomic, strong) IBOutlet UIView *cameraView;
-@property(nonatomic, strong) IBOutlet UIToolbar *toolbar;
+@property (nonatomic, strong) IBOutlet UIView *cameraView;
+@property (nonatomic, strong) IBOutlet UIToolbar *toolbar;
 
-@property(nonatomic, strong) AVCaptureSession *session;
-@property(nonatomic, strong) AVCaptureVideoPreviewLayer *preview;
-@property(nonatomic, assign) UIStatusBarStyle barStyle;
+@property (nonatomic, strong) AVCaptureSession *session;
+@property (nonatomic, strong) AVCaptureVideoPreviewLayer *preview;
+@property (nonatomic, assign) UIStatusBarStyle barStyle;
 
 @end
 

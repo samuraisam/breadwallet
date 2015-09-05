@@ -36,14 +36,14 @@
 @interface BRSeedViewController ()
 
 // TODO: create a secure version of UILabel and use it for seedLabel, but make sure there's an accessibility work around
-@property(nonatomic, strong) IBOutlet UILabel *seedLabel, *writeLabel;
-@property(nonatomic, strong) IBOutlet UIButton *writeButton;
-@property(nonatomic, strong) IBOutlet UIToolbar *toolbar;
-@property(nonatomic, strong) IBOutlet UIBarButtonItem *remindButton, *doneButton;
-@property(nonatomic, strong) IBOutlet UIImageView *wallpaper;
+@property (nonatomic, strong) IBOutlet UILabel *seedLabel, *writeLabel;
+@property (nonatomic, strong) IBOutlet UIButton *writeButton;
+@property (nonatomic, strong) IBOutlet UIToolbar *toolbar;
+@property (nonatomic, strong) IBOutlet UIBarButtonItem *remindButton, *doneButton;
+@property (nonatomic, strong) IBOutlet UIImageView *wallpaper;
 
-@property(nonatomic, strong) NSString *seedPhrase;
-@property(nonatomic, strong) id resignActiveObserver, screenshotObserver;
+@property (nonatomic, strong) NSString *seedPhrase;
+@property (nonatomic, strong) id resignActiveObserver, screenshotObserver;
 
 @end
 

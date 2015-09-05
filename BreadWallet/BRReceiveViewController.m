@@ -44,12 +44,12 @@
 
 @interface BRReceiveViewController ()
 
-@property(nonatomic, strong) BRBubbleView *tipView;
-@property(nonatomic, assign) BOOL showTips;
+@property (nonatomic, strong) BRBubbleView *tipView;
+@property (nonatomic, assign) BOOL showTips;
 
-@property(nonatomic, strong) IBOutlet UILabel *label;
-@property(nonatomic, strong) IBOutlet UIButton *addressButton;
-@property(nonatomic, strong) IBOutlet UIImageView *qrView;
+@property (nonatomic, strong) IBOutlet UILabel *label;
+@property (nonatomic, strong) IBOutlet UIButton *addressButton;
+@property (nonatomic, strong) IBOutlet UIImageView *qrView;
 
 @end
 

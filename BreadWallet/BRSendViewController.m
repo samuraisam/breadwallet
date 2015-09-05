@@ -61,20 +61,20 @@ static NSString *sanitizeString(NSString *s) {
 
 @interface BRSendViewController ()
 
-@property(nonatomic, assign) BOOL clearClipboard, useClipboard, showTips, showBalance, canChangeAmount;
-@property(nonatomic, strong) BRTransaction *sweepTx;
-@property(nonatomic, strong) BRPaymentProtocolRequest *request;
-@property(nonatomic, strong) NSURL *url, *callback;
-@property(nonatomic, assign) uint64_t amount;
-@property(nonatomic, strong) NSString *okAddress, *okIdentity;
-@property(nonatomic, strong) BRBubbleView *tipView;
-@property(nonatomic, strong) BRScanViewController *scanController;
-@property(nonatomic, strong) id clipboardObserver;
+@property (nonatomic, assign) BOOL clearClipboard, useClipboard, showTips, showBalance, canChangeAmount;
+@property (nonatomic, strong) BRTransaction *sweepTx;
+@property (nonatomic, strong) BRPaymentProtocolRequest *request;
+@property (nonatomic, strong) NSURL *url, *callback;
+@property (nonatomic, assign) uint64_t amount;
+@property (nonatomic, strong) NSString *okAddress, *okIdentity;
+@property (nonatomic, strong) BRBubbleView *tipView;
+@property (nonatomic, strong) BRScanViewController *scanController;
+@property (nonatomic, strong) id clipboardObserver;
 
-@property(nonatomic, strong) IBOutlet UILabel *sendLabel;
-@property(nonatomic, strong) IBOutlet UIButton *scanButton, *clipboardButton;
-@property(nonatomic, strong) IBOutlet UITextView *clipboardText;
-@property(nonatomic, strong) IBOutlet NSLayoutConstraint *clipboardXLeft;
+@property (nonatomic, strong) IBOutlet UILabel *sendLabel;
+@property (nonatomic, strong) IBOutlet UIButton *scanButton, *clipboardButton;
+@property (nonatomic, strong) IBOutlet UITextView *clipboardText;
+@property (nonatomic, strong) IBOutlet NSLayoutConstraint *clipboardXLeft;
 
 @end
 

@@ -46,17 +46,17 @@ static NSUInteger txAddressIndex(BRTransaction *tx, NSArray *chain) {
 
 @interface BRWallet ()
 
-@property(nonatomic, strong) id<BRKeySequence> sequence;
-@property(nonatomic, strong) NSData *masterPublicKey;
-@property(nonatomic, strong) NSMutableArray *internalAddresses, *externalAddresses;
-@property(nonatomic, strong) NSMutableSet *allAddresses, *usedAddresses, *allTxHashes;
-@property(nonatomic, strong) NSSet *spentOutputs, *invalidTx;
-@property(nonatomic, strong) NSMutableOrderedSet *transactions;
-@property(nonatomic, strong) NSOrderedSet *utxos;
-@property(nonatomic, strong) NSMutableDictionary *allTx;
-@property(nonatomic, strong) NSArray *balanceHistory;
-@property(nonatomic, strong) NSData * (^seed)(NSString *authprompt, uint64_t amount);
-@property(nonatomic, strong) NSManagedObjectContext *moc;
+@property (nonatomic, strong) id<BRKeySequence> sequence;
+@property (nonatomic, strong) NSData *masterPublicKey;
+@property (nonatomic, strong) NSMutableArray *internalAddresses, *externalAddresses;
+@property (nonatomic, strong) NSMutableSet *allAddresses, *usedAddresses, *allTxHashes;
+@property (nonatomic, strong) NSSet *spentOutputs, *invalidTx;
+@property (nonatomic, strong) NSMutableOrderedSet *transactions;
+@property (nonatomic, strong) NSOrderedSet *utxos;
+@property (nonatomic, strong) NSMutableDictionary *allTx;
+@property (nonatomic, strong) NSArray *balanceHistory;
+@property (nonatomic, strong) NSData * (^seed)(NSString *authprompt, uint64_t amount);
+@property (nonatomic, strong) NSManagedObjectContext *moc;
 
 @end
 

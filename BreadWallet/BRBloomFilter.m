@@ -63,8 +63,8 @@ static uint32_t murmurHash3(const uint8_t *b, size_t len, uint32_t seed) {
 // bloom filters are explained in BIP37: https://github.com/bitcoin/bips/blob/master/bip-0037.mediawiki
 @interface BRBloomFilter ()
 
-@property(nonatomic, strong) NSMutableData *filter;
-@property(nonatomic, assign) uint32_t hashFuncs;
+@property (nonatomic, strong) NSMutableData *filter;
+@property (nonatomic, assign) uint32_t hashFuncs;
 
 @end
 

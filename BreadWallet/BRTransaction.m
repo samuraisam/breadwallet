@@ -36,8 +36,8 @@
 
 @interface BRTransaction ()
 
-@property(nonatomic, strong) NSMutableArray *hashes, *indexes, *inScripts, *signatures, *sequences;
-@property(nonatomic, strong) NSMutableArray *amounts, *addresses, *outScripts;
+@property (nonatomic, strong) NSMutableArray *hashes, *indexes, *inScripts, *signatures, *sequences;
+@property (nonatomic, strong) NSMutableArray *amounts, *addresses, *outScripts;
 
 @end
 

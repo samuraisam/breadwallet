@@ -31,13 +31,13 @@
 
 @interface BRSettingsViewController ()
 
-@property(nonatomic, assign) BOOL touchId;
-@property(nonatomic, strong) UITableViewController *selectorController;
-@property(nonatomic, strong) NSArray *selectorOptions;
-@property(nonatomic, strong) NSString *selectedOption, *noOptionsText;
-@property(nonatomic, assign) NSUInteger selectorType;
-@property(nonatomic, strong) UISwipeGestureRecognizer *navBarSwipe;
-@property(nonatomic, strong) id balanceObserver;
+@property (nonatomic, assign) BOOL touchId;
+@property (nonatomic, strong) UITableViewController *selectorController;
+@property (nonatomic, strong) NSArray *selectorOptions;
+@property (nonatomic, strong) NSString *selectedOption, *noOptionsText;
+@property (nonatomic, assign) NSUInteger selectorType;
+@property (nonatomic, strong) UISwipeGestureRecognizer *navBarSwipe;
+@property (nonatomic, strong) id balanceObserver;
 
 @end
 
