@@ -51,7 +51,8 @@
 // - In case parse256(IL) >= n or ki = 0, the resulting key is invalid, and one should proceed with the next value for i
 //   (Note: this has probability lower than 1 in 2^127.)
 //
-static void CKDpriv(UInt256 *k, UInt256 *c, unsigned i) {
+static void CKDpriv(UInt256 *k, UInt256 *c, unsigned i)
+{
     unsigned char buf[sizeof(BRPubKey) + sizeof(i)];
     UInt512 I;
 
@@ -86,7 +87,8 @@ static void CKDpriv(UInt256 *k, UInt256 *c, unsigned i) {
 // - In case parse256(IL) >= n or Ki is the point at infinity, the resulting key is invalid, and one should proceed with
 //   the next value for i.
 //
-static void CKDpub(BRPubKey *K, UInt256 *c, uint32_t i) {
+static void CKDpub(BRPubKey *K, UInt256 *c, uint32_t i)
+{
     if (i & BIP32_HARD) return;  // can't derive private child key from public parent key
 
     unsigned char buf[sizeof(*K) + sizeof(i)];
@@ -109,7 +111,8 @@ static void CKDpub(BRPubKey *K, UInt256 *c, uint32_t i) {
 }
 
 // helper function for serializing BIP32 master public/private keys to standard export format
-static NSString *serialize(uint8_t depth, uint32_t fingerprint, uint32_t child, UInt256 chain, NSData *key) {
+static NSString *serialize(uint8_t depth, uint32_t fingerprint, uint32_t child, UInt256 chain, NSData *key)
+{
     NSMutableData *d = [NSMutableData secureDataWithCapacity:14 + key.length + sizeof(chain)];
 
     fingerprint = CFSwapInt32HostToBig(fingerprint);
@@ -132,7 +135,8 @@ static NSString *serialize(uint8_t depth, uint32_t fingerprint, uint32_t child, 
 
 // master public key format is: 4 byte parent fingerprint || 32 byte chain code || 33 byte compressed public key
 // the values are taken from BIP32 account m/0H
-- (NSData *)masterPublicKeyFromSeed:(NSData *)seed {
+- (NSData *)masterPublicKeyFromSeed:(NSData *)seed
+{
     if (!seed) return nil;
 
     NSMutableData *mpk = [NSMutableData secureData];
@@ -152,7 +156,8 @@ static NSString *serialize(uint8_t depth, uint32_t fingerprint, uint32_t child, 
     return mpk;
 }
 
-- (NSData *)publicKey:(unsigned)n internal:(BOOL)internal masterPublicKey:(NSData *)masterPublicKey {
+- (NSData *)publicKey:(unsigned)n internal:(BOOL)internal masterPublicKey:(NSData *)masterPublicKey
+{
     if (masterPublicKey.length < 4 + sizeof(UInt256) + sizeof(BRPubKey)) return nil;
 
     UInt256 chain = *(const UInt256 *)((const uint8_t *)masterPublicKey.bytes + 4);
@@ -164,11 +169,13 @@ static NSString *serialize(uint8_t depth, uint32_t fingerprint, uint32_t child, 
     return [NSData dataWithBytes:&pubKey length:sizeof(pubKey)];
 }
 
-- (NSString *)privateKey:(unsigned)n internal:(BOOL)internal fromSeed:(NSData *)seed {
+- (NSString *)privateKey:(unsigned)n internal:(BOOL)internal fromSeed:(NSData *)seed
+{
     return seed ? [self privateKeys:@[ @(n) ] internal:internal fromSeed:seed].lastObject : nil;
 }
 
-- (NSArray *)privateKeys:(NSArray *)n internal:(BOOL)internal fromSeed:(NSData *)seed {
+- (NSArray *)privateKeys:(NSArray *)n internal:(BOOL)internal fromSeed:(NSData *)seed
+{
     if (!seed || !n) return nil;
     if (n.count == 0) return @[];
 
@@ -204,7 +211,8 @@ static NSString *serialize(uint8_t depth, uint32_t fingerprint, uint32_t child, 
 
 #pragma mark - serializations
 
-- (NSString *)serializedPrivateMasterFromSeed:(NSData *)seed {
+- (NSString *)serializedPrivateMasterFromSeed:(NSData *)seed
+{
     if (!seed) return nil;
 
     UInt512 I;
@@ -216,7 +224,8 @@ static NSString *serialize(uint8_t depth, uint32_t fingerprint, uint32_t child, 
     return serialize(0, 0, 0, chain, [NSData dataWithBytes:&secret length:sizeof(secret)]);
 }
 
-- (NSString *)serializedMasterPublicKey:(NSData *)masterPublicKey {
+- (NSString *)serializedMasterPublicKey:(NSData *)masterPublicKey
+{
     if (masterPublicKey.length < 36) return nil;
 
     uint32_t fingerprint = CFSwapInt32BigToHost(*(const uint32_t *)masterPublicKey.bytes);

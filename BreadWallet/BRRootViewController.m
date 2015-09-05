@@ -73,7 +73,8 @@
 
 @implementation BRRootViewController
 
-- (void)viewDidLoad {
+- (void)viewDidLoad
+{
     [super viewDidLoad];
     // Do any additional setup after loading the view.
 
@@ -422,7 +423,8 @@
     }
 }
 
-- (void)viewWillAppear:(BOOL)animated {
+- (void)viewWillAppear:(BOOL)animated
+{
     [super viewWillAppear:animated];
 
     self.navigationItem.leftBarButtonItem.image = [UIImage imageNamed:@"burger"];
@@ -434,7 +436,8 @@
     }
 }
 
-- (void)viewDidAppear:(BOOL)animated {
+- (void)viewDidAppear:(BOOL)animated
+{
     self.didAppear = YES;
 
     if (!self.navBarTap) {
@@ -457,7 +460,8 @@
     [super viewDidAppear:animated];
 }
 
-- (void)protectedViewDidAppear:(BOOL)animated {
+- (void)protectedViewDidAppear:(BOOL)animated
+{
     BRWalletManager *manager = [BRWalletManager sharedInstance];
 
     if (self.protectedObserver) [[NSNotificationCenter defaultCenter] removeObserver:self.protectedObserver];
@@ -510,7 +514,8 @@
     }
 }
 
-- (void)viewWillDisappear:(BOOL)animated {
+- (void)viewWillDisappear:(BOOL)animated
+{
     if (self.navBarTap) [self.navigationController.navigationBar removeGestureRecognizer:self.navBarTap];
     self.navBarTap = nil;
     [self hideTips];
@@ -518,13 +523,15 @@
     [super viewWillDisappear:animated];
 }
 
-- (BOOL)shouldPerformSegueWithIdentifier:(NSString *)identifier sender:(id)sender {
+- (BOOL)shouldPerformSegueWithIdentifier:(NSString *)identifier sender:(id)sender
+{
     if ([self nextTip]) return NO;
 
     return YES;
 }
 
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
+{
     [super prepareForSegue:segue sender:sender];
 
     [segue.destinationViewController setTransitioningDelegate:self];
@@ -545,12 +552,14 @@
     }
 }
 
-- (void)viewDidLayoutSubviews {
+- (void)viewDidLayoutSubviews
+{
     self.wallpaper.center = CGPointMake(self.wallpaper.center.x, self.wallpaper.superview.frame.size.height / 2);
     [self scrollViewDidScroll:self.scrollView];
 }
 
-- (void)dealloc {
+- (void)dealloc
+{
     [NSObject cancelPreviousPerformRequestsWithTarget:self];
     [self.reachability stopNotifier];
     if (self.navigationController.delegate == self) self.navigationController.delegate = nil;
@@ -570,7 +579,8 @@
     AudioServicesDisposeSystemSoundID(self.pingsound);
 }
 
-- (void)setBalance:(uint64_t)balance {
+- (void)setBalance:(uint64_t)balance
+{
     BRWalletManager *manager = [BRWalletManager sharedInstance];
 
     if (balance > _balance && [UIApplication sharedApplication].applicationState != UIApplicationStateBackground) {
@@ -593,7 +603,8 @@
     }
 }
 
-- (void)startActivityWithTimeout:(NSTimeInterval)timeout {
+- (void)startActivityWithTimeout:(NSTimeInterval)timeout
+{
     NSTimeInterval start = [NSDate timeIntervalSinceReferenceDate];
 
     if (timeout > 1 && start + timeout > self.start + self.timeout) {
@@ -611,7 +622,8 @@
     [self updateProgress];
 }
 
-- (void)stopActivityWithSuccess:(BOOL)success {
+- (void)stopActivityWithSuccess:(BOOL)success
+{
     double progress = [BRPeerManager sharedInstance].syncProgress;
 
     self.start = self.timeout = 0.0;
@@ -638,11 +650,10 @@
     }
 }
 
-- (void)setProgressTo:(NSNumber *)n {
-    self.progress.progress = n.floatValue;
-}
+- (void)setProgressTo:(NSNumber *)n { self.progress.progress = n.floatValue; }
 
-- (void)updateProgress {
+- (void)updateProgress
+{
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(updateProgress) object:nil];
 
     static int counter = 0;
@@ -688,11 +699,10 @@
     if (progress < 1.0) [self performSelector:@selector(updateProgress) withObject:nil afterDelay:0.2];
 }
 
-- (void)ping {
-    AudioServicesPlaySystemSound(self.pingsound);
-}
+- (void)ping { AudioServicesPlaySystemSound(self.pingsound); }
 
-- (void)showErrorBar {
+- (void)showErrorBar
+{
     if (self.navigationItem.prompt != nil) return;
     self.navigationItem.prompt = @"";
     self.errorBar.hidden = NO;
@@ -716,7 +726,8 @@
     self.progress.hidden = self.pulse.hidden = YES;
 }
 
-- (void)hideErrorBar {
+- (void)hideErrorBar
+{
     if (self.navigationItem.prompt == nil) return;
     self.navigationItem.prompt = nil;
 
@@ -732,7 +743,8 @@
         }];
 }
 
-- (void)showBackupDialogIfNeeded {
+- (void)showBackupDialogIfNeeded
+{
     BRWalletManager *manager = [BRWalletManager sharedInstance];
     NSUserDefaults *defs = [NSUserDefaults standardUserDefaults];
     NSTimeInterval now = [NSDate timeIntervalSinceReferenceDate];
@@ -759,12 +771,14 @@
         otherButtonTitles:NSLocalizedString(@"show phrase", nil), nil] show];
 }
 
-- (void)hideTips {
+- (void)hideTips
+{
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(tip:) object:nil];
     if (self.tipView.alpha > 0.5) [self.tipView popOut];
 }
 
-- (BOOL)nextTip {
+- (BOOL)nextTip
+{
     if (self.tipView.alpha < 0.5) {  // XXX(sam): what is the intention of this code?
         BOOL ret;
 
@@ -808,7 +822,8 @@
 
 #pragma mark - IBAction
 
-- (IBAction)tip:(id)sender {
+- (IBAction)tip:(id)sender
+{
     BRWalletManager *manager = [BRWalletManager sharedInstance];
 
     if (sender == self.receiveViewController) {
@@ -858,7 +873,8 @@
     if (self.showTips) self.scrollView.scrollEnabled = NO;
 }
 
-- (IBAction)unlock:(id)sender {
+- (IBAction)unlock:(id)sender
+{
     BRWalletManager *m = [BRWalletManager sharedInstance];
 
     if (sender && !m.didAuthenticate && ![m authenticateWithPrompt:nil andTouchId:YES]) return;
@@ -867,13 +883,15 @@
     [self.navigationItem setRightBarButtonItem:nil animated:(sender) ? YES : NO];
 }
 
-- (IBAction)connect:(id)sender {
+- (IBAction)connect:(id)sender
+{
     if (!sender && [self.reachability currentReachabilityStatus] == NotReachable) return;
 
     [[BRPeerManager sharedInstance] connect];
 }
 
-- (IBAction)navBarTap:(id)sender {
+- (IBAction)navBarTap:(id)sender
+{
     if ([self nextTip]) return;
 
     if (!self.errorBar.hidden) {
@@ -885,7 +903,8 @@
 }
 
 #if SNAPSHOT
-- (IBAction)nextScreen:(id)sender {
+- (IBAction)nextScreen:(id)sender
+{
     BRWalletManager *m = [BRWalletManager sharedInstance];
 
     if (self.navigationController.presentedViewController) {
@@ -924,26 +943,28 @@
 #pragma mark - UIPageViewControllerDataSource
 
 - (UIViewController *)pageViewController:(UIPageViewController *)pageViewController
-      viewControllerBeforeViewController:(UIViewController *)viewController {
+      viewControllerBeforeViewController:(UIViewController *)viewController
+{
     return (viewController == self.receiveViewController) ? self.sendViewController : nil;
 }
 
 - (UIViewController *)pageViewController:(UIPageViewController *)pageViewController
-       viewControllerAfterViewController:(UIViewController *)viewController {
+       viewControllerAfterViewController:(UIViewController *)viewController
+{
     return (viewController == self.sendViewController) ? self.receiveViewController : nil;
 }
 
-- (NSInteger)presentationCountForPageViewController:(UIPageViewController *)pageViewController {
-    return 2;
-}
+- (NSInteger)presentationCountForPageViewController:(UIPageViewController *)pageViewController { return 2; }
 
-- (NSInteger)presentationIndexForPageViewController:(UIPageViewController *)pageViewController {
+- (NSInteger)presentationIndexForPageViewController:(UIPageViewController *)pageViewController
+{
     return (pageViewController.viewControllers.lastObject == self.receiveViewController) ? 1 : 0;
 }
 
 #pragma mark - UIScrollViewDelegate
 
-- (void)scrollViewDidScroll:(UIScrollView *)scrollView {
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView
+{
     CGFloat off = scrollView.contentOffset.x + (scrollView.contentInset.left < 0 ? scrollView.contentInset.left : 0);
 
     self.wallpaper.center =
@@ -952,7 +973,8 @@
 
 #pragma mark - UIAlertViewDelegate
 
-- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
+{
     if (buttonIndex == alertView.cancelButtonIndex) return;
 
     if ([[alertView buttonTitleAtIndex:buttonIndex] isEqual:NSLocalizedString(@"close app", nil)]) abort();
@@ -971,7 +993,8 @@
 
 #pragma mark - UIActionSheetDelegate
 
-- (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex {
+- (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
+{
     if (buttonIndex != actionSheet.destructiveButtonIndex) return;
 
     [[BRWalletManager sharedInstance] setSeedPhrase:nil];
@@ -994,12 +1017,14 @@
 
 // This is used for percent driven interactive transitions, as well as for container controllers that have companion
 // animations that might need to synchronize with the main animation.
-- (NSTimeInterval)transitionDuration:(id<UIViewControllerContextTransitioning>)transitionContext {
+- (NSTimeInterval)transitionDuration:(id<UIViewControllerContextTransitioning>)transitionContext
+{
     return (transitionContext.isAnimated) ? 0.35 : 0.0;
 }
 
 // This method can only be a nop if the transition is interactive and not a percentDriven interactive transition.
-- (void)animateTransition:(id<UIViewControllerContextTransitioning>)transitionContext {
+- (void)animateTransition:(id<UIViewControllerContextTransitioning>)transitionContext
+{
     BRWalletManager *manager = [BRWalletManager sharedInstance];
     UIView *containerView = transitionContext.containerView;
     UIViewController *to = [transitionContext viewControllerForKey:UITransitionContextToViewControllerKey],
@@ -1148,7 +1173,8 @@
 - (id<UIViewControllerAnimatedTransitioning>)navigationController:(UINavigationController *)navigationController
                                   animationControllerForOperation:(UINavigationControllerOperation)operation
                                                fromViewController:(UIViewController *)fromVC
-                                                 toViewController:(UIViewController *)toVC {
+                                                 toViewController:(UIViewController *)toVC
+{
     return self;
 }
 
@@ -1156,11 +1182,13 @@
 
 - (id<UIViewControllerAnimatedTransitioning>)animationControllerForPresentedController:(UIViewController *)presented
                                                                   presentingController:(UIViewController *)presenting
-                                                                      sourceController:(UIViewController *)source {
+                                                                      sourceController:(UIViewController *)source
+{
     return self;
 }
 
-- (id<UIViewControllerAnimatedTransitioning>)animationControllerForDismissedController:(UIViewController *)dismissed {
+- (id<UIViewControllerAnimatedTransitioning>)animationControllerForDismissedController:(UIViewController *)dismissed
+{
     return self;
 }
 

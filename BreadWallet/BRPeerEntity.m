@@ -37,7 +37,8 @@
 @dynamic services;
 @dynamic misbehavin;
 
-- (instancetype)setAttributesFromPeer:(BRPeer *)peer {
+- (instancetype)setAttributesFromPeer:(BRPeer *)peer
+{
     // TODO: store IPv6 addresses
     if (peer.address.u64[0] != 0 || peer.address.u32[2] != CFSwapInt32HostToBig(0xffff)) return nil;
 
@@ -52,7 +53,8 @@
     return self;
 }
 
-- (BRPeer *)peer {
+- (BRPeer *)peer
+{
     __block BRPeer *peer = nil;
 
     [self.managedObjectContext performBlockAndWait:^{

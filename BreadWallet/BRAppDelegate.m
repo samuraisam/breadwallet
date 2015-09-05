@@ -37,7 +37,8 @@
 
 @implementation BRAppDelegate
 
-- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
+{
     // Override point for customization after application launch.
 
     // use background fetch to stay synced with the blockchain
@@ -79,14 +80,16 @@
 // Constants representing common extension point identifiers are provided further down.
 // If unimplemented, the default behavior is to allow the extension point identifier.
 - (BOOL)application:(UIApplication *)application
-    shouldAllowExtensionPointIdentifier:(NSString *)extensionPointIdentifier {
+    shouldAllowExtensionPointIdentifier:(NSString *)extensionPointIdentifier
+{
     return NO;  // disable extensions such as custom keyboards for security purposes
 }
 
 - (BOOL)application:(UIApplication *)application
             openURL:(NSURL *)url
   sourceApplication:(NSString *)sourceApplication
-         annotation:(id)annotation {
+         annotation:(id)annotation
+{
     if (![url.scheme isEqual:@"bitcoin"] && ![url.scheme isEqual:@"bread"]) {
         [[[UIAlertView alloc] initWithTitle:@"Not a bitcoin URL"
                                     message:url.absoluteString
@@ -108,7 +111,8 @@
 }
 
 - (void)application:(UIApplication *)application
-    performFetchWithCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler {
+    performFetchWithCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler
+{
     NSUserDefaults *defs = [NSUserDefaults standardUserDefaults];
     BRWalletManager *m = [BRWalletManager sharedInstance];
     __block uint64_t balance = m.wallet.balance;

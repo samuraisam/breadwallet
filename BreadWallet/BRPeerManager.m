@@ -122,7 +122,8 @@ static const char *dns_seeds[] = {"seed.bitcoin.sipa.be.", "dnsseed.bluematt.me.
 
 @implementation BRPeerManager
 
-+ (instancetype)sharedInstance {
++ (instancetype)sharedInstance
+{
     static id singleton = nil;
     static dispatch_once_t onceToken = 0;
 
@@ -133,7 +134,8 @@ static const char *dns_seeds[] = {"seed.bitcoin.sipa.be.", "dnsseed.bluematt.me.
     return singleton;
 }
 
-- (instancetype)init {
+- (instancetype)init
+{
     if (!(self = [super init])) return nil;
 
     self.earliestKeyTime = [BRWalletManager sharedInstance].seedCreationTime;
@@ -190,16 +192,19 @@ static const char *dns_seeds[] = {"seed.bitcoin.sipa.be.", "dnsseed.bluematt.me.
     return self;
 }
 
-- (void)dealloc {
+- (void)dealloc
+{
     [NSObject cancelPreviousPerformRequestsWithTarget:self];
     if (self.backgroundObserver) [[NSNotificationCenter defaultCenter] removeObserver:self.backgroundObserver];
     if (self.seedObserver) [[NSNotificationCenter defaultCenter] removeObserver:self.seedObserver];
 }
 
-- (NSMutableOrderedSet *)peers {
+- (NSMutableOrderedSet *)peers
+{
     if (_peers.count >= PEER_MAX_CONNECTIONS) return _peers;
 
-    @synchronized(self) {
+    @synchronized(self)
+    {
         if (_peers.count >= PEER_MAX_CONNECTIONS) return _peers;
         _peers = [NSMutableOrderedSet orderedSet];
 
@@ -287,7 +292,8 @@ static const char *dns_seeds[] = {"seed.bitcoin.sipa.be.", "dnsseed.bluematt.me.
     }
 }
 
-- (NSMutableDictionary *)blocks {
+- (NSMutableDictionary *)blocks
+{
     if (_blocks.count > 0) return _blocks;
 
     [[BRMerkleBlockEntity context] performBlockAndWait:^{
@@ -323,7 +329,8 @@ static const char *dns_seeds[] = {"seed.bitcoin.sipa.be.", "dnsseed.bluematt.me.
 }
 
 // this is used as part of a getblocks or getheaders request
-- (NSArray *)blockLocatorArray {
+- (NSArray *)blockLocatorArray
+{
     // append 10 most recent block hashes, decending, then continue appending, doubling the step back each time,
     // finishing with the genesis block (top, -1, -2, -3, -4, -5, -6, -7, -8, -9, -11, -15, -23, -39, -71, -135, ..., 0)
     NSMutableArray *locators = [NSMutableArray array];
@@ -343,7 +350,8 @@ static const char *dns_seeds[] = {"seed.bitcoin.sipa.be.", "dnsseed.bluematt.me.
     return locators;
 }
 
-- (BRMerkleBlock *)lastBlock {
+- (BRMerkleBlock *)lastBlock
+{
     if (_lastBlock) return _lastBlock;
 
     NSFetchRequest *req = [BRMerkleBlockEntity fetchRequest];
@@ -375,16 +383,16 @@ static const char *dns_seeds[] = {"seed.bitcoin.sipa.be.", "dnsseed.bluematt.me.
     return _lastBlock;
 }
 
-- (uint32_t)lastBlockHeight {
-    return self.lastBlock.height;
-}
+- (uint32_t)lastBlockHeight { return self.lastBlock.height; }
 
 // last block height reported by current download peer
-- (uint32_t)estimatedBlockHeight {
+- (uint32_t)estimatedBlockHeight
+{
     return (self.downloadPeer.lastblock > self.lastBlockHeight) ? self.downloadPeer.lastblock : self.lastBlockHeight;
 }
 
-- (double)syncProgress {
+- (double)syncProgress
+{
     if (!self.downloadPeer) return (self.syncStartHeight == self.lastBlockHeight) ? 0.05 : 0.0;
     if (self.lastBlockHeight >= self.downloadPeer.lastblock) return 1.0;
     return 0.1 +
@@ -392,7 +400,8 @@ static const char *dns_seeds[] = {"seed.bitcoin.sipa.be.", "dnsseed.bluematt.me.
 }
 
 // number of connected peers
-- (NSUInteger)peerCount {
+- (NSUInteger)peerCount
+{
     NSUInteger count = 0;
 
     for (BRPeer *peer in self.connectedPeers) {
@@ -402,7 +411,8 @@ static const char *dns_seeds[] = {"seed.bitcoin.sipa.be.", "dnsseed.bluematt.me.
     return count;
 }
 
-- (BRBloomFilter *)bloomFilter {
+- (BRBloomFilter *)bloomFilter
+{
     if (_bloomFilter) return _bloomFilter;
 
     BRWalletManager *m = [BRWalletManager sharedInstance];
@@ -445,7 +455,8 @@ static const char *dns_seeds[] = {"seed.bitcoin.sipa.be.", "dnsseed.bluematt.me.
     return _bloomFilter;
 }
 
-- (void)connect {
+- (void)connect
+{
     if ([BRWalletManager sharedInstance].noWallet) return;  // check to make sure the wallet has been created
     if (self.connectFailures >= MAX_CONNECT_FAILURES) self.connectFailures = 0;  // this attempt is a manual retry
 
@@ -519,7 +530,8 @@ static const char *dns_seeds[] = {"seed.bitcoin.sipa.be.", "dnsseed.bluematt.me.
 
 // rescans blocks and transactions after earliestKeyTime, a new random download peer is also selected due to the
 // possibility that a malicious node might lie by omitting transactions that match the bloom filter
-- (void)rescan {
+- (void)rescan
+{
     if (!self.connected) return;
 
     dispatch_async(self.q, ^{
@@ -543,7 +555,8 @@ static const char *dns_seeds[] = {"seed.bitcoin.sipa.be.", "dnsseed.bluematt.me.
     });
 }
 
-- (void)publishTransaction:(BRTransaction *)transaction completion:(void (^)(NSError *error))completion {
+- (void)publishTransaction:(BRTransaction *)transaction completion:(void (^)(NSError *error))completion
+{
     if (!transaction.isSigned) {
         if (completion) {
             completion([NSError
@@ -595,13 +608,12 @@ static const char *dns_seeds[] = {"seed.bitcoin.sipa.be.", "dnsseed.bluematt.me.
 }
 
 // number of connected peers that have relayed the transaction
-- (NSUInteger)relayCountForTransaction:(UInt256)txHash {
-    return [self.txRelays[uint256_obj(txHash)] count];
-}
+- (NSUInteger)relayCountForTransaction:(UInt256)txHash { return [self.txRelays[uint256_obj(txHash)] count]; }
 
 // seconds since reference date, 00:00:00 01/01/01 GMT
 // NOTE: this is only accurate for the last two weeks worth of blocks, other timestamps are estimated from checkpoints
-- (NSTimeInterval)timestampForBlockHeight:(uint32_t)blockHeight {
+- (NSTimeInterval)timestampForBlockHeight:(uint32_t)blockHeight
+{
     if (blockHeight == TX_UNCONFIRMED)
         return (self.lastBlock.timestamp - NSTimeIntervalSince1970) + 10 * 60;  // next block
 
@@ -639,7 +651,8 @@ static const char *dns_seeds[] = {"seed.bitcoin.sipa.be.", "dnsseed.bluematt.me.
     return checkpoint_array[0].timestamp - NSTimeIntervalSince1970;
 }
 
-- (void)setBlockHeight:(int32_t)height andTimestamp:(NSTimeInterval)timestamp forTxHashes:(NSArray *)txHashes {
+- (void)setBlockHeight:(int32_t)height andTimestamp:(NSTimeInterval)timestamp forTxHashes:(NSArray *)txHashes
+{
     [[BRWalletManager sharedInstance].wallet setBlockHeight:height andTimestamp:timestamp forTxHashes:txHashes];
 
     if (height != TX_UNCONFIRMED) {  // remove confirmed tx from publish list and relay counts
@@ -649,7 +662,8 @@ static const char *dns_seeds[] = {"seed.bitcoin.sipa.be.", "dnsseed.bluematt.me.
     }
 }
 
-- (void)txTimeout:(NSValue *)txHash {
+- (void)txTimeout:(NSValue *)txHash
+{
     void (^callback)(NSError *error) = self.publishedCallback[txHash];
 
     [self.publishedTx removeObjectForKey:txHash];
@@ -666,7 +680,8 @@ static const char *dns_seeds[] = {"seed.bitcoin.sipa.be.", "dnsseed.bluematt.me.
     }
 }
 
-- (void)syncTimeout {
+- (void)syncTimeout
+{
     NSTimeInterval now = [NSDate timeIntervalSinceReferenceDate];
 
     if (now - self.lastRelayTime < PROTOCOL_TIMEOUT) {  // the download peer relayed something in time, so restart timer
@@ -685,7 +700,8 @@ static const char *dns_seeds[] = {"seed.bitcoin.sipa.be.", "dnsseed.bluematt.me.
     });
 }
 
-- (void)syncStopped {
+- (void)syncStopped
+{
     if ([UIApplication sharedApplication].applicationState == UIApplicationStateBackground) {
         [self.connectedPeers makeObjectsPerformSelector:@selector(disconnect)];
         [self.connectedPeers removeAllObjects];
@@ -727,7 +743,8 @@ static const char *dns_seeds[] = {"seed.bitcoin.sipa.be.", "dnsseed.bluematt.me.
 }
 
 // unconfirmed transactions that aren't in the mempools of any of connected peers have likely dropped off the network
-- (void)removeUnrelayedTransactions {
+- (void)removeUnrelayedTransactions
+{
     BRWalletManager *m = [BRWalletManager sharedInstance];
     BOOL rescan = NO;
     UInt256 h;
@@ -777,7 +794,8 @@ static const char *dns_seeds[] = {"seed.bitcoin.sipa.be.", "dnsseed.bluematt.me.
     }
 }
 
-- (void)updateFilter {
+- (void)updateFilter
+{
     if (self.downloadPeer.needsFilterUpdate) return;
     self.downloadPeer.needsFilterUpdate = YES;
     NSLog(@"filter update needed, waiting for pong");
@@ -812,7 +830,8 @@ static const char *dns_seeds[] = {"seed.bitcoin.sipa.be.", "dnsseed.bluematt.me.
     }];
 }
 
-- (void)peerMisbehavin:(BRPeer *)peer {
+- (void)peerMisbehavin:(BRPeer *)peer
+{
     peer.misbehavin++;
     [self.peers removeObject:peer];
     [self.misbehavinPeers addObject:peer];
@@ -828,7 +847,8 @@ static const char *dns_seeds[] = {"seed.bitcoin.sipa.be.", "dnsseed.bluematt.me.
     [self connect];
 }
 
-- (void)sortPeers {
+- (void)sortPeers
+{
     [_peers sortUsingComparator:^NSComparisonResult(BRPeer *p1, BRPeer *p2) {
         if (p1.timestamp > p2.timestamp) return NSOrderedAscending;
         if (p1.timestamp < p2.timestamp) return NSOrderedDescending;
@@ -836,7 +856,8 @@ static const char *dns_seeds[] = {"seed.bitcoin.sipa.be.", "dnsseed.bluematt.me.
     }];
 }
 
-- (void)savePeers {
+- (void)savePeers
+{
     NSMutableSet *peers = [[self.peers.set setByAddingObjectsFromSet:self.misbehavinPeers] mutableCopy];
     NSMutableSet *addrs = [NSMutableSet set];
 
@@ -865,7 +886,8 @@ static const char *dns_seeds[] = {"seed.bitcoin.sipa.be.", "dnsseed.bluematt.me.
     }];
 }
 
-- (void)saveBlocks {
+- (void)saveBlocks
+{
     NSMutableDictionary *blocks = [NSMutableDictionary dictionary];
     BRMerkleBlock *b = self.lastBlock;
 
@@ -891,7 +913,8 @@ static const char *dns_seeds[] = {"seed.bitcoin.sipa.be.", "dnsseed.bluematt.me.
 
 #pragma mark - BRPeerDelegate
 
-- (void)peerConnected:(BRPeer *)peer {
+- (void)peerConnected:(BRPeer *)peer
+{
     NSTimeInterval now = [NSDate timeIntervalSinceReferenceDate];
 
     if (peer.timestamp > now + 2 * 60 * 60 || peer.timestamp < now - 2 * 60 * 60)
@@ -970,7 +993,8 @@ static const char *dns_seeds[] = {"seed.bitcoin.sipa.be.", "dnsseed.bluematt.me.
     }
 }
 
-- (void)peer:(BRPeer *)peer disconnectedWithError:(NSError *)error {
+- (void)peer:(BRPeer *)peer disconnectedWithError:(NSError *)error
+{
     NSLog(@"%@:%d disconnected%@%@", peer.host, peer.port, (error ? @", " : @""), (error ? error : @""));
 
     if ([error.domain isEqual:@"BreadWallet"] && error.code != BITCOIN_TIMEOUT_CODE) {
@@ -1013,7 +1037,8 @@ static const char *dns_seeds[] = {"seed.bitcoin.sipa.be.", "dnsseed.bluematt.me.
     });
 }
 
-- (void)peer:(BRPeer *)peer relayedPeers:(NSArray *)peers {
+- (void)peer:(BRPeer *)peer relayedPeers:(NSArray *)peers
+{
     NSLog(@"%@:%d relayed %d peer(s)", peer.host, peer.port, (int)peers.count);
     [self.peers addObjectsFromArray:peers];
     [self.peers minusSet:self.misbehavinPeers];
@@ -1032,7 +1057,8 @@ static const char *dns_seeds[] = {"seed.bitcoin.sipa.be.", "dnsseed.bluematt.me.
     if (peers.count > 1 && peers.count < 1000) [self savePeers];  // peer relaying is complete when we receive <1000
 }
 
-- (void)peer:(BRPeer *)peer relayedTransaction:(BRTransaction *)transaction {
+- (void)peer:(BRPeer *)peer relayedTransaction:(BRTransaction *)transaction
+{
     BRWalletManager *m = [BRWalletManager sharedInstance];
     NSValue *hash = uint256_obj(transaction.txHash);
     void (^callback)(NSError *error) = self.publishedCallback[hash];
@@ -1081,7 +1107,8 @@ static const char *dns_seeds[] = {"seed.bitcoin.sipa.be.", "dnsseed.bluematt.me.
     }
 }
 
-- (void)peer:(BRPeer *)peer hasTransaction:(UInt256)txHash {
+- (void)peer:(BRPeer *)peer hasTransaction:(UInt256)txHash
+{
     BRWalletManager *m = [BRWalletManager sharedInstance];
     NSValue *hash = uint256_obj(txHash);
     BRTransaction *tx = self.publishedTx[hash];
@@ -1112,7 +1139,8 @@ static const char *dns_seeds[] = {"seed.bitcoin.sipa.be.", "dnsseed.bluematt.me.
     }
 }
 
-- (void)peer:(BRPeer *)peer rejectedTransaction:(UInt256)txHash withCode:(uint8_t)code {
+- (void)peer:(BRPeer *)peer rejectedTransaction:(UInt256)txHash withCode:(uint8_t)code
+{
     BRWalletManager *m = [BRWalletManager sharedInstance];
     NSValue *hash = uint256_obj(txHash);
 
@@ -1129,7 +1157,8 @@ static const char *dns_seeds[] = {"seed.bitcoin.sipa.be.", "dnsseed.bluematt.me.
     }
 }
 
-- (void)peer:(BRPeer *)peer relayedBlock:(BRMerkleBlock *)block {
+- (void)peer:(BRPeer *)peer relayedBlock:(BRMerkleBlock *)block
+{
     // ignore block headers that are newer than one week before earliestKeyTime (headers have 0 totalTransactions)
     if (block.totalTransactions == 0 &&
         block.timestamp + 7 * 24 * 60 * 60 > self.earliestKeyTime + NSTimeIntervalSince1970 + 2 * 60 * 60)
@@ -1321,7 +1350,8 @@ static const char *dns_seeds[] = {"seed.bitcoin.sipa.be.", "dnsseed.bluematt.me.
     }
 }
 
-- (BRTransaction *)peer:(BRPeer *)peer requestedTransaction:(UInt256)txHash {
+- (BRTransaction *)peer:(BRPeer *)peer requestedTransaction:(UInt256)txHash
+{
     BRWalletManager *m = [BRWalletManager sharedInstance];
     NSValue *hash = uint256_obj(txHash);
     BRTransaction *tx = self.publishedTx[hash];
@@ -1353,7 +1383,8 @@ static const char *dns_seeds[] = {"seed.bitcoin.sipa.be.", "dnsseed.bluematt.me.
 
 #pragma mark - UIAlertViewDelegate
 
-- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
+{
     if (buttonIndex == alertView.cancelButtonIndex) return;
     [self rescan];
 }

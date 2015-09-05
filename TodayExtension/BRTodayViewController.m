@@ -46,13 +46,15 @@
 
 @implementation BRTodayViewController
 
-- (void)viewDidLoad {
+- (void)viewDidLoad
+{
     [super viewDidLoad];
 
     [self updateReceiveMoneyUI];
 }
 
-- (void)widgetPerformUpdateWithCompletionHandler:(void (^)(NCUpdateResult))completionHandler {
+- (void)widgetPerformUpdateWithCompletionHandler:(void (^)(NCUpdateResult))completionHandler
+{
     [self.bubbleView popOut];
     self.bubbleView = nil;
     if (!completionHandler) return;
@@ -80,12 +82,14 @@
     }
 }
 
-- (NSUserDefaults *)appGroupUserDefault {
+- (NSUserDefaults *)appGroupUserDefault
+{
     if (!_appGroupUserDefault) _appGroupUserDefault = [[NSUserDefaults alloc] initWithSuiteName:APP_GROUP_ID];
     return _appGroupUserDefault;
 }
 
-- (void)updateReceiveMoneyUI {
+- (void)updateReceiveMoneyUI
+{
     self.qrCodeData = [self.appGroupUserDefault objectForKey:APP_GROUP_REQUEST_DATA_KEY];
 
     if (self.qrCodeData && self.qrImage.bounds.size.width > 0) {
@@ -100,21 +104,22 @@
 
 #pragma mark - NCWidgetProviding
 
-- (UIEdgeInsets)widgetMarginInsetsForProposedMarginInsets:(UIEdgeInsets)defaultMarginInsets {
-    return UIEdgeInsetsZero;
-}
+- (UIEdgeInsets)widgetMarginInsetsForProposedMarginInsets:(UIEdgeInsets)defaultMarginInsets { return UIEdgeInsetsZero; }
 
 #pragma mark - UI Events
 
-- (IBAction)scanButtonTapped:(UIButton *)sender {
+- (IBAction)scanButtonTapped:(UIButton *)sender
+{
     [self.extensionContext openURL:[NSURL URLWithString:SCAN_URL] completionHandler:nil];
 }
 
-- (IBAction)openAppButtonTapped:(id)sender {
+- (IBAction)openAppButtonTapped:(id)sender
+{
     [self.extensionContext openURL:[NSURL URLWithString:OPEN_URL] completionHandler:nil];
 }
 
-- (IBAction)qrImageTapped:(id)sender {
+- (IBAction)qrImageTapped:(id)sender
+{
     // UIMenuControl doesn't seem to work in an NCWidget, so use a BRBubbleView that looks nearly the same
     if (self.bubbleView) {
         if (CGRectContainsPoint(self.bubbleView.frame,
@@ -142,7 +147,8 @@
     }
 }
 
-- (IBAction)widgetTapped:(id)sender {
+- (IBAction)widgetTapped:(id)sender
+{
     [self.bubbleView popOut];
     self.bubbleView = nil;
 }

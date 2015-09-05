@@ -48,7 +48,8 @@
 
 @implementation BRAmountViewController
 
-- (void)viewDidLoad {
+- (void)viewDidLoad
+{
     [super viewDidLoad];
     // Do any additional setup after loading the view.
 
@@ -101,12 +102,14 @@
                                                       }];
 }
 
-- (void)dealloc {
+- (void)dealloc
+{
     if (self.balanceObserver) [[NSNotificationCenter defaultCenter] removeObserver:self.balanceObserver];
     if (self.backgroundObserver) [[NSNotificationCenter defaultCenter] removeObserver:self.backgroundObserver];
 }
 
-- (void)viewWillAppear:(BOOL)animated {
+- (void)viewWillAppear:(BOOL)animated
+{
     [super viewWillAppear:animated];
 
     self.addressLabel.text =
@@ -125,14 +128,16 @@
     [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationFade];
 }
 
-- (void)viewWillDisappear:(BOOL)animated {
+- (void)viewWillDisappear:(BOOL)animated
+{
     self.amount = 0;
     if (self.navigationController.viewControllers.firstObject != self) self.wallpaper.hidden = animated;
 
     [super viewWillDisappear:animated];
 }
 
-- (void)updateLocalCurrencyLabel {
+- (void)updateLocalCurrencyLabel
+{
     BRWalletManager *m = [BRWalletManager sharedInstance];
     uint64_t amount = (self.swapped) ? [m amountForLocalCurrencyString:self.amountField.text]
                                      : [m amountForString:self.amountField.text];
@@ -147,7 +152,8 @@
 
 #pragma mark - IBAction
 
-- (IBAction)unlock:(id)sender {
+- (IBAction)unlock:(id)sender
+{
     BRWalletManager *manager = [BRWalletManager sharedInstance];
 
     if (sender && !manager.didAuthenticate && ![manager authenticateWithPrompt:nil andTouchId:YES]) return;
@@ -156,7 +162,8 @@
     [self.navigationItem setRightBarButtonItem:self.payButton animated:(sender) ? YES : NO];
 }
 
-- (IBAction)number:(id)sender {
+- (IBAction)number:(id)sender
+{
     NSUInteger l = [self.amountField.text rangeOfCharacterFromSet:self.charset options:NSBackwardsSearch].location;
 
     l = (l < self.amountField.text.length) ? l + 1 : self.amountField.text.length;
@@ -165,7 +172,8 @@
                     replacementString:((UIButton *)sender).titleLabel.text];
 }
 
-- (IBAction)del:(id)sender {
+- (IBAction)del:(id)sender
+{
     NSUInteger l = [self.amountField.text rangeOfCharacterFromSet:self.charset options:NSBackwardsSearch].location;
 
     if (l < self.amountField.text.length) {
@@ -173,7 +181,8 @@
     }
 }
 
-- (IBAction)pay:(id)sender {
+- (IBAction)pay:(id)sender
+{
     BRWalletManager *manager = [BRWalletManager sharedInstance];
 
     self.amount = (self.swapped) ? [manager amountForLocalCurrencyString:self.amountField.text]
@@ -184,11 +193,13 @@
     [self.delegate amountViewController:self selectedAmount:self.amount];
 }
 
-- (IBAction)done:(id)sender {
+- (IBAction)done:(id)sender
+{
     [self.navigationController.presentingViewController dismissViewControllerAnimated:YES completion:nil];
 }
 
-- (IBAction)swapCurrency:(id)sender {
+- (IBAction)swapCurrency:(id)sender
+{
     self.swapped = !self.swapped;
 
     if (self.swapLeftLabel.hidden) {
@@ -288,7 +299,8 @@
         }];
 }
 
-- (IBAction)pressSwapButton:(id)sender {
+- (IBAction)pressSwapButton:(id)sender
+{
     if (self.swapLeftLabel.hidden) {
         self.swapLeftLabel.text = self.localCurrencyLabel.text;
         self.swapLeftLabel.frame = self.localCurrencyLabel.frame;
@@ -323,7 +335,8 @@
                      }];
 }
 
-- (IBAction)releaseSwapButton:(id)sender {
+- (IBAction)releaseSwapButton:(id)sender
+{
     [UIView animateWithDuration:0.1
         animations:^{
             // self.swapLeftLabel.transform = CGAffineTransformIdentity;
@@ -339,7 +352,8 @@
 
 - (BOOL)textField:(UITextField *)textField
     shouldChangeCharactersInRange:(NSRange)range
-                replacementString:(NSString *)string {
+                replacementString:(NSString *)string
+{
     BRWalletManager *manager = [BRWalletManager sharedInstance];
     NSNumberFormatter *numberFormatter = (self.swapped) ? manager.localFormat : manager.format;
     NSUInteger mindigits = numberFormatter.minimumFractionDigits;

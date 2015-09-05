@@ -42,13 +42,15 @@
 @dynamic outputs;
 @dynamic lockTime;
 
-+ (void)setContext:(NSManagedObjectContext *)context {
++ (void)setContext:(NSManagedObjectContext *)context
+{
     [super setContext:context];
     [BRTxInputEntity setContext:context];
     [BRTxOutputEntity setContext:context];
 }
 
-- (instancetype)setAttributesFromTx:(BRTransaction *)tx {
+- (instancetype)setAttributesFromTx:(BRTransaction *)tx
+{
     [self.managedObjectContext performBlockAndWait:^{
         NSMutableOrderedSet *inputs = [self mutableOrderedSetValueForKey:@"inputs"];
         NSMutableOrderedSet *outputs = [self mutableOrderedSetValueForKey:@"outputs"];
@@ -91,7 +93,8 @@
     return self;
 }
 
-- (BRTransaction *)transaction {
+- (BRTransaction *)transaction
+{
     BRTransaction *tx = [BRTransaction new];
 
     [self.managedObjectContext performBlockAndWait:^{
@@ -120,7 +123,8 @@
     return tx;
 }
 
-- (void)deleteObject {
+- (void)deleteObject
+{
     for (BRTxInputEntity *e in self.inputs) {  // mark inputs as unspent
         [[BRTxOutputEntity objectsMatching:@"txHash == %@ && n == %d", e.txHash, e.n].lastObject setSpent:NO];
     }

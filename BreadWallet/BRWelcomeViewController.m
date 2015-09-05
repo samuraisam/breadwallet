@@ -43,7 +43,8 @@
 
 @implementation BRWelcomeViewController
 
-- (void)viewDidLoad {
+- (void)viewDidLoad
+{
     [super viewDidLoad];
     // Do any additional setup after loading the view.
 
@@ -76,13 +77,15 @@
                                                       }];
 }
 
-- (void)dealloc {
+- (void)dealloc
+{
     if (self.navigationController.delegate == self) self.navigationController.delegate = nil;
     if (self.foregroundObserver) [[NSNotificationCenter defaultCenter] removeObserver:self.foregroundObserver];
     if (self.backgroundObserver) [[NSNotificationCenter defaultCenter] removeObserver:self.backgroundObserver];
 }
 
-- (void)viewWillAppear:(BOOL)animated {
+- (void)viewWillAppear:(BOOL)animated
+{
     [super viewWillAppear:animated];
 
     [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent animated:animated];
@@ -96,7 +99,8 @@
     }
 }
 
-- (void)viewDidAppear:(BOOL)animated {
+- (void)viewDidAppear:(BOOL)animated
+{
     [super viewDidAppear:animated];
 
     dispatch_async(dispatch_get_main_queue(), ^{  // animation sometimes doesn't work if run directly in viewDidAppear
@@ -159,7 +163,8 @@
     });
 }
 
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
+{
     [super prepareForSegue:segue sender:sender];
 
     //    [segue.destinationViewController setTransitioningDelegate:self];
@@ -209,7 +214,8 @@
     }
 }
 
-- (void)animateWallpaper {
+- (void)animateWallpaper
+{
     if (self.animating) return;
     self.animating = YES;
     self.wallpaperXLeft.constant = -240.0;
@@ -227,7 +233,8 @@
 
 #pragma mark IBAction
 
-- (IBAction)generate:(id)sender {
+- (IBAction)generate:(id)sender
+{
     if (![BRWalletManager sharedInstance].passcodeEnabled) {
         [[[UIAlertView alloc]
                 initWithTitle:NSLocalizedString(@"turn device passcode on", nil)
@@ -256,7 +263,8 @@
                      }];
 }
 
-- (IBAction)show:(id)sender {
+- (IBAction)show:(id)sender
+{
     [self.navigationController presentViewController:self.seedNav
                                             animated:YES
                                           completion:^{
@@ -273,12 +281,11 @@
 
 // This is used for percent driven interactive transitions, as well as for container controllers that have companion
 // animations that might need to synchronize with the main animation.
-- (NSTimeInterval)transitionDuration:(id<UIViewControllerContextTransitioning>)transitionContext {
-    return 0.35;
-}
+- (NSTimeInterval)transitionDuration:(id<UIViewControllerContextTransitioning>)transitionContext { return 0.35; }
 
 // This method can only be a nop if the transition is interactive and not a percentDriven interactive transition.
-- (void)animateTransition:(id<UIViewControllerContextTransitioning>)transitionContext {
+- (void)animateTransition:(id<UIViewControllerContextTransitioning>)transitionContext
+{
     UIView *v = transitionContext.containerView;
     UIViewController *to = [transitionContext viewControllerForKey:UITransitionContextToViewControllerKey],
                      *from = [transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
@@ -310,7 +317,8 @@
 - (id<UIViewControllerAnimatedTransitioning>)navigationController:(UINavigationController *)navigationController
                                   animationControllerForOperation:(UINavigationControllerOperation)operation
                                                fromViewController:(UIViewController *)fromVC
-                                                 toViewController:(UIViewController *)toVC {
+                                                 toViewController:(UIViewController *)toVC
+{
     return self;
 }
 
@@ -320,11 +328,13 @@
 
 - (id<UIViewControllerAnimatedTransitioning>)animationControllerForPresentedController:(UIViewController *)presented
                                                                   presentingController:(UIViewController *)presenting
-                                                                      sourceController:(UIViewController *)source {
+                                                                      sourceController:(UIViewController *)source
+{
     return self;
 }
 
-- (id<UIViewControllerAnimatedTransitioning>)animationControllerForDismissedController:(UIViewController *)dismissed {
+- (id<UIViewControllerAnimatedTransitioning>)animationControllerForDismissedController:(UIViewController *)dismissed
+{
     return self;
 }
 

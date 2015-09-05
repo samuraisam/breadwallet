@@ -55,7 +55,8 @@
 
 @implementation BRReceiveViewController
 
-- (void)viewDidLoad {
+- (void)viewDidLoad
+{
     [super viewDidLoad];
 
     [self.addressButton setTitle:nil forState:UIControlStateNormal];
@@ -63,13 +64,15 @@
     [self updateAddress];
 }
 
-- (void)viewWillDisappear:(BOOL)animated {
+- (void)viewWillDisappear:(BOOL)animated
+{
     [self hideTips];
 
     [super viewWillDisappear:animated];
 }
 
-- (void)updateAddress {
+- (void)updateAddress
+{
     static NSUserDefaults *groupDefs = nil;
     BRWalletManager *manager = [BRWalletManager sharedInstance];
     BRPaymentRequest *req = self.paymentRequest;
@@ -95,17 +98,20 @@
     }
 }
 
-- (BRPaymentRequest *)paymentRequest {
+- (BRPaymentRequest *)paymentRequest
+{
     if (_paymentRequest) return _paymentRequest;
     return [BRPaymentRequest requestWithString:self.paymentAddress];
 }
 
-- (NSString *)paymentAddress {
+- (NSString *)paymentAddress
+{
     if (_paymentRequest) return _paymentRequest.paymentAddress;
     return [BRWalletManager sharedInstance].wallet.receiveAddress;
 }
 
-- (BOOL)nextTip {
+- (BOOL)nextTip
+{
     if (self.tipView.alpha < 0.5) return [(id)self.parentViewController.parentViewController nextTip];
 
     BRBubbleView *tipView = self.tipView;
@@ -132,17 +138,20 @@
     return YES;
 }
 
-- (void)hideTips {
+- (void)hideTips
+{
     if (self.tipView.alpha > 0.5) [self.tipView popOut];
 }
 
 #pragma mark - IBAction
 
-- (IBAction)done:(id)sender {
+- (IBAction)done:(id)sender
+{
     [self.navigationController.presentingViewController dismissViewControllerAnimated:YES completion:nil];
 }
 
-- (IBAction)tip:(id)sender {
+- (IBAction)tip:(id)sender
+{
     if ([self nextTip]) return;
 
     if (![sender isKindOfClass:[UIGestureRecognizer class]] ||
@@ -159,7 +168,8 @@
     [self.view addSubview:[self.tipView popIn]];
 }
 
-- (IBAction)address:(id)sender {
+- (IBAction)address:(id)sender
+{
     if ([self nextTip]) return;
 
     BOOL req = (_paymentRequest) ? YES : NO;
@@ -192,7 +202,8 @@
 
 #pragma mark - UIActionSheetDelegate
 
-- (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex {
+- (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
+{
     NSString *title = [actionSheet buttonTitleAtIndex:buttonIndex];
 
     // TODO: allow user to create a payment protocol request object, and use merge avoidance techniques:
@@ -269,7 +280,8 @@
 #pragma mark - MFMessageComposeViewControllerDelegate
 
 - (void)messageComposeViewController:(MFMessageComposeViewController *)controller
-                 didFinishWithResult:(MessageComposeResult)result {
+                 didFinishWithResult:(MessageComposeResult)result
+{
     [self.navigationController dismissViewControllerAnimated:YES completion:nil];
 }
 
@@ -277,13 +289,15 @@
 
 - (void)mailComposeController:(MFMailComposeViewController *)controller
           didFinishWithResult:(MFMailComposeResult)result
-                        error:(NSError *)error {
+                        error:(NSError *)error
+{
     [self.navigationController dismissViewControllerAnimated:YES completion:nil];
 }
 
 #pragma mark - BRAmountViewControllerDelegate
 
-- (void)amountViewController:(BRAmountViewController *)amountViewController selectedAmount:(uint64_t)amount {
+- (void)amountViewController:(BRAmountViewController *)amountViewController selectedAmount:(uint64_t)amount
+{
     if (amount < TX_MIN_OUTPUT_AMOUNT) {
         BRWalletManager *manager = [BRWalletManager sharedInstance];
 
@@ -312,12 +326,11 @@
 
 // This is used for percent driven interactive transitions, as well as for container controllers that have companion
 // animations that might need to synchronize with the main animation.
-- (NSTimeInterval)transitionDuration:(id<UIViewControllerContextTransitioning>)transitionContext {
-    return 0.35;
-}
+- (NSTimeInterval)transitionDuration:(id<UIViewControllerContextTransitioning>)transitionContext { return 0.35; }
 
 // This method can only be a nop if the transition is interactive and not a percentDriven interactive transition.
-- (void)animateTransition:(id<UIViewControllerContextTransitioning>)transitionContext {
+- (void)animateTransition:(id<UIViewControllerContextTransitioning>)transitionContext
+{
     UIView *containerView = transitionContext.containerView;
     UIViewController *to = [transitionContext viewControllerForKey:UITransitionContextToViewControllerKey],
                      *from = [transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
@@ -339,7 +352,8 @@
 - (id<UIViewControllerAnimatedTransitioning>)navigationController:(UINavigationController *)navigationController
                                   animationControllerForOperation:(UINavigationControllerOperation)operation
                                                fromViewController:(UIViewController *)fromVC
-                                                 toViewController:(UIViewController *)toVC {
+                                                 toViewController:(UIViewController *)toVC
+{
     return self;
 }
 
@@ -347,11 +361,13 @@
 
 - (id<UIViewControllerAnimatedTransitioning>)animationControllerForPresentedController:(UIViewController *)presented
                                                                   presentingController:(UIViewController *)presenting
-                                                                      sourceController:(UIViewController *)source {
+                                                                      sourceController:(UIViewController *)source
+{
     return self;
 }
 
-- (id<UIViewControllerAnimatedTransitioning>)animationControllerForDismissedController:(UIViewController *)dismissed {
+- (id<UIViewControllerAnimatedTransitioning>)animationControllerForDismissedController:(UIViewController *)dismissed
+{
     return self;
 }
 

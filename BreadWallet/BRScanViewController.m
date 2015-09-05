@@ -38,7 +38,8 @@
 
 @implementation BRScanViewController
 
-- (void)viewDidLoad {
+- (void)viewDidLoad
+{
     [super viewDidLoad];
     // Do any additional setup after loading the view.
 
@@ -50,7 +51,8 @@
     [self.toolbar setShadowImage:[UIImage new] forToolbarPosition:UIToolbarPositionAny];
 }
 
-- (void)viewWillAppear:(BOOL)animated {
+- (void)viewWillAppear:(BOOL)animated
+{
     [super viewWillAppear:animated];
 
     self.barStyle = [UIApplication sharedApplication].statusBarStyle;
@@ -109,13 +111,15 @@
     });
 }
 
-- (void)viewWillDisappear:(BOOL)animated {
+- (void)viewWillDisappear:(BOOL)animated
+{
     [[UIApplication sharedApplication] setStatusBarStyle:self.barStyle animated:animated];
 
     [super viewWillDisappear:animated];
 }
 
-- (void)viewDidDisappear:(BOOL)animated {
+- (void)viewDidDisappear:(BOOL)animated
+{
     [self.session stopRunning];
     self.session = nil;
     [self.preview removeFromSuperlayer];
@@ -124,13 +128,12 @@
     [super viewDidDisappear:animated];
 }
 
-- (void)stop {
-    [self.session removeOutput:self.session.outputs.firstObject];
-}
+- (void)stop { [self.session removeOutput:self.session.outputs.firstObject]; }
 
 #pragma mark - IBAction
 
-- (IBAction)flash:(id)sender {
+- (IBAction)flash:(id)sender
+{
     NSError *error = nil;
     AVCaptureDevice *device = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
 
@@ -140,8 +143,6 @@
     }
 }
 
-- (IBAction)done:(id)sender {
-    [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
-}
+- (IBAction)done:(id)sender { [self.presentingViewController dismissViewControllerAnimated:YES completion:nil]; }
 
 @end

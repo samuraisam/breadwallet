@@ -38,7 +38,8 @@
 @dynamic sequence;
 @dynamic transaction;
 
-- (instancetype)setAttributesFromTx:(BRTransaction *)tx inputIndex:(NSUInteger)index {
+- (instancetype)setAttributesFromTx:(BRTransaction *)tx inputIndex:(NSUInteger)index
+{
     [self.managedObjectContext performBlockAndWait:^{
         UInt256 hash = UINT256_ZERO;
 

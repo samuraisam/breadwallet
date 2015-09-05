@@ -43,14 +43,16 @@
 
 @implementation BRTxDetailViewController
 
-- (void)viewDidLoad {
+- (void)viewDidLoad
+{
     [super viewDidLoad];
 
     // Uncomment the following line to preserve selection between presentations.
     // self.clearsSelectionOnViewWillAppear = NO;
 }
 
-- (void)viewWillAppear:(BOOL)animated {
+- (void)viewWillAppear:(BOOL)animated
+{
     [super viewWillAppear:animated];
 
     if (!self.txStatusObserver) {
@@ -64,18 +66,21 @@
     }
 }
 
-- (void)viewWillDisappear:(BOOL)animated {
+- (void)viewWillDisappear:(BOOL)animated
+{
     if (self.txStatusObserver) [[NSNotificationCenter defaultCenter] removeObserver:self.txStatusObserver];
     self.txStatusObserver = nil;
 
     [super viewWillDisappear:animated];
 }
 
-- (void)dealloc {
+- (void)dealloc
+{
     if (self.txStatusObserver) [[NSNotificationCenter defaultCenter] removeObserver:self.txStatusObserver];
 }
 
-- (void)setTransaction:(BRTransaction *)transaction {
+- (void)setTransaction:(BRTransaction *)transaction
+{
     BRWalletManager *manager = [BRWalletManager sharedInstance];
     NSMutableArray *text = [NSMutableArray array], *detail = [NSMutableArray array], *amount = [NSMutableArray array];
     uint64_t fee = [manager.wallet feeForTransaction:transaction];
@@ -118,19 +123,22 @@
     self.outputAmount = amount;
 }
 
-- (void)setBackgroundForCell:(UITableViewCell *)cell indexPath:(NSIndexPath *)path {
+- (void)setBackgroundForCell:(UITableViewCell *)cell indexPath:(NSIndexPath *)path
+{
     [cell viewWithTag:100].hidden = (path.row > 0);
     [cell viewWithTag:101].hidden = (path.row + 1 < [self tableView:self.tableView numberOfRowsInSection:path.section]);
 }
 
 #pragma mark - Table view data source
 
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
+{
     // Return the number of sections.
     return 3;
 }
 
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
     // Return the number of rows in the section.
     switch (section) {
         case 0:
@@ -144,7 +152,8 @@
     return 1;
 }
 
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
     UITableViewCell *cell;
     BRCopyLabel *detailLabel;
     UILabel *textLabel, *subtitleLabel, *amountLabel, *localCurrencyLabel;
@@ -277,7 +286,8 @@
     return cell;
 }
 
-- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
+- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
+{
     switch (section) {
         case 0:
             return nil;
@@ -292,7 +302,8 @@
 
 #pragma mark - Table view delegate
 
-- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
     switch (indexPath.section) {
         case 0:
             return 44.0;
@@ -305,7 +316,8 @@
     return 44.0;
 }
 
-- (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
+- (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
+{
     NSString *sectionTitle = [self tableView:tableView titleForHeaderInSection:section];
 
     if (sectionTitle.length == 0) return 22.0;
@@ -320,7 +332,8 @@
     return textRect.size.height + 12.0;
 }
 
-- (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
+- (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
+{
     UIView *headerview =
         [[UIView alloc] initWithFrame:CGRectMake(0.0, 0.0, self.view.frame.size.width,
                                                  [self tableView:tableView heightForHeaderInSection:section])];
@@ -340,7 +353,8 @@
     return headerview;
 }
 
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
     NSUInteger i = [self.tableView.indexPathsForVisibleRows indexOfObject:indexPath];
     UITableViewCell *cell = (i < self.tableView.visibleCells.count) ? self.tableView.visibleCells[i] : nil;
     BRCopyLabel *copyLabel = (id)[cell viewWithTag:2];

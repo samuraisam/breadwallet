@@ -44,7 +44,8 @@
 
 @implementation BRRestoreViewController
 
-- (void)viewDidLoad {
+- (void)viewDidLoad
+{
     [super viewDidLoad];
     // Do any additional setup after loading the view.
 
@@ -95,25 +96,30 @@
     self.textView.layer.borderWidth = 0.5;
 }
 
-- (void)viewWillAppear:(BOOL)animated {
+- (void)viewWillAppear:(BOOL)animated
+{
     [super viewWillAppear:animated];
 
     [self.textView becomeFirstResponder];
 }
 
-- (void)viewWillDisappear:(BOOL)animated {
+- (void)viewWillDisappear:(BOOL)animated
+{
     self.textView.text = nil;
 
     [super viewWillDisappear:animated];
 }
 
-- (void)dealloc {
+- (void)dealloc
+{
     if (self.keyboardObserver) [[NSNotificationCenter defaultCenter] removeObserver:self.keyboardObserver];
     if (self.resignActiveObserver) [[NSNotificationCenter defaultCenter] removeObserver:self.resignActiveObserver];
 }
 
-- (void)wipeWithPhrase:(NSString *)phrase {
-    @autoreleasepool {
+- (void)wipeWithPhrase:(NSString *)phrase
+{
+    @autoreleasepool
+    {
         BRWalletManager *m = [BRWalletManager sharedInstance];
 
         if ([phrase isEqual:@"wipe"]) phrase = m.seedPhrase;  // this triggers authentication request
@@ -138,13 +144,15 @@
 
 #pragma mark - IBAction
 
-- (IBAction)cancel:(id)sender {
+- (IBAction)cancel:(id)sender
+{
     [self.navigationController.presentingViewController dismissViewControllerAnimated:YES completion:nil];
 }
 
 #pragma mark - UITextViewDelegate
 
-- (void)textViewDidChange:(UITextView *)textView {
+- (void)textViewDidChange:(UITextView *)textView
+{
     static NSCharacterSet *invalid = nil;
     static dispatch_once_t onceToken = 0;
 
@@ -155,7 +163,8 @@
         invalid = set.invertedSet;
     });
 
-    @autoreleasepool {  // @autoreleasepool ensures sensitive data will be dealocated immediately
+    @autoreleasepool
+    {  // @autoreleasepool ensures sensitive data will be dealocated immediately
         BRWalletManager *m = [BRWalletManager sharedInstance];
         NSMutableString *s =
             CFBridgingRelease(CFStringCreateMutableCopy(SecureAllocator(), 0, (CFStringRef)textView.text));
@@ -263,7 +272,8 @@
 
 #pragma mark - UIActionSheetDelegate
 
-- (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex {
+- (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
+{
     if (buttonIndex != actionSheet.destructiveButtonIndex) {
         [self.textView becomeFirstResponder];
         return;

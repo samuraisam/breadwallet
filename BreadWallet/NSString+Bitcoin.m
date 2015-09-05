@@ -34,7 +34,8 @@ static const UniChar base58chars[] = {'1', '2', '3', '4', '5', '6', '7', '8', '9
 
 @implementation NSString (Bitcoin)
 
-+ (NSString *)base58WithData:(NSData *)d {
++ (NSString *)base58WithData:(NSData *)d
+{
     if (!d) return nil;
 
     size_t i, z = 0;
@@ -68,7 +69,8 @@ static const UniChar base58chars[] = {'1', '2', '3', '4', '5', '6', '7', '8', '9
     return CFBridgingRelease(s);
 }
 
-+ (NSString *)base58checkWithData:(NSData *)d {
++ (NSString *)base58checkWithData:(NSData *)d
+{
     if (!d) return nil;
 
     NSMutableData *data = [NSMutableData secureDataWithData:d];
@@ -77,7 +79,8 @@ static const UniChar base58chars[] = {'1', '2', '3', '4', '5', '6', '7', '8', '9
     return [self base58WithData:data];
 }
 
-+ (NSString *)hexWithData:(NSData *)d {
++ (NSString *)hexWithData:(NSData *)d
+{
     if (!d) return nil;
 
     const uint8_t *bytes = d.bytes;
@@ -94,7 +97,8 @@ static const UniChar base58chars[] = {'1', '2', '3', '4', '5', '6', '7', '8', '9
 // miss a receive transaction, only that transaction's funds are missed, however if we accept a receive transaction that
 // we are unable to correctly sign later, then the entire wallet balance after that point would become stuck with the
 // current coin selection code
-+ (NSString *)addressWithScriptPubKey:(NSData *)script {
++ (NSString *)addressWithScriptPubKey:(NSData *)script
+{
     if (script == (id)[NSNull null]) return nil;
 
     NSArray *elem = [script scriptElements];
@@ -130,7 +134,8 @@ static const UniChar base58chars[] = {'1', '2', '3', '4', '5', '6', '7', '8', '9
     return [self base58checkWithData:d];
 }
 
-+ (NSString *)addressWithScriptSig:(NSData *)script {
++ (NSString *)addressWithScriptSig:(NSData *)script
+{
     if (script == (id)[NSNull null]) return nil;
 
     NSArray *elem = [script scriptElements];
@@ -164,7 +169,8 @@ static const UniChar base58chars[] = {'1', '2', '3', '4', '5', '6', '7', '8', '9
     return [self base58checkWithData:d];
 }
 
-- (NSData *)base58ToData {
+- (NSData *)base58ToData
+{
     size_t i, z = 0;
 
     while (z < self.length && [self characterAtIndex:z] == base58chars[0]) z++;  // count leading zeroes
@@ -279,7 +285,8 @@ static const UniChar base58chars[] = {'1', '2', '3', '4', '5', '6', '7', '8', '9
     return d;
 }
 
-- (NSData *)base58checkToData {
+- (NSData *)base58checkToData
+{
     NSData *d = self.base58ToData;
 
     if (d.length < 4) return nil;
@@ -291,7 +298,8 @@ static const UniChar base58chars[] = {'1', '2', '3', '4', '5', '6', '7', '8', '9
     return data;
 }
 
-- (NSData *)hexToData {
+- (NSData *)hexToData
+{
     if (self.length % 2) return nil;
 
     NSMutableData *d = [NSMutableData secureDataWithCapacity:self.length / 2];
@@ -348,13 +356,15 @@ static const UniChar base58chars[] = {'1', '2', '3', '4', '5', '6', '7', '8', '9
     return d;
 }
 
-- (NSData *)addressToHash160 {
+- (NSData *)addressToHash160
+{
     NSData *d = self.base58checkToData;
 
     return (d.length == 160 / 8 + 1) ? [d subdataWithRange:NSMakeRange(1, d.length - 1)] : nil;
 }
 
-- (BOOL)isValidBitcoinAddress {
+- (BOOL)isValidBitcoinAddress
+{
     NSData *d = self.base58checkToData;
 
     if (d.length != 21) return NO;
@@ -368,7 +378,8 @@ static const UniChar base58chars[] = {'1', '2', '3', '4', '5', '6', '7', '8', '9
     return (version == BITCOIN_PUBKEY_ADDRESS || version == BITCOIN_SCRIPT_ADDRESS) ? YES : NO;
 }
 
-- (BOOL)isValidBitcoinPrivateKey {
+- (BOOL)isValidBitcoinPrivateKey
+{
     NSData *d = self.base58checkToData;
 
     if (d.length == 33 || d.length == 34) {  // wallet import format: https://en.bitcoin.it/wiki/Wallet_import_format
@@ -396,7 +407,8 @@ static const UniChar base58chars[] = {'1', '2', '3', '4', '5', '6', '7', '8', '9
 }
 
 // BIP38 encrypted keys: https://github.com/bitcoin/bips/blob/master/bip-0038.mediawiki
-- (BOOL)isValidBitcoinBIP38Key {
+- (BOOL)isValidBitcoinBIP38Key
+{
     NSData *d = self.base58checkToData;
 
     if (d.length != 39) return NO;  // invalid length

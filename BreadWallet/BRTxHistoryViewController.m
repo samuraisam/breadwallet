@@ -36,7 +36,8 @@
 
 #define TRANSACTION_CELL_HEIGHT 75
 
-static NSString *dateFormat(NSString *template) {
+static NSString *dateFormat(NSString *template)
+{
     NSString *format = [NSDateFormatter dateFormatFromTemplate:template options:0 locale:[NSLocale currentLocale]];
 
     format = [format stringByReplacingOccurrencesOfString:@", " withString:@" "];
@@ -69,7 +70,8 @@ static NSString *dateFormat(NSString *template) {
 
 @implementation BRTxHistoryViewController
 
-- (void)viewDidLoad {
+- (void)viewDidLoad
+{
     [super viewDidLoad];
 
     self.txDates = [NSMutableDictionary dictionary];
@@ -82,7 +84,8 @@ static NSString *dateFormat(NSString *template) {
     self.moreTx = YES;
 }
 
-- (void)viewWillAppear:(BOOL)animated {
+- (void)viewWillAppear:(BOOL)animated
+{
     [super viewWillAppear:animated];
     [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDefault animated:YES];
 
@@ -207,7 +210,8 @@ static NSString *dateFormat(NSString *template) {
     }
 }
 
-- (void)viewWillDisappear:(BOOL)animated {
+- (void)viewWillDisappear:(BOOL)animated
+{
     if (self.isMovingFromParentViewController || self.navigationController.isBeingDismissed) {
         // BUG: XXX this isn't triggered from start/recover new wallet
         if (self.backgroundObserver) [[NSNotificationCenter defaultCenter] removeObserver:self.backgroundObserver];
@@ -236,7 +240,8 @@ static NSString *dateFormat(NSString *template) {
 //    [segue.destinationViewController setModalPresentationStyle:UIModalPresentationCustom];
 //}
 
-- (void)dealloc {
+- (void)dealloc
+{
     if (self.navigationController.delegate == self) self.navigationController.delegate = nil;
     if (self.backgroundObserver) [[NSNotificationCenter defaultCenter] removeObserver:self.backgroundObserver];
     if (self.balanceObserver) [[NSNotificationCenter defaultCenter] removeObserver:self.balanceObserver];
@@ -246,7 +251,8 @@ static NSString *dateFormat(NSString *template) {
     if (self.syncFailedObserver) [[NSNotificationCenter defaultCenter] removeObserver:self.syncFailedObserver];
 }
 
-- (uint32_t)blockHeight {
+- (uint32_t)blockHeight
+{
     static uint32_t height = 0;
     uint32_t h = [BRPeerManager sharedInstance].lastBlockHeight;
 
@@ -254,7 +260,8 @@ static NSString *dateFormat(NSString *template) {
     return height;
 }
 
-- (void)setTransactions:(NSArray *)transactions {
+- (void)setTransactions:(NSArray *)transactions
+{
     uint32_t height = self.blockHeight;
 
     if (transactions.count <= 5) self.moreTx = NO;
@@ -274,12 +281,14 @@ static NSString *dateFormat(NSString *template) {
     }
 }
 
-- (void)setBackgroundForCell:(UITableViewCell *)cell tableView:(UITableView *)tableView indexPath:(NSIndexPath *)path {
+- (void)setBackgroundForCell:(UITableViewCell *)cell tableView:(UITableView *)tableView indexPath:(NSIndexPath *)path
+{
     [cell viewWithTag:100].hidden = (path.row > 0);
     [cell viewWithTag:101].hidden = (path.row + 1 < [self tableView:tableView numberOfRowsInSection:path.section]);
 }
 
-- (NSString *)dateForTx:(BRTransaction *)tx {
+- (NSString *)dateForTx:(BRTransaction *)tx
+{
     static NSDateFormatter *f1 = nil;
     static NSDateFormatter *f2 = nil;
     static NSDateFormatter *monthDayFormatter = nil;
@@ -324,11 +333,13 @@ static NSString *dateFormat(NSString *template) {
 
 #pragma mark - IBAction
 
-- (IBAction)done:(id)sender {
+- (IBAction)done:(id)sender
+{
     [self.navigationController.presentingViewController dismissViewControllerAnimated:YES completion:nil];
 }
 
-- (IBAction)unlock:(id)sender {
+- (IBAction)unlock:(id)sender
+{
     BRWalletManager *manager = [BRWalletManager sharedInstance];
 
     if (!manager.didAuthenticate && ![manager authenticateWithPrompt:nil andTouchId:YES]) return;
@@ -344,7 +355,8 @@ static NSString *dateFormat(NSString *template) {
     }
 }
 
-- (IBAction)scanQR:(id)sender {
+- (IBAction)scanQR:(id)sender
+{
     // TODO: show scanner in settings rather than dismissing
     UINavigationController *nav = (id)self.navigationController.presentingViewController;
 
@@ -364,7 +376,8 @@ static NSString *dateFormat(NSString *template) {
                             }];
 }
 
-- (IBAction)showTx:(id)sender {
+- (IBAction)showTx:(id)sender
+{
     BRTxDetailViewController *detailController =
         [self.storyboard instantiateViewControllerWithIdentifier:@"TxDetailViewController"];
     detailController.transaction = sender;
@@ -372,7 +385,8 @@ static NSString *dateFormat(NSString *template) {
     [self.navigationController pushViewController:detailController animated:YES];
 }
 
-- (IBAction)more:(id)sender {
+- (IBAction)more:(id)sender
+{
     BRWalletManager *manager = [BRWalletManager sharedInstance];
     NSUInteger txCount = self.transactions.count;
 
@@ -397,11 +411,10 @@ static NSString *dateFormat(NSString *template) {
 
 #pragma mark - UITableViewDataSource
 
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return 3;
-}
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView { return 3; }
 
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
     switch (section) {
         case 0:
             if (self.transactions.count == 0) return 1;
@@ -417,7 +430,8 @@ static NSString *dateFormat(NSString *template) {
     return 0;
 }
 
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
     static NSString *noTxIdent = @"NoTxCell", *transactionIdent = @"TransactionCell", *actionIdent = @"ActionCell",
                     *disclosureIdent = @"DisclosureCell";
     UITableViewCell *cell = nil;
@@ -556,7 +570,8 @@ static NSString *dateFormat(NSString *template) {
     return cell;
 }
 
-- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
+- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
+{
     switch (section) {
         case 0:
             return nil;
@@ -575,7 +590,8 @@ static NSString *dateFormat(NSString *template) {
 
 #pragma mark - UITableViewDelegate
 
-- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
     switch (indexPath.section) {
         case 0:
             return (self.moreTx && indexPath.row >= self.transactions.count) ? 44.0 : TRANSACTION_CELL_HEIGHT;
@@ -588,7 +604,8 @@ static NSString *dateFormat(NSString *template) {
     return 44.0;
 }
 
-- (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
+- (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
+{
     NSString *sectionTitle = [self tableView:tableView titleForHeaderInSection:section];
 
     if (sectionTitle.length == 0) return 22.0;
@@ -602,7 +619,8 @@ static NSString *dateFormat(NSString *template) {
     return r.size.height + 22.0 + 10.0;
 }
 
-- (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
+- (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
+{
     UIView *v = [[UIView alloc] initWithFrame:CGRectMake(0.0, 0.0, self.view.frame.size.width,
                                                          [self tableView:tableView heightForHeaderInSection:section])];
     UILabel *l =
@@ -621,18 +639,21 @@ static NSString *dateFormat(NSString *template) {
     return v;
 }
 
-- (CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section {
+- (CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section
+{
     return (section + 1 == [self numberOfSectionsInTableView:tableView]) ? 22.0 : 0.0;
 }
 
-- (UIView *)tableView:(UITableView *)tableView viewForFooterInSection:(NSInteger)section {
+- (UIView *)tableView:(UITableView *)tableView viewForFooterInSection:(NSInteger)section
+{
     UIView *v = [[UIView alloc] initWithFrame:CGRectMake(0.0, 0.0, self.view.frame.size.width,
                                                          [self tableView:tableView heightForFooterInSection:section])];
     v.backgroundColor = [UIColor clearColor];
     return v;
 }
 
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
     // TODO: include an option to generate a new wallet and sweep old balance if backup may have been compromized
     UIViewController *destinationController = nil;
 
@@ -669,7 +690,8 @@ static NSString *dateFormat(NSString *template) {
 
 #pragma mark - UIAlertViewDelegate
 
-- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
+{
     if (buttonIndex == alertView.cancelButtonIndex) {
         [self.tableView deselectRowAtIndexPath:self.tableView.indexPathForSelectedRow animated:YES];
         return;
@@ -687,12 +709,11 @@ static NSString *dateFormat(NSString *template) {
 
 // This is used for percent driven interactive transitions, as well as for container controllers that have companion
 // animations that might need to synchronize with the main animation.
-- (NSTimeInterval)transitionDuration:(id<UIViewControllerContextTransitioning>)transitionContext {
-    return 0.35;
-}
+- (NSTimeInterval)transitionDuration:(id<UIViewControllerContextTransitioning>)transitionContext { return 0.35; }
 
 // This method can only be a nop if the transition is interactive and not a percentDriven interactive transition.
-- (void)animateTransition:(id<UIViewControllerContextTransitioning>)transitionContext {
+- (void)animateTransition:(id<UIViewControllerContextTransitioning>)transitionContext
+{
     UIView *containerView = transitionContext.containerView;
     UIViewController *to = [transitionContext viewControllerForKey:UITransitionContextToViewControllerKey],
                      *from = [transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
@@ -726,7 +747,8 @@ static NSString *dateFormat(NSString *template) {
 - (id<UIViewControllerAnimatedTransitioning>)navigationController:(UINavigationController *)navigationController
                                   animationControllerForOperation:(UINavigationControllerOperation)operation
                                                fromViewController:(UIViewController *)fromVC
-                                                 toViewController:(UIViewController *)toVC {
+                                                 toViewController:(UIViewController *)toVC
+{
     return self;
 }
 
@@ -734,11 +756,13 @@ static NSString *dateFormat(NSString *template) {
 
 - (id<UIViewControllerAnimatedTransitioning>)animationControllerForPresentedController:(UIViewController *)presented
                                                                   presentingController:(UIViewController *)presenting
-                                                                      sourceController:(UIViewController *)source {
+                                                                      sourceController:(UIViewController *)source
+{
     return self;
 }
 
-- (id<UIViewControllerAnimatedTransitioning>)animationControllerForDismissedController:(UIViewController *)dismissed {
+- (id<UIViewControllerAnimatedTransitioning>)animationControllerForDismissedController:(UIViewController *)dismissed
+{
     return self;
 }
 

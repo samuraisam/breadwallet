@@ -43,13 +43,15 @@
 
 @implementation BRSettingsViewController
 
-- (void)viewDidLoad {
+- (void)viewDidLoad
+{
     [super viewDidLoad];
 
     self.touchId = [BRWalletManager sharedInstance].touchIdEnabled;
 }
 
-- (void)viewWillAppear:(BOOL)animated {
+- (void)viewWillAppear:(BOOL)animated
+{
     [super viewWillAppear:animated];
 
     BRWalletManager *manager = [BRWalletManager sharedInstance];
@@ -75,7 +77,8 @@
     }
 }
 
-- (void)viewWillDisappear:(BOOL)animated {
+- (void)viewWillDisappear:(BOOL)animated
+{
     if (self.isMovingFromParentViewController || self.navigationController.isBeingDismissed) {
         if (self.balanceObserver) [[NSNotificationCenter defaultCenter] removeObserver:self.balanceObserver];
         self.balanceObserver = nil;
@@ -84,11 +87,13 @@
     [super viewWillDisappear:animated];
 }
 
-- (void)dealloc {
+- (void)dealloc
+{
     if (self.balanceObserver) [[NSNotificationCenter defaultCenter] removeObserver:self.balanceObserver];
 }
 
-- (UITableViewController *)selectorController {
+- (UITableViewController *)selectorController
+{
     if (_selectorController) return _selectorController;
     _selectorController = [[UITableViewController alloc] initWithStyle:UITableViewStylePlain];
     _selectorController.transitioningDelegate = self.navigationController.viewControllers.firstObject;
@@ -98,19 +103,22 @@
     return _selectorController;
 }
 
-- (void)setBackgroundForCell:(UITableViewCell *)cell tableView:(UITableView *)tableView indexPath:(NSIndexPath *)path {
+- (void)setBackgroundForCell:(UITableViewCell *)cell tableView:(UITableView *)tableView indexPath:(NSIndexPath *)path
+{
     [cell viewWithTag:100].hidden = (path.row > 0);
     [cell viewWithTag:101].hidden = (path.row + 1 < [self tableView:tableView numberOfRowsInSection:path.section]);
 }
 
 #pragma mark - IBAction
 
-- (IBAction)about:(id)sender {
+- (IBAction)about:(id)sender
+{
     [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"http://breadwallet.com"]];
 }
 
 #if DEBUG
-- (IBAction)copyLogs:(id)sender {
+- (IBAction)copyLogs:(id)sender
+{
     aslmsg q = asl_new(ASL_TYPE_QUERY), m;
     aslresponse r = asl_search(NULL, q);
     NSMutableString *s = [NSMutableString string];
@@ -135,7 +143,8 @@
 }
 #endif
 
-- (IBAction)touchIdLimit:(id)sender {
+- (IBAction)touchIdLimit:(id)sender
+{
     BRWalletManager *manager = [BRWalletManager sharedInstance];
 
     if ([manager authenticateWithPrompt:nil andTouchId:NO]) {
@@ -160,7 +169,8 @@
         [self.tableView deselectRowAtIndexPath:self.tableView.indexPathForSelectedRow animated:YES];
 }
 
-- (IBAction)navBarSwipe:(id)sender {
+- (IBAction)navBarSwipe:(id)sender
+{
     BRWalletManager *manager = [BRWalletManager sharedInstance];
     NSUInteger digits = (((manager.format.maximumFractionDigits - 2) / 3 + 1) % 3) * 3 + 2;
 
@@ -178,12 +188,14 @@
 
 #pragma mark - UITableViewDataSource
 
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
+{
     if (tableView == self.selectorController.tableView) return 1;
     return 3;
 }
 
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
     if (tableView == self.selectorController.tableView) return self.selectorOptions.count;
 
     switch (section) {
@@ -198,7 +210,8 @@
     return 0;
 }
 
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
     static NSString *disclosureIdent = @"DisclosureCell", *restoreIdent = @"RestoreCell", *actionIdent = @"ActionCell",
                     *selectorIdent = @"SelectorCell", *selectorOptionCell = @"SelectorOptionCell";
     UITableViewCell *cell = nil;
@@ -269,14 +282,16 @@
     return cell;
 }
 
-- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
+- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
+{
     if (tableView == self.selectorController.tableView && self.selectorOptions.count == 0) return self.noOptionsText;
     return nil;
 }
 
 #pragma mark - UITableViewDelegate
 
-- (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
+- (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
+{
     NSString *sectionTitle = [self tableView:tableView titleForHeaderInSection:section];
 
     if (sectionTitle.length == 0) return 22.0;
@@ -290,7 +305,8 @@
     return textRect.size.height + 22.0 + 10.0;
 }
 
-- (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
+- (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
+{
     UIView *sectionHeader =
         [[UIView alloc] initWithFrame:CGRectMake(0.0, 0.0, self.view.frame.size.width,
                                                  [self tableView:tableView heightForHeaderInSection:section])];
@@ -310,11 +326,13 @@
     return sectionHeader;
 }
 
-- (CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section {
+- (CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section
+{
     return (section + 1 == [self numberOfSectionsInTableView:tableView]) ? 22.0 : 0.0;
 }
 
-- (UIView *)tableView:(UITableView *)tableView viewForFooterInSection:(NSInteger)section {
+- (UIView *)tableView:(UITableView *)tableView viewForFooterInSection:(NSInteger)section
+{
     UIView *sectionFooter =
         [[UIView alloc] initWithFrame:CGRectMake(0.0, 0.0, self.view.frame.size.width,
                                                  [self tableView:tableView heightForFooterInSection:section])];
@@ -322,7 +340,8 @@
     return sectionFooter;
 }
 
-- (void)showAbout {
+- (void)showAbout
+{
     // TODO: XXXX add a link to support
     UIViewController *c;
     UILabel *l;
@@ -350,7 +369,8 @@
     [self.navigationController pushViewController:c animated:YES];
 }
 
-- (void)showRecoveryPhrase {
+- (void)showRecoveryPhrase
+{
     [[[UIAlertView alloc]
             initWithTitle:NSLocalizedString(@"WARNING", nil)
                   message:[NSString stringWithFormat:
@@ -374,7 +394,8 @@
         otherButtonTitles:NSLocalizedString(@"show", nil), nil] show];
 }
 
-- (void)showCurrencySelector {
+- (void)showCurrencySelector
+{
     NSUInteger currencyCodeIndex = 0;
     BRWalletManager *manager = [BRWalletManager sharedInstance];
     double localPrice = manager.localCurrencyPrice;
@@ -414,7 +435,8 @@
     }
 }
 
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
     // TODO: include an option to generate a new wallet and sweep old balance if backup may have been compromized
     BRWalletManager *manager = [BRWalletManager sharedInstance];
     NSUInteger currencyCodeIndex = 0;
@@ -489,7 +511,8 @@
 
 #pragma mark - UIAlertViewDelegate
 
-- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
+{
     if (buttonIndex == alertView.cancelButtonIndex) {
         [self.tableView deselectRowAtIndexPath:self.tableView.indexPathForSelectedRow animated:YES];
         return;

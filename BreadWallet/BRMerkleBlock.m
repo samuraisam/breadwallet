@@ -67,11 +67,10 @@
 @implementation BRMerkleBlock
 
 // message can be either a merkleblock or header message
-+ (instancetype)blockWithMessage:(NSData *)message {
-    return [[self alloc] initWithMessage:message];
-}
++ (instancetype)blockWithMessage:(NSData *)message { return [[self alloc] initWithMessage:message]; }
 
-- (instancetype)initWithMessage:(NSData *)message {
+- (instancetype)initWithMessage:(NSData *)message
+{
     if (!(self = [self init])) return nil;
 
     if (message.length < 80) return nil;
@@ -121,7 +120,8 @@
                 totalTransactions:(uint32_t)totalTransactions
                            hashes:(NSData *)hashes
                             flags:(NSData *)flags
-                           height:(uint32_t)height {
+                           height:(uint32_t)height
+{
     if (!(self = [self init])) return nil;
 
     _blockHash = blockHash;
@@ -142,7 +142,8 @@
 // true if merkle tree and timestamp are valid, and proof-of-work matches the stated difficulty target
 // NOTE: This only checks if the block difficulty matches the difficulty target in the header. It does not check if the
 // target is correct for the block's height in the chain. Use verifyDifficultyFromPreviousBlock: for that.
-- (BOOL)isValid {
+- (BOOL)isValid
+{
     // target is in "compact" format, where the most significant byte is the size of resulting value in bytes, the next
     // bit is the sign, and the remaining 23bits is the value after having been right shifted by (size - 3)*8 bits
     static const uint32_t maxsize = MAX_PROOF_OF_WORK >> 24, maxtarget = MAX_PROOF_OF_WORK & 0x00ffffffu;
@@ -190,7 +191,8 @@
     return YES;
 }
 
-- (NSData *)toData {
+- (NSData *)toData
+{
     NSMutableData *d = [NSMutableData data];
 
     [d appendUInt32:_version];
@@ -212,7 +214,8 @@
 }
 
 // true if the given tx hash is included in the block
-- (BOOL)containsTxHash:(UInt256)txHash {
+- (BOOL)containsTxHash:(UInt256)txHash
+{
     for (NSUInteger i = 0; i < _hashes.length / sizeof(UInt256); i += sizeof(UInt256)) {
         if (uint256_eq(txHash, [_hashes hashAtOffset:i])) return YES;
     }
@@ -221,7 +224,8 @@
 }
 
 // returns an array of the matched tx hashes
-- (NSArray *)txHashes {
+- (NSArray *)txHashes
+{
     int hashIdx = 0, flagIdx = 0;
     NSArray *txHashes = [self _walk:&
         hashIdx:&
@@ -245,7 +249,8 @@
 // targeted time between transitions (14*24*60*60 seconds). If the new difficulty is more than 4x or less than 1/4 of
 // the previous difficulty, the change is limited to either 4x or 1/4. There is also a minimum difficulty value
 // intuitively named MAX_PROOF_OF_WORK... since larger values are less difficult.
-- (BOOL)verifyDifficultyFromPreviousBlock:(BRMerkleBlock *)previous andTransitionTime:(uint32_t)time {
+- (BOOL)verifyDifficultyFromPreviousBlock:(BRMerkleBlock *)previous andTransitionTime:(uint32_t)time
+{
     if (!uint256_eq(_prevBlock, previous.blockHash) || _height != previous.height + 1) return NO;
     if ((_height % BLOCK_DIFFICULTY_INTERVAL) == 0 && time == 0) return NO;
 
@@ -282,7 +287,8 @@
 
 // recursively walks the merkle tree in depth first order, calling leaf(hash, flag) for each stored hash, and
 // branch(left, right) with the result from each branch
-- (id)_walk:(int *)hashIdx:(int *)flagIdx:(int)depth:(id (^)(id, BOOL))leaf:(id (^)(id, id))branch {
+- (id)_walk:(int *)hashIdx:(int *)flagIdx:(int)depth:(id (^)(id, BOOL))leaf:(id (^)(id, id))branch
+{
     if ((*flagIdx) / 8 >= _flags.length || (*hashIdx + 1) * sizeof(UInt256) > _hashes.length) return leaf(nil, NO);
 
     BOOL flag = (((const uint8_t *)_flags.bytes)[*flagIdx / 8] & (1 << (*flagIdx % 8)));
@@ -302,12 +308,14 @@
     return branch(left, right);
 }
 
-- (NSUInteger)hash {
+- (NSUInteger)hash
+{
     if (uint256_is_zero(_blockHash)) return super.hash;
     return *(const NSUInteger *)&_blockHash;
 }
 
-- (BOOL)isEqual:(id)obj {
+- (BOOL)isEqual:(id)obj
+{
     return self == obj || ([obj isKindOfClass:[BRMerkleBlock class]] && uint256_eq([obj blockHash], _blockHash));
 }
 

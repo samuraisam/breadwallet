@@ -35,11 +35,10 @@
 
 @implementation BRCopyLabel
 
-- (BOOL)canBecomeFirstResponder {
-    return YES;
-}
+- (BOOL)canBecomeFirstResponder { return YES; }
 
-- (BOOL)resignFirstResponder {
+- (BOOL)resignFirstResponder
+{
     if ([super resignFirstResponder]) {
         [UIView animateWithDuration:0.2
             animations:^{
@@ -56,15 +55,12 @@
         return NO;
 }
 
-- (BOOL)canPerformAction:(SEL)action withSender:(id)sender {
-    return (action == @selector(copy:));
-}
+- (BOOL)canPerformAction:(SEL)action withSender:(id)sender { return (action == @selector(copy:)); }
 
-- (NSString *)copyableText {
-    return (_copyableText) ? _copyableText : self.text;
-}
+- (NSString *)copyableText { return (_copyableText) ? _copyableText : self.text; }
 
-- (CGRect)copyableFrame {
+- (CGRect)copyableFrame
+{
     NSRange r = [self.text rangeOfString:self.copyableText];
 
     if (r.location == NSNotFound) return CGRectZero;
@@ -85,12 +81,14 @@
                       self.bounds.size.height);
 }
 
-- (void)setSelectedColor:(UIColor *)selectedColor {
+- (void)setSelectedColor:(UIColor *)selectedColor
+{
     _selectedColor = selectedColor;
     self.highlight.backgroundColor = selectedColor;
 }
 
-- (void)toggleCopyMenu {
+- (void)toggleCopyMenu
+{
     if (self.copyableText.length == 0) return;
 
     if ([self isFirstResponder]) {
@@ -126,18 +124,21 @@
     }
 }
 
-- (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {
+- (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
+{
     [self toggleCopyMenu];
     [super touchesEnded:touches withEvent:event];
 }
 
-- (void)dealloc {
+- (void)dealloc
+{
     if (self.menuHideObserver) [[NSNotificationCenter defaultCenter] removeObserver:self.menuHideObserver];
 }
 
 #pragma mark - UIResponderStandardEditActions
 
-- (void)copy:(id)sender {
+- (void)copy:(id)sender
+{
     [UIPasteboard generalPasteboard].string = self.copyableText;
     [self resignFirstResponder];
 }

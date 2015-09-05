@@ -65,7 +65,8 @@ const unsigned char sboxi[256] = {
 
 #define xt(x) (((x) << 1) ^ ((((x) >> 7) & 1) * 0x1b))
 
-static void AES256ECBEncrypt(const void *key, void *buf) {
+static void AES256ECBEncrypt(const void *key, void *buf)
+{
     unsigned char *x = buf, k[32], r = 1, a, b, c, d, e, i, j;
 
     memcpy(k, key, sizeof(k));
@@ -97,7 +98,8 @@ static void AES256ECBEncrypt(const void *key, void *buf) {
     for (i = 0; i < 4; i++) ((unsigned *)x)[i] ^= ((unsigned *)k)[i];  // final add round key
 }
 
-static void AES256ECBDecrypt(const void *key, void *buf) {
+static void AES256ECBDecrypt(const void *key, void *buf)
+{
     unsigned char *x = buf, k[32], r = 1, a, b, c, d, e, f, g, h, i, j;
 
     memcpy(k, key, sizeof(k));
@@ -149,7 +151,8 @@ static void AES256ECBDecrypt(const void *key, void *buf) {
 #define rotl(a, b) (((a) << (b)) | ((a) >> (32 - (b))))
 
 // salsa20/8 stream cypher: http://cr.yp.to/snuffle.html
-static void salsa20_8(unsigned b[16]) {
+static void salsa20_8(unsigned b[16])
+{
     unsigned x00 = b[0], x01 = b[1], x02 = b[2], x03 = b[3], x04 = b[4], x05 = b[5], x06 = b[6], x07 = b[7], x08 = b[8],
              x09 = b[9], x10 = b[10], x11 = b[11], x12 = b[12], x13 = b[13], x14 = b[14], x15 = b[15];
 
@@ -171,7 +174,8 @@ static void salsa20_8(unsigned b[16]) {
     b[8] += x08, b[9] += x09, b[10] += x10, b[11] += x11, b[12] += x12, b[13] += x13, b[14] += x14, b[15] += x15;
 }
 
-static void blockmix_salsa8(unsigned long long *dest, const unsigned long long *src, unsigned long long *b, int r) {
+static void blockmix_salsa8(unsigned long long *dest, const unsigned long long *src, unsigned long long *b, int r)
+{
     memcpy(b, &src[(2 * r - 1) * 8], 64);
 
     for (int i = 0; i < 2 * r; i += 2) {
@@ -186,7 +190,8 @@ static void blockmix_salsa8(unsigned long long *dest, const unsigned long long *
 
 // scrypt key derivation: http://www.tarsnap.com/scrypt.html
 static void scrypt(const void *pw, size_t pwlen, const void *salt, size_t slen, long n, int r, int p, void *dk,
-                   size_t dklen) {
+                   size_t dklen)
+{
     unsigned long long x[16 * r], y[16 * r], z[8], *v = malloc(128 * r * n), m;
     unsigned b[32 * r * p];
 
@@ -229,7 +234,8 @@ static void scrypt(const void *pw, size_t pwlen, const void *salt, size_t slen, 
     memset(&m, 0, sizeof(m));
 }
 
-static NSData *normalize_passphrase(NSString *passphrase) {
+static NSData *normalize_passphrase(NSString *passphrase)
+{
     NSData *password;
     CFMutableStringRef pw = CFStringCreateMutableCopy(SecureAllocator(), 0, (CFStringRef)passphrase);
 
@@ -239,7 +245,8 @@ static NSData *normalize_passphrase(NSString *passphrase) {
     return password;
 }
 
-static UInt256 derive_passfactor(uint8_t flag, uint64_t entropy, NSString *passphrase) {
+static UInt256 derive_passfactor(uint8_t flag, uint64_t entropy, NSString *passphrase)
+{
     NSData *pw = normalize_passphrase(passphrase);
     UInt256 prefactor;
 
@@ -256,7 +263,8 @@ static UInt256 derive_passfactor(uint8_t flag, uint64_t entropy, NSString *passp
         return prefactor;  // passfactor = prefactor
 }
 
-static UInt512 derive_key(NSData *passpoint, uint32_t addresshash, uint64_t entropy) {
+static UInt512 derive_key(NSData *passpoint, uint32_t addresshash, uint64_t entropy)
+{
     UInt512 dk;
     unsigned char salt[sizeof(addresshash) + sizeof(entropy)];
 
@@ -268,7 +276,8 @@ static UInt512 derive_key(NSData *passpoint, uint32_t addresshash, uint64_t entr
     return dk;
 }
 
-static NSData *point_multiply(NSData *point, UInt256 factor, BOOL compressed) {
+static NSData *point_multiply(NSData *point, UInt256 factor, BOOL compressed)
+{
     NSMutableData *d = [NSMutableData secureDataWithLength:compressed ? 33 : 65];
 
     secp256k1_point_mul(d.mutableBytes, point.bytes, factor, compressed);
@@ -278,7 +287,8 @@ static NSData *point_multiply(NSData *point, UInt256 factor, BOOL compressed) {
 @implementation BRKey (BIP38)
 
 // decrypts a BIP38 key using the given passphrase or retuns nil if passphrase is incorrect
-+ (instancetype)keyWithBIP38Key:(NSString *)key andPassphrase:(NSString *)passphrase {
++ (instancetype)keyWithBIP38Key:(NSString *)key andPassphrase:(NSString *)passphrase
+{
     return [[self alloc] initWithBIP38Key:key andPassphrase:passphrase];
 }
 
@@ -301,7 +311,8 @@ static NSData *point_multiply(NSData *point, UInt256 factor, BOOL compressed) {
 + (NSString *)BIP38IntermediateCodeWithLot:(uint32_t)lot
                                   sequence:(uint16_t)sequence
                                       salt:(uint32_t)salt
-                                passphrase:(NSString *)passphrase {
+                                passphrase:(NSString *)passphrase
+{
     if (lot >= 0x100000u || sequence >= 0x1000u || !passphrase) return nil;
     salt = CFSwapInt32HostToBig(salt);
 
@@ -393,9 +404,8 @@ static NSData *point_multiply(NSData *point, UInt256 factor, BOOL compressed) {
 }
 
 // returns true if the "confirmation code" confirms that the given bitcoin address depends on the specified passphrase
-+ (BOOL)confirmWithBIP38ConfirmationCode:(NSString *)code
-                                 address:(NSString *)address
-                              passphrase:(NSString *)passphrase {
++ (BOOL)confirmWithBIP38ConfirmationCode:(NSString *)code address:(NSString *)address passphrase:(NSString *)passphrase
+{
     NSData *d = code.base58checkToData;
 
     if (d.length != 51 || !address || !passphrase) return NO;
@@ -428,7 +438,8 @@ static NSData *point_multiply(NSData *point, UInt256 factor, BOOL compressed) {
     return ([[BRKey keyWithPublicKey:pubKey].address isEqual:address]) ? YES : NO;
 }
 
-- (instancetype)initWithBIP38Key:(NSString *)key andPassphrase:(NSString *)passphrase {
+- (instancetype)initWithBIP38Key:(NSString *)key andPassphrase:(NSString *)passphrase
+{
     NSData *d = key.base58checkToData;
 
     if (d.length != 39 || !passphrase) return nil;
@@ -495,7 +506,8 @@ static NSData *point_multiply(NSData *point, UInt256 factor, BOOL compressed) {
 }
 
 // encrypts receiver with passphrase and returns BIP38 key
-- (NSString *)BIP38KeyWithPassphrase:(NSString *)passphrase {
+- (NSString *)BIP38KeyWithPassphrase:(NSString *)passphrase
+{
     NSData *priv = self.privateKey.base58checkToData;
 
     if (priv.length < 33 || !passphrase) return nil;

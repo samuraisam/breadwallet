@@ -46,7 +46,8 @@
 
 @implementation NSData (ProtoBuf)
 
-- (uint64_t)protoBufVarIntAtOffset:(NSUInteger *)off {
+- (uint64_t)protoBufVarIntAtOffset:(NSUInteger *)off
+{
     uint64_t varInt = 0;
     uint8_t b = 0x80;
     NSUInteger i = 0;
@@ -59,7 +60,8 @@
     return varInt;
 }
 
-- (NSData *)protoBufLenDelimAtOffset:(NSUInteger *)off {
+- (NSData *)protoBufLenDelimAtOffset:(NSUInteger *)off
+{
     NSData *lenDelim = nil;
     NSUInteger len = (NSUInteger)[self protoBufVarIntAtOffset:off];
 
@@ -69,7 +71,8 @@
 }
 
 // sets either int or data depending on field type, and returns field key
-- (NSUInteger)protoBufFieldAtOffset:(NSUInteger *)off int:(uint64_t *)i data:(NSData **)d {
+- (NSUInteger)protoBufFieldAtOffset:(NSUInteger *)off int:(uint64_t *)i data:(NSData **)d
+{
     NSUInteger key = (NSUInteger)[self protoBufVarIntAtOffset:off];
     uint64_t varInt = 0;
     NSData *lenDelim = nil;
@@ -110,7 +113,8 @@
 
 @implementation NSMutableData (ProtoBuf)
 
-- (void)appendProtoBufVarInt:(uint64_t)i {
+- (void)appendProtoBufVarInt:(uint64_t)i
+{
     do {
         uint8_t b = i & 0x7f;
 
@@ -120,22 +124,26 @@
     } while (i > 0);
 }
 
-- (void)appendProtoBufLenDelim:(NSData *)d {
+- (void)appendProtoBufLenDelim:(NSData *)d
+{
     [self appendProtoBufVarInt:d.length];
     [self appendData:d];
 }
 
-- (void)appendProtoBufString:(NSString *)s withKey:(NSUInteger)key {
+- (void)appendProtoBufString:(NSString *)s withKey:(NSUInteger)key
+{
     [self appendProtoBufVarInt:(key << 3) + PROTOBUF_LENDELIM];
     [self appendProtoBufLenDelim:[s dataUsingEncoding:NSUTF8StringEncoding]];
 }
 
-- (void)appendProtoBufData:(NSData *)d withKey:(NSUInteger)key {
+- (void)appendProtoBufData:(NSData *)d withKey:(NSUInteger)key
+{
     [self appendProtoBufVarInt:(key << 3) + PROTOBUF_LENDELIM];
     [self appendProtoBufLenDelim:d];
 }
 
-- (void)appendProtoBufInt:(uint64_t)i withKey:(NSUInteger)key {
+- (void)appendProtoBufInt:(uint64_t)i withKey:(NSUInteger)key
+{
     [self appendProtoBufVarInt:(key << 3) + PROTOBUF_VARINT];
     [self appendProtoBufVarInt:i];
 }
@@ -182,9 +190,7 @@ typedef enum : NSUInteger { ack_payment = 1, ack_memo = 2 } ack_key;
 
 @implementation BRPaymentProtocolDetails
 
-+ (instancetype)detailsWithData:(NSData *)data {
-    return [[self alloc] initWithData:data];
-}
++ (instancetype)detailsWithData:(NSData *)data { return [[self alloc] initWithData:data]; }
 
 - (instancetype)initWithNetwork:(NSString *)network
                   outputAmounts:(NSArray *)amounts
@@ -193,7 +199,8 @@ typedef enum : NSUInteger { ack_payment = 1, ack_memo = 2 } ack_key;
                         expires:(NSTimeInterval)expires
                            memo:(NSString *)memo
                      paymentURL:(NSString *)url
-                   merchantData:(NSData *)data {
+                   merchantData:(NSData *)data
+{
     if (scripts.count == 0 || amounts.count != scripts.count) return nil;
     if (!(self = [self init])) return nil;
 
@@ -207,7 +214,8 @@ typedef enum : NSUInteger { ack_payment = 1, ack_memo = 2 } ack_key;
     return self;
 }
 
-- (instancetype)initWithData:(NSData *)data {
+- (instancetype)initWithData:(NSData *)data
+{
     if (!(self = [self init])) return nil;
 
     NSUInteger off = 0;
@@ -253,11 +261,10 @@ typedef enum : NSUInteger { ack_payment = 1, ack_memo = 2 } ack_key;
     return self;
 }
 
-- (NSString *)network {
-    return (_network) ? _network : @"main";
-}
+- (NSString *)network { return (_network) ? _network : @"main"; }
 
-- (NSArray *)outputAmounts {
+- (NSArray *)outputAmounts
+{
     if (![_outputAmounts containsObject:@(UINT64_MAX)]) return _outputAmounts;
 
     NSMutableArray *amounts = [NSMutableArray arrayWithArray:_outputAmounts];
@@ -269,7 +276,8 @@ typedef enum : NSUInteger { ack_payment = 1, ack_memo = 2 } ack_key;
     return amounts;
 }
 
-- (NSData *)toData {
+- (NSData *)toData
+{
     NSMutableData *d = [NSMutableData data];
     NSUInteger i = 0;
 
@@ -303,11 +311,10 @@ typedef enum : NSUInteger { ack_payment = 1, ack_memo = 2 } ack_key;
 
 @implementation BRPaymentProtocolRequest
 
-+ (instancetype)requestWithData:(NSData *)data {
-    return [[self alloc] initWithData:data];
-}
++ (instancetype)requestWithData:(NSData *)data { return [[self alloc] initWithData:data]; }
 
-- (instancetype)initWithData:(NSData *)data {
+- (instancetype)initWithData:(NSData *)data
+{
     if (!(self = [self init])) return nil;
 
     NSUInteger off = 0;
@@ -345,7 +352,8 @@ typedef enum : NSUInteger { ack_payment = 1, ack_memo = 2 } ack_key;
                         pkiType:(NSString *)type
                           certs:(NSArray *)certs
                         details:(BRPaymentProtocolDetails *)details
-                      signature:(NSData *)sig {
+                      signature:(NSData *)sig
+{
     if (!details) return nil;  // required
     if (!(self = [self init])) return nil;
 
@@ -364,15 +372,12 @@ typedef enum : NSUInteger { ack_payment = 1, ack_memo = 2 } ack_key;
     return self;
 }
 
-- (uint32_t)version {
-    return (_version) ? _version : 1;
-}
+- (uint32_t)version { return (_version) ? _version : 1; }
 
-- (NSString *)pkiType {
-    return (_pkiType) ? _pkiType : @"none";
-}
+- (NSString *)pkiType { return (_pkiType) ? _pkiType : @"none"; }
 
-- (NSData *)toData {
+- (NSData *)toData
+{
     NSMutableData *d = [NSMutableData data];
 
     if (_version) [d appendProtoBufInt:_version withKey:request_version];
@@ -383,7 +388,8 @@ typedef enum : NSUInteger { ack_payment = 1, ack_memo = 2 } ack_key;
     return d;
 }
 
-- (NSArray *)certs {
+- (NSArray *)certs
+{
     NSMutableArray *certs = [NSMutableArray array];
     NSUInteger off = 0;
 
@@ -396,7 +402,8 @@ typedef enum : NSUInteger { ack_payment = 1, ack_memo = 2 } ack_key;
     return certs;
 }
 
-- (BOOL)isValid {
+- (BOOL)isValid
+{
     if (![self.pkiType isEqual:@"none"]) {
         NSMutableArray *certs = [NSMutableArray array];
         NSArray *policies = @[ CFBridgingRelease(SecPolicyCreateBasicX509()) ];
@@ -474,11 +481,10 @@ typedef enum : NSUInteger { ack_payment = 1, ack_memo = 2 } ack_key;
 
 @implementation BRPaymentProtocolPayment
 
-+ (instancetype)paymentWithData:(NSData *)data {
-    return [[self alloc] initWithData:data];
-}
++ (instancetype)paymentWithData:(NSData *)data { return [[self alloc] initWithData:data]; }
 
-- (instancetype)initWithData:(NSData *)data {
+- (instancetype)initWithData:(NSData *)data
+{
     if (!(self = [self init])) return nil;
 
     NSUInteger off = 0;
@@ -521,7 +527,8 @@ typedef enum : NSUInteger { ack_payment = 1, ack_memo = 2 } ack_key;
                         transactions:(NSArray *)transactions
                      refundToAmounts:(NSArray *)amounts
                      refundToScripts:(NSArray *)scripts
-                                memo:(NSString *)memo {
+                                memo:(NSString *)memo
+{
     if (amounts.count != scripts.count) return nil;
     if (!(self = [self init])) return nil;
 
@@ -533,7 +540,8 @@ typedef enum : NSUInteger { ack_payment = 1, ack_memo = 2 } ack_key;
     return self;
 }
 
-- (NSArray *)refundToAmounts {
+- (NSArray *)refundToAmounts
+{
     if (![_refundToAmounts containsObject:@(UINT64_MAX)]) return _refundToAmounts;
 
     NSMutableArray *amounts = [NSMutableArray arrayWithArray:_refundToAmounts];
@@ -545,7 +553,8 @@ typedef enum : NSUInteger { ack_payment = 1, ack_memo = 2 } ack_key;
     return amounts;
 }
 
-- (NSData *)toData {
+- (NSData *)toData
+{
     NSMutableData *d = [NSMutableData data];
     NSUInteger i = 0;
 
@@ -572,11 +581,10 @@ typedef enum : NSUInteger { ack_payment = 1, ack_memo = 2 } ack_key;
 
 @implementation BRPaymentProtocolACK
 
-+ (instancetype)ackWithData:(NSData *)data {
-    return [[self alloc] initWithData:data];
-}
++ (instancetype)ackWithData:(NSData *)data { return [[self alloc] initWithData:data]; }
 
-- (instancetype)initWithData:(NSData *)data {
+- (instancetype)initWithData:(NSData *)data
+{
     if (!(self = [self init])) return nil;
 
     NSUInteger off = 0;
@@ -601,7 +609,8 @@ typedef enum : NSUInteger { ack_payment = 1, ack_memo = 2 } ack_key;
     return self;
 }
 
-- (instancetype)initWithPayment:(BRPaymentProtocolPayment *)payment andMemo:(NSString *)memo {
+- (instancetype)initWithPayment:(BRPaymentProtocolPayment *)payment andMemo:(NSString *)memo
+{
     if (!payment) return nil;  // required
     if (!(self = [self init])) return nil;
 
@@ -610,7 +619,8 @@ typedef enum : NSUInteger { ack_payment = 1, ack_memo = 2 } ack_key;
     return self;
 }
 
-- (NSData *)toData {
+- (NSData *)toData
+{
     NSMutableData *d = [NSMutableData data];
 
     [d appendProtoBufData:_payment.data withKey:ack_payment];

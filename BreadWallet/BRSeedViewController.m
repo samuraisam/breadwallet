@@ -49,7 +49,8 @@
 
 @implementation BRSeedViewController
 
-- (instancetype)customInit {
+- (instancetype)customInit
+{
     BRWalletManager *m = [BRWalletManager sharedInstance];
 
     if (m.noWallet) {
@@ -65,22 +66,26 @@
     return self;
 }
 
-- (instancetype)init {
+- (instancetype)init
+{
     if (!(self = [super init])) return nil;
     return [self customInit];
 }
 
-- (instancetype)initWithCoder:(NSCoder *)aDecoder {
+- (instancetype)initWithCoder:(NSCoder *)aDecoder
+{
     if (!(self = [super initWithCoder:aDecoder])) return nil;
     return [self customInit];
 }
 
-- (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
+- (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
+{
     if (!(self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil])) return nil;
     return [self customInit];
 }
 
-- (void)viewDidLoad {
+- (void)viewDidLoad
+{
     [super viewDidLoad];
     // Do any additional setup after loading the view.
 
@@ -90,7 +95,8 @@
                                                       target:self
                                                       action:@selector(done:)];
 
-    @autoreleasepool {  // @autoreleasepool ensures sensitive data will be dealocated immediately
+    @autoreleasepool
+    {  // @autoreleasepool ensures sensitive data will be dealocated immediately
         if (self.seedPhrase.length > 0 && [self.seedPhrase characterAtIndex:0] > 0x3000) {  // ideographic language
             CGRect r;
             NSMutableString *s = CFBridgingRelease(CFStringCreateMutable(SecureAllocator(), 0)),
@@ -127,7 +133,8 @@
 #endif
 }
 
-- (void)viewWillAppear:(BOOL)animated {
+- (void)viewWillAppear:(BOOL)animated
+{
     [super viewWillAppear:animated];
 
     NSTimeInterval delay = WRITE_TOGGLE_DELAY;
@@ -150,7 +157,8 @@
                      }];
 }
 
-- (void)viewDidAppear:(BOOL)animated {
+- (void)viewDidAppear:(BOOL)animated
+{
     [super viewDidAppear:animated];
 
     if (!self.resignActiveObserver) {
@@ -204,7 +212,8 @@
     }
 }
 
-- (void)viewWillDisappear:(BOOL)animated {
+- (void)viewWillDisappear:(BOOL)animated
+{
     [super viewWillDisappear:animated];
 
     // don't leave the seed phrase laying around in memory any longer than necessary
@@ -216,13 +225,15 @@
     self.screenshotObserver = nil;
 }
 
-- (void)dealloc {
+- (void)dealloc
+{
     [NSObject cancelPreviousPerformRequestsWithTarget:self];
     if (self.resignActiveObserver) [[NSNotificationCenter defaultCenter] removeObserver:self.resignActiveObserver];
     if (self.screenshotObserver) [[NSNotificationCenter defaultCenter] removeObserver:self.screenshotObserver];
 }
 
-- (void)showWriteToggle {
+- (void)showWriteToggle
+{
     self.writeLabel.alpha = self.writeButton.alpha = 0.0;
     self.writeLabel.hidden = self.writeButton.hidden = NO;
 
@@ -234,7 +245,8 @@
 
 #pragma mark - IBAction
 
-- (IBAction)done:(id)sender {
+- (IBAction)done:(id)sender
+{
     if (self.navigationController.viewControllers.firstObject != self) return;
 
     self.navigationController.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
@@ -242,7 +254,8 @@
                                                                                                     completion:nil];
 }
 
-- (IBAction)toggleWrite:(id)sender {
+- (IBAction)toggleWrite:(id)sender
+{
     NSUserDefaults *defs = [NSUserDefaults standardUserDefaults];
 
     if ([defs boolForKey:WALLET_NEEDS_BACKUP_KEY]) {

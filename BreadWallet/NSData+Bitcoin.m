@@ -36,7 +36,8 @@
 // basic sha1 operation
 #define sha1(x, y, z) (t = rol32(a, 5) + (x) + e + (y) + (z), e = d, d = c, c = rol32(b, 30), b = a, a = t)
 
-static void SHA1Compress(unsigned *r, unsigned *x) {
+static void SHA1Compress(unsigned *r, unsigned *x)
+{
     unsigned a = r[0], b = r[1], c = r[2], d = r[3], e = r[4], i = 0, t;
 
     for (; i < 16; i++) sha1(f1(b, c, d), 0x5a827999, (x[i] = CFSwapInt32BigToHost(x[i])));
@@ -48,7 +49,8 @@ static void SHA1Compress(unsigned *r, unsigned *x) {
     r[0] += a, r[1] += b, r[2] += c, r[3] += d, r[4] += e;
 }
 
-void SHA1(const void *data, size_t len, void *md) {
+void SHA1(const void *data, size_t len, void *md)
+{
     unsigned i, x[80], buf[] = {0x67452301, 0xefcdab89, 0x98badcfe, 0x10325476, 0xc3d2e1f0};  // initial buffer values
 
     for (i = 0; i < len; i += 64) {  // process data in 64 byte blocks
@@ -78,7 +80,8 @@ void SHA1(const void *data, size_t len, void *md) {
 #define s2(x) (ror32((x), 7) ^ ror32((x), 18) ^ ((x) >> 3))
 #define s3(x) (ror32((x), 17) ^ ror32((x), 19) ^ ((x) >> 10))
 
-static void SHA256Compress(unsigned *r, unsigned *x) {
+static void SHA256Compress(unsigned *r, unsigned *x)
+{
     static const unsigned k[] = {
         0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
         0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174,
@@ -103,7 +106,8 @@ static void SHA256Compress(unsigned *r, unsigned *x) {
     r[0] += a, r[1] += b, r[2] += c, r[3] += d, r[4] += e, r[5] += f, r[6] += g, r[7] += h;
 }
 
-void SHA256(const void *data, size_t len, void *md) {
+void SHA256(const void *data, size_t len, void *md)
+{
     size_t i;
     unsigned x[16], buf[] = {0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a,
                              0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19};  // initial buffer values
@@ -131,7 +135,8 @@ void SHA256(const void *data, size_t len, void *md) {
 #define S2(x) (ror64((x), 1) ^ ror64((x), 8) ^ ((x) >> 7))
 #define S3(x) (ror64((x), 19) ^ ror64((x), 61) ^ ((x) >> 6))
 
-static void SHA512Compress(unsigned long long *r, unsigned long long *x) {
+static void SHA512Compress(unsigned long long *r, unsigned long long *x)
+{
     static const unsigned long long k[] = {
         0x428a2f98d728ae22, 0x7137449123ef65cd, 0xb5c0fbcfec4d3b2f, 0xe9b5dba58189dbbc, 0x3956c25bf348b538,
         0x59f111f1b605d019, 0x923f82a4af194f9b, 0xab1c5ed5da6d8118, 0xd807aa98a3030242, 0x12835b0145706fbe,
@@ -165,7 +170,8 @@ static void SHA512Compress(unsigned long long *r, unsigned long long *x) {
     r[0] += a, r[1] += b, r[2] += c, r[3] += d, r[4] += e, r[5] += f, r[6] += g, r[7] += h;
 }
 
-void SHA512(const void *data, size_t len, void *md) {
+void SHA512(const void *data, size_t len, void *md)
+{
     size_t i;
     unsigned long long x[16], buf[] = {0x6a09e667f3bcc908, 0xbb67ae8584caa73b, 0x3c6ef372fe94f82b, 0xa54ff53a5f1d36f1,
                                        0x510e527fade682d1, 0x9b05688c2b3e6c1f, 0x1f83d9abfb41bd6b, 0x5be0cd19137e2179};
@@ -196,7 +202,8 @@ void SHA512(const void *data, size_t len, void *md) {
     ((a) = rol32((f) + (b) + CFSwapInt32LittleToHost(c) + (d), (e)) + (g), (f) = (g), (g) = (h), (h) = rol32((i), 10), \
      (i) = (j), (j) = (a))
 
-static void RMDcompress(unsigned *r, unsigned *x) {
+static void RMDcompress(unsigned *r, unsigned *x)
+{
     // left line
     static const unsigned rl1[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15},  // round 1, id
         rl2[] = {7, 4, 13, 1, 10, 6, 15, 3, 12, 0, 9, 5, 2, 14, 11, 8},                    // round 2, rho
@@ -240,7 +247,8 @@ static void RMDcompress(unsigned *r, unsigned *x) {
 }
 
 // ripemd-160 hash function: http://homes.esat.kuleuven.be/~bosselae/ripemd160.html
-void RMD160(const void *data, size_t len, void *md) {
+void RMD160(const void *data, size_t len, void *md)
+{
     size_t i;
     unsigned x[16], buf[] = {0x67452301, 0xefcdab89, 0x98badcfe, 0x10325476, 0xc3d2e1f0};  // initial buffer values
 
@@ -262,7 +270,8 @@ void RMD160(const void *data, size_t len, void *md) {
 // opad = 0x5c5c5c...5c5c
 // ipad = 0x363636...3636
 void HMAC(void (*hash)(const void *, size_t, void *), int hlen, const void *key, size_t klen, const void *data,
-          size_t dlen, void *md) {
+          size_t dlen, void *md)
+{
     int blen = (hlen > 32) ? 128 : 64;
     unsigned char k[hlen], kipad[blen + dlen], kopad[blen + hlen];
 
@@ -289,7 +298,8 @@ void HMAC(void (*hash)(const void *, size_t, void *), int hlen, const void *key,
 // ...
 // Urounds = hmac_hash(pw, Urounds-1)
 void PBKDF2(void (*hash)(const void *, size_t, void *), int hlen, const void *pw, size_t pwlen, const void *salt,
-            size_t slen, unsigned rounds, void *dk, size_t dklen) {
+            size_t slen, unsigned rounds, void *dk, size_t dklen)
+{
     unsigned char s[slen + sizeof(unsigned)], U[hlen], T[hlen];
     unsigned i, r, j;
 
@@ -316,21 +326,24 @@ void PBKDF2(void (*hash)(const void *, size_t, void *), int hlen, const void *pw
 
 @implementation NSData (Bitcoin)
 
-- (UInt160)SHA1 {
+- (UInt160)SHA1
+{
     UInt160 sha1;
 
     SHA1(self.bytes, self.length, &sha1);
     return sha1;
 }
 
-- (UInt256)SHA256 {
+- (UInt256)SHA256
+{
     UInt256 sha256;
 
     SHA256(self.bytes, self.length, &sha256);
     return sha256;
 }
 
-- (UInt256)SHA256_2 {
+- (UInt256)SHA256_2
+{
     UInt256 sha256;
 
     SHA256(self.bytes, self.length, &sha256);
@@ -338,21 +351,24 @@ void PBKDF2(void (*hash)(const void *, size_t, void *), int hlen, const void *pw
     return sha256;
 }
 
-- (UInt512)SHA512 {
+- (UInt512)SHA512
+{
     UInt512 sha512;
 
     SHA512(self.bytes, self.length, &sha512);
     return sha512;
 }
 
-- (UInt160)RMD160 {
+- (UInt160)RMD160
+{
     UInt160 rmd160;
 
     RMD160(self.bytes, (size_t)self.length, &rmd160);
     return rmd160;
 }
 
-- (UInt160)hash160 {
+- (UInt160)hash160
+{
     UInt256 sha256;
     UInt160 rmd160;
 
@@ -361,7 +377,8 @@ void PBKDF2(void (*hash)(const void *, size_t, void *), int hlen, const void *pw
     return rmd160;
 }
 
-- (NSData *)reverse {
+- (NSData *)reverse
+{
     NSUInteger len = self.length;
     NSMutableData *d = [NSMutableData dataWithLength:len];
     uint8_t *b1 = d.mutableBytes;
@@ -374,27 +391,32 @@ void PBKDF2(void (*hash)(const void *, size_t, void *), int hlen, const void *pw
     return d;
 }
 
-- (uint8_t)UInt8AtOffset:(NSUInteger)offset {
+- (uint8_t)UInt8AtOffset:(NSUInteger)offset
+{
     if (self.length < offset + sizeof(uint8_t)) return 0;
     return *((const uint8_t *)self.bytes + offset);
 }
 
-- (uint16_t)UInt16AtOffset:(NSUInteger)offset {
+- (uint16_t)UInt16AtOffset:(NSUInteger)offset
+{
     if (self.length < offset + sizeof(uint16_t)) return 0;
     return CFSwapInt16LittleToHost(*(const uint16_t *)((const uint8_t *)self.bytes + offset));
 }
 
-- (uint32_t)UInt32AtOffset:(NSUInteger)offset {
+- (uint32_t)UInt32AtOffset:(NSUInteger)offset
+{
     if (self.length < offset + sizeof(uint32_t)) return 0;
     return CFSwapInt32LittleToHost(*(const uint32_t *)((const uint8_t *)self.bytes + offset));
 }
 
-- (uint64_t)UInt64AtOffset:(NSUInteger)offset {
+- (uint64_t)UInt64AtOffset:(NSUInteger)offset
+{
     if (self.length < offset + sizeof(uint64_t)) return 0;
     return CFSwapInt64LittleToHost(*(const uint64_t *)((const uint8_t *)self.bytes + offset));
 }
 
-- (uint64_t)varIntAtOffset:(NSUInteger)offset length:(NSUInteger *)length {
+- (uint64_t)varIntAtOffset:(NSUInteger)offset length:(NSUInteger *)length
+{
     uint8_t h = [self UInt8AtOffset:offset];
 
     switch (h) {
@@ -416,12 +438,14 @@ void PBKDF2(void (*hash)(const void *, size_t, void *), int hlen, const void *pw
     }
 }
 
-- (UInt256)hashAtOffset:(NSUInteger)offset {
+- (UInt256)hashAtOffset:(NSUInteger)offset
+{
     if (self.length < offset + sizeof(UInt256)) return UINT256_ZERO;
     return *(const UInt256 *)((const char *)self.bytes + offset);
 }
 
-- (NSString *)stringAtOffset:(NSUInteger)offset length:(NSUInteger *)length {
+- (NSString *)stringAtOffset:(NSUInteger)offset length:(NSUInteger *)length
+{
     NSUInteger ll, l = (NSUInteger)[self varIntAtOffset:offset length:&ll];
 
     if (length) *length = ll + l;
@@ -430,7 +454,8 @@ void PBKDF2(void (*hash)(const void *, size_t, void *), int hlen, const void *pw
         [[NSString alloc] initWithBytes:(const char *)self.bytes + offset + ll length:l encoding:NSUTF8StringEncoding];
 }
 
-- (NSData *)dataAtOffset:(NSUInteger)offset length:(NSUInteger *)length {
+- (NSData *)dataAtOffset:(NSUInteger)offset length:(NSUInteger *)length
+{
     NSUInteger ll, l = (NSUInteger)[self varIntAtOffset:offset length:&ll];
 
     if (length) *length = ll + l;
@@ -439,7 +464,8 @@ void PBKDF2(void (*hash)(const void *, size_t, void *), int hlen, const void *pw
 }
 
 // an array of NSNumber and NSData objects representing each script element
-- (NSArray *)scriptElements {
+- (NSArray *)scriptElements
+{
     NSMutableArray *a = [NSMutableArray array];
     const uint8_t *b = (const uint8_t *)self.bytes;
     NSUInteger l, length = self.length;
@@ -492,7 +518,8 @@ void PBKDF2(void (*hash)(const void *, size_t, void *), int hlen, const void *pw
 }
 
 // returns the opcode used to store the receiver in a script (i.e. OP_PUSHDATA1)
-- (int)intValue {
+- (int)intValue
+{
     if (self.length < OP_PUSHDATA1)
         return (int)self.length;
     else if (self.length <= UINT8_MAX)

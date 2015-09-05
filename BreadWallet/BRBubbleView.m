@@ -39,11 +39,10 @@
 
 @implementation BRBubbleView
 
-- (BOOL)canBecomeFirstResponder {
-    return YES;
-}
+- (BOOL)canBecomeFirstResponder { return YES; }
 
-- (BOOL)resignFirstResponder {
+- (BOOL)resignFirstResponder
+{
     if ([super resignFirstResponder]) {
         [self popOut];
         return YES;
@@ -51,7 +50,8 @@
         return NO;
 }
 
-+ (instancetype)viewWithText:(NSString *)text center:(CGPoint)center {
++ (instancetype)viewWithText:(NSString *)text center:(CGPoint)center
+{
     BRBubbleView *v =
         [[self alloc] initWithFrame:CGRectMake(center.x - MARGIN_X, center.y - MARGIN_Y, MARGIN_X * 2, MARGIN_Y * 2)];
 
@@ -59,7 +59,8 @@
     return v;
 }
 
-+ (instancetype)viewWithText:(NSString *)text tipPoint:(CGPoint)point tipDirection:(BRBubbleTipDirection)direction {
++ (instancetype)viewWithText:(NSString *)text tipPoint:(CGPoint)point tipDirection:(BRBubbleTipDirection)direction
+{
     BRBubbleView *v = [[self alloc] initWithFrame:CGRectMake(0, 0, MARGIN_X * 2, MARGIN_Y * 2)];
 
     v.text = text;
@@ -68,7 +69,8 @@
     return v;
 }
 
-- (instancetype)initWithFrame:(CGRect)frame {
+- (instancetype)initWithFrame:(CGRect)frame
+{
     if (!(self = [super initWithFrame:frame])) return nil;
 
     self.layer.cornerRadius = RADIUS;
@@ -87,39 +89,38 @@
     return self;
 }
 
-- (void)dealloc {
-    [NSObject cancelPreviousPerformRequestsWithTarget:self];
-}
+- (void)dealloc { [NSObject cancelPreviousPerformRequestsWithTarget:self]; }
 
-- (void)setText:(NSString *)text {
+- (void)setText:(NSString *)text
+{
     self.label.text = text;
     [self setNeedsLayout];
 }
 
-- (NSString *)text {
-    return self.label.text;
-}
+- (NSString *)text { return self.label.text; }
 
-- (void)setFont:(UIFont *)font {
+- (void)setFont:(UIFont *)font
+{
     self.label.font = font;
     [self setNeedsLayout];
 }
 
-- (UIFont *)font {
-    return self.label.font;
-}
+- (UIFont *)font { return self.label.font; }
 
-- (void)setTipPoint:(CGPoint)tipPoint {
+- (void)setTipPoint:(CGPoint)tipPoint
+{
     _tipPoint = tipPoint;
     [self setNeedsLayout];
 }
 
-- (void)setTipDirection:(BRBubbleTipDirection)tipDirection {
+- (void)setTipDirection:(BRBubbleTipDirection)tipDirection
+{
     _tipDirection = tipDirection;
     [self setNeedsLayout];
 }
 
-- (void)setCustomView:(UIView *)customView {
+- (void)setCustomView:(UIView *)customView
+{
     if (_customView) [_customView removeFromSuperview];
     _customView = customView;
     customView.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin |
@@ -128,7 +129,8 @@
     [self setNeedsLayout];
 }
 
-- (instancetype)popIn {
+- (instancetype)popIn
+{
     self.alpha = 0.0;
     self.transform = CGAffineTransformMakeScale(0.75, 0.75);
 
@@ -146,7 +148,8 @@
     return self;
 }
 
-- (instancetype)popOut {
+- (instancetype)popOut
+{
     [UIView animateWithDuration:0.25
         delay:0.0
         options:UIViewAnimationOptionCurveEaseOut
@@ -161,12 +164,14 @@
     return self;
 }
 
-- (instancetype)popOutAfterDelay:(NSTimeInterval)delay {
+- (instancetype)popOutAfterDelay:(NSTimeInterval)delay
+{
     [self performSelector:@selector(popOut) withObject:nil afterDelay:delay];
     return self;
 }
 
-- (void)layoutSubviews {
+- (void)layoutSubviews
+{
     CGPoint center = self.center;
     CGRect rect = [self.label textRectForBounds:CGRectMake(0.0, 0.0, MAX_WIDTH - MARGIN_X * 2, CGFLOAT_MAX)
                          limitedToNumberOfLines:0];

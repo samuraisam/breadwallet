@@ -34,7 +34,8 @@
 
 @implementation BRBIP39Mnemonic
 
-- (NSString *)encodePhrase:(NSData *)data {
+- (NSString *)encodePhrase:(NSData *)data
+{
     if (!data || (data.length % 4) != 0) return nil;  // data length must be a multiple of 32 bits
 
     NSArray *words = [NSArray arrayWithContentsOfFile:[[NSBundle mainBundle] pathForResource:WORDS ofType:@"plist"]];
@@ -55,7 +56,8 @@
     return CFBridgingRelease(CFStringCreateByCombiningStrings(SecureAllocator(), (CFArrayRef)a, CFSTR(" ")));
 }
 
-- (NSData *)decodePhrase:(NSString *)phrase {
+- (NSData *)decodePhrase:(NSString *)phrase
+{
     NSArray *words = [NSArray arrayWithContentsOfFile:[[NSBundle mainBundle] pathForResource:WORDS ofType:@"plist"]];
     NSArray *a = CFBridgingRelease(CFStringCreateArrayBySeparatingStrings(
         SecureAllocator(), (CFStringRef)[self normalizePhrase:phrase], CFSTR(" ")));
@@ -95,11 +97,10 @@
     return d;
 }
 
-- (BOOL)phraseIsValid:(NSString *)phrase {
-    return ([self decodePhrase:phrase] == nil) ? NO : YES;
-}
+- (BOOL)phraseIsValid:(NSString *)phrase { return ([self decodePhrase:phrase] == nil) ? NO : YES; }
 
-- (NSString *)normalizePhrase:(NSString *)phrase {
+- (NSString *)normalizePhrase:(NSString *)phrase
+{
     if (!phrase) return nil;
 
     NSMutableString *s = CFBridgingRelease(CFStringCreateMutableCopy(SecureAllocator(), 0, (CFStringRef)phrase));
@@ -122,7 +123,8 @@
     return s;
 }
 
-- (NSData *)deriveKeyFromPhrase:(NSString *)phrase withPassphrase:(NSString *)passphrase {
+- (NSData *)deriveKeyFromPhrase:(NSString *)phrase withPassphrase:(NSString *)passphrase
+{
     if (!phrase) return nil;
 
     NSMutableData *key = [NSMutableData secureDataWithLength:sizeof(UInt512)];

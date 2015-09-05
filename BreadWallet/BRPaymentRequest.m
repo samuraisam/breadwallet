@@ -34,34 +34,29 @@
 // BIP21 bitcoin URI object https://github.com/bitcoin/bips/blob/master/bip-0021.mediawiki
 @implementation BRPaymentRequest
 
-+ (instancetype)requestWithString:(NSString *)string {
-    return [[self alloc] initWithString:string];
-}
++ (instancetype)requestWithString:(NSString *)string { return [[self alloc] initWithString:string]; }
 
-+ (instancetype)requestWithData:(NSData *)data {
-    return [[self alloc] initWithData:data];
-}
++ (instancetype)requestWithData:(NSData *)data { return [[self alloc] initWithData:data]; }
 
-+ (instancetype)requestWithURL:(NSURL *)url {
-    return [[self alloc] initWithURL:url];
-}
++ (instancetype)requestWithURL:(NSURL *)url { return [[self alloc] initWithURL:url]; }
 
-- (instancetype)initWithString:(NSString *)string {
+- (instancetype)initWithString:(NSString *)string
+{
     if (!(self = [super init])) return nil;
 
     self.string = string;
     return self;
 }
 
-- (instancetype)initWithData:(NSData *)data {
+- (instancetype)initWithData:(NSData *)data
+{
     return [self initWithString:[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]];
 }
 
-- (instancetype)initWithURL:(NSURL *)url {
-    return [self initWithString:url.absoluteString];
-}
+- (instancetype)initWithURL:(NSURL *)url { return [self initWithString:url.absoluteString]; }
 
-- (void)setString:(NSString *)string {
+- (void)setString:(NSString *)string
+{
     self.paymentAddress = nil;
     self.label = nil;
     self.message = nil;
@@ -108,7 +103,8 @@
         self.r = s;  // BIP73 url: https://github.com/bitcoin/bips/blob/master/bip-0073.mediawiki
 }
 
-- (NSString *)string {
+- (NSString *)string
+{
     if (!self.paymentAddress) return nil;
 
     NSMutableString *s = [NSMutableString stringWithFormat:@"bitcoin:%@", self.paymentAddress];
@@ -147,28 +143,22 @@
     return s;
 }
 
-- (void)setData:(NSData *)data {
-    self.string = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-}
+- (void)setData:(NSData *)data { self.string = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]; }
 
-- (NSData *)data {
-    return [self.string dataUsingEncoding:NSUTF8StringEncoding];
-}
+- (NSData *)data { return [self.string dataUsingEncoding:NSUTF8StringEncoding]; }
 
-- (void)setUrl:(NSURL *)url {
-    self.string = url.absoluteString;
-}
+- (void)setUrl:(NSURL *)url { self.string = url.absoluteString; }
 
-- (NSURL *)url {
-    return [NSURL URLWithString:self.string];
-}
+- (NSURL *)url { return [NSURL URLWithString:self.string]; }
 
-- (BOOL)isValid {
+- (BOOL)isValid
+{
     return ([self.paymentAddress isValidBitcoinAddress] || (self.r && [NSURL URLWithString:self.r])) ? YES : NO;
 }
 
 // receiver converted to BIP70 request object
-- (BRPaymentProtocolRequest *)protocolRequest {
+- (BRPaymentProtocolRequest *)protocolRequest
+{
     static NSString *network = @"main";
 #if BITCOIN_TESTNET
     network = @"test";
@@ -199,7 +189,8 @@
 // fetches the request over HTTP and calls completion block
 + (void)fetch:(NSString *)url
       timeout:(NSTimeInterval)timeout
-   completion:(void (^)(BRPaymentProtocolRequest *req, NSError *error))completion {
+   completion:(void (^)(BRPaymentProtocolRequest *req, NSError *error))completion
+{
     if (!completion) return;
 
     NSURL *u = [NSURL URLWithString:url];
@@ -282,7 +273,8 @@
 + (void)postPayment:(BRPaymentProtocolPayment *)payment
                  to:(NSString *)paymentURL
             timeout:(NSTimeInterval)timeout
-         completion:(void (^)(BRPaymentProtocolACK *ack, NSError *error))completion {
+         completion:(void (^)(BRPaymentProtocolACK *ack, NSError *error))completion
+{
     NSURL *u = [NSURL URLWithString:paymentURL];
 
     if (!u) {

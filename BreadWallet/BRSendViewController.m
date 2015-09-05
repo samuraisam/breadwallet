@@ -52,7 +52,8 @@
 #define REDX @"\xE2\x9D\x8C"      // unicode cross mark U+274C, red x emoji (utf-8)
 #define NBSP @"\xC2\xA0"          // no-break space (utf-8)
 
-static NSString *sanitizeString(NSString *s) {
+static NSString *sanitizeString(NSString *s)
+{
     NSMutableString *sane = [NSMutableString stringWithString:(s) ? s : @""];
 
     CFStringTransform((CFMutableStringRef)sane, NULL, kCFStringTransformToUnicodeName, NO);
@@ -80,7 +81,8 @@ static NSString *sanitizeString(NSString *s) {
 
 @implementation BRSendViewController
 
-- (void)viewDidLoad {
+- (void)viewDidLoad
+{
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
 
@@ -108,12 +110,14 @@ static NSString *sanitizeString(NSString *s) {
                                                       }];
 }
 
-- (void)viewWillAppear:(BOOL)animated {
+- (void)viewWillAppear:(BOOL)animated
+{
     [super viewWillAppear:animated];
     [self cancel:nil];
 }
 
-- (void)viewDidAppear:(BOOL)animated {
+- (void)viewDidAppear:(BOOL)animated
+{
     [super viewDidAppear:animated];
 
     if (!self.scanController) {
@@ -121,16 +125,19 @@ static NSString *sanitizeString(NSString *s) {
     }
 }
 
-- (void)viewWillDisappear:(BOOL)animated {
+- (void)viewWillDisappear:(BOOL)animated
+{
     [self hideTips];
     [super viewWillDisappear:animated];
 }
 
-- (void)dealloc {
+- (void)dealloc
+{
     if (self.clipboardObserver) [[NSNotificationCenter defaultCenter] removeObserver:self.clipboardObserver];
 }
 
-- (void)handleURL:(NSURL *)url {
+- (void)handleURL:(NSURL *)url
+{
     // TODO: XXX custom url splash image per: "Providing Launch Images for Custom URL Schemes."
     BRWalletManager *manager = [BRWalletManager sharedInstance];
 
@@ -210,7 +217,8 @@ static NSString *sanitizeString(NSString *s) {
     }
 }
 
-- (void)handleFile:(NSData *)file {
+- (void)handleFile:(NSData *)file
+{
     BRPaymentProtocolRequest *request = [BRPaymentProtocolRequest requestWithData:file];
 
     if (request) {
@@ -275,7 +283,8 @@ static NSString *sanitizeString(NSString *s) {
                       address:(NSString *)address
                          name:(NSString *)name
                          memo:(NSString *)memo
-                     isSecure:(BOOL)isSecure {
+                     isSecure:(BOOL)isSecure
+{
     BRWalletManager *manager = [BRWalletManager sharedInstance];
     NSString *prompt = (isSecure && name.length > 0) ? LOCK @" " : @"";
 
@@ -301,7 +310,8 @@ static NSString *sanitizeString(NSString *s) {
     return prompt;
 }
 
-- (void)confirmRequest:(BRPaymentRequest *)request {
+- (void)confirmRequest:(BRPaymentRequest *)request
+{
     if (!request.isValid) {
         if ([request.paymentAddress isValidBitcoinPrivateKey] || [request.paymentAddress isValidBitcoinBIP38Key]) {
             [self confirmSweep:request.paymentAddress];
@@ -337,7 +347,8 @@ static NSString *sanitizeString(NSString *s) {
         [self confirmProtocolRequest:request.protocolRequest];
 }
 
-- (void)confirmProtocolRequest:(BRPaymentProtocolRequest *)protoReq {
+- (void)confirmProtocolRequest:(BRPaymentProtocolRequest *)protoReq
+{
     BRWalletManager *manager = [BRWalletManager sharedInstance];
     BRTransaction *tx = nil;
     uint64_t amount = 0, fee = 0;
@@ -488,7 +499,8 @@ static NSString *sanitizeString(NSString *s) {
     });
 }
 
-- (void)confirmTransaction:(BRTransaction *)tx withPrompt:(NSString *)prompt forAmount:(uint64_t)amount {
+- (void)confirmTransaction:(BRTransaction *)tx withPrompt:(NSString *)prompt forAmount:(uint64_t)amount
+{
     BRWalletManager *manager = [BRWalletManager sharedInstance];
     BOOL didAuth = manager.didAuthenticate;
 
@@ -678,7 +690,8 @@ static NSString *sanitizeString(NSString *s) {
         waiting = NO;
 }
 
-- (void)confirmSweep:(NSString *)privKey {
+- (void)confirmSweep:(NSString *)privKey
+{
     if (![privKey isValidBitcoinPrivateKey] && ![privKey isValidBitcoinBIP38Key]) return;
 
     BRWalletManager *manager = [BRWalletManager sharedInstance];
@@ -735,7 +748,8 @@ static NSString *sanitizeString(NSString *s) {
                   }];
 }
 
-- (void)showBalance:(NSString *)address {
+- (void)showBalance:(NSString *)address
+{
     if (![address isValidBitcoinAddress]) return;
 
     BRWalletManager *manager = [BRWalletManager sharedInstance];
@@ -780,7 +794,8 @@ static NSString *sanitizeString(NSString *s) {
              }];
 }
 
-- (void)cancelOrChangeAmount {
+- (void)cancelOrChangeAmount
+{
     if (self.canChangeAmount && self.request && self.amount == 0) {
         [[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"change payment amount?", nil)
                                     message:nil
@@ -792,11 +807,13 @@ static NSString *sanitizeString(NSString *s) {
         [self cancel:nil];
 }
 
-- (void)hideTips {
+- (void)hideTips
+{
     if (self.tipView.alpha > 0.5) [self.tipView popOut];
 }
 
-- (BOOL)nextTip {
+- (BOOL)nextTip
+{
     [self.clipboardText resignFirstResponder];
     if (self.tipView.alpha < 0.5) return [(id)self.parentViewController.parentViewController nextTip];
 
@@ -822,12 +839,14 @@ static NSString *sanitizeString(NSString *s) {
     return YES;
 }
 
-- (void)resetQRGuide {
+- (void)resetQRGuide
+{
     self.scanController.message.text = nil;
     self.scanController.cameraGuide.image = [UIImage imageNamed:@"cameraguide"];
 }
 
-- (void)updateClipboardText {
+- (void)updateClipboardText
+{
     NSString *p = [[UIPasteboard generalPasteboard]
                        .string stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
     UIImage *img = [UIPasteboard generalPasteboard].image;
@@ -870,7 +889,8 @@ static NSString *sanitizeString(NSString *s) {
     [self.clipboardText scrollRangeToVisible:NSMakeRange(0, 0)];
 }
 
-- (void)payFirstFromArray:(NSArray *)paymentRequestArray {
+- (void)payFirstFromArray:(NSArray *)paymentRequestArray
+{
     BRWalletManager *manager = [BRWalletManager sharedInstance];
     NSUInteger i = 0;
 
@@ -928,7 +948,8 @@ static NSString *sanitizeString(NSString *s) {
 
 #pragma mark - IBAction
 
-- (IBAction)tip:(id)sender {
+- (IBAction)tip:(id)sender
+{
     if ([self nextTip]) return;
 
     if (![sender isKindOfClass:[UIGestureRecognizer class]] || ![[sender view] isKindOfClass:[UILabel class]]) {
@@ -944,7 +965,8 @@ static NSString *sanitizeString(NSString *s) {
     [self.view addSubview:[self.tipView popIn]];
 }
 
-- (IBAction)scanQR:(id)sender {
+- (IBAction)scanQR:(id)sender
+{
     if ([self nextTip]) return;
     if (![sender isEqual:self.scanButton]) self.showBalance = YES;
     [sender setEnabled:NO];
@@ -953,7 +975,8 @@ static NSString *sanitizeString(NSString *s) {
     [self.navigationController presentViewController:self.scanController animated:YES completion:nil];
 }
 
-- (IBAction)payToClipboard:(id)sender {
+- (IBAction)payToClipboard:(id)sender
+{
     if ([self nextTip]) return;
 
     NSString *p = [[UIPasteboard generalPasteboard]
@@ -980,7 +1003,8 @@ static NSString *sanitizeString(NSString *s) {
     [self payFirstFromArray:s.array];
 }
 
-- (IBAction)reset:(id)sender {
+- (IBAction)reset:(id)sender
+{
     if (self.navigationController.topViewController != self.parentViewController.parentViewController) {
         [self.navigationController popToRootViewControllerAnimated:YES];
     }
@@ -990,7 +1014,8 @@ static NSString *sanitizeString(NSString *s) {
     [self cancel:sender];
 }
 
-- (IBAction)cancel:(id)sender {
+- (IBAction)cancel:(id)sender
+{
     self.url = self.callback = nil;
     self.sweepTx = nil;
     self.amount = 0;
@@ -1003,7 +1028,8 @@ static NSString *sanitizeString(NSString *s) {
 
 #pragma mark - BRAmountViewControllerDelegate
 
-- (void)amountViewController:(BRAmountViewController *)amountViewController selectedAmount:(uint64_t)amount {
+- (void)amountViewController:(BRAmountViewController *)amountViewController selectedAmount:(uint64_t)amount
+{
     self.amount = amount;
     [self confirmProtocolRequest:self.request];
 }
@@ -1012,7 +1038,8 @@ static NSString *sanitizeString(NSString *s) {
 
 - (void)captureOutput:(AVCaptureOutput *)captureOutput
     didOutputMetadataObjects:(NSArray *)metadataObjects
-              fromConnection:(AVCaptureConnection *)connection {
+              fromConnection:(AVCaptureConnection *)connection
+{
     for (AVMetadataMachineReadableCodeObject *codeObject in metadataObjects) {
         if (![codeObject.type isEqual:AVMetadataObjectTypeQRCode]) continue;
 
@@ -1109,7 +1136,8 @@ static NSString *sanitizeString(NSString *s) {
 
 #pragma mark - UIAlertViewDelegate
 
-- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
+{
     NSString *title = [alertView buttonTitleAtIndex:buttonIndex];
 
     if (buttonIndex == alertView.cancelButtonIndex || [title isEqual:NSLocalizedString(@"cancel", nil)]) {
@@ -1151,12 +1179,14 @@ static NSString *sanitizeString(NSString *s) {
 
 #pragma mark UITextViewDelegate
 
-- (BOOL)textViewShouldBeginEditing:(UITextView *)textView {
+- (BOOL)textViewShouldBeginEditing:(UITextView *)textView
+{
     if ([self nextTip]) return NO;
     return YES;
 }
 
-- (void)textViewDidBeginEditing:(UITextView *)textView {
+- (void)textViewDidBeginEditing:(UITextView *)textView
+{
     // BUG: XXX this needs to take keyboard size into account
     self.useClipboard = NO;
     self.clipboardText.text = [UIPasteboard generalPasteboard].string;
@@ -1172,7 +1202,8 @@ static NSString *sanitizeString(NSString *s) {
                      completion:nil];
 }
 
-- (void)textViewDidEndEditing:(UITextView *)textView {
+- (void)textViewDidEndEditing:(UITextView *)textView
+{
     [UIView animateWithDuration:0.35
                           delay:0.0
                         options:UIViewAnimationOptionCurveEaseOut
@@ -1186,7 +1217,8 @@ static NSString *sanitizeString(NSString *s) {
     [self updateClipboardText];
 }
 
-- (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text {
+- (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text
+{
     if ([text isEqual:@"\n"]) {
         [textView resignFirstResponder];
         return NO;
@@ -1200,12 +1232,11 @@ static NSString *sanitizeString(NSString *s) {
 
 // This is used for percent driven interactive transitions, as well as for container controllers that have companion
 // animations that might need to synchronize with the main animation.
-- (NSTimeInterval)transitionDuration:(id<UIViewControllerContextTransitioning>)transitionContext {
-    return 0.35;
-}
+- (NSTimeInterval)transitionDuration:(id<UIViewControllerContextTransitioning>)transitionContext { return 0.35; }
 
 // This method can only be a nop if the transition is interactive and not a percentDriven interactive transition.
-- (void)animateTransition:(id<UIViewControllerContextTransitioning>)transitionContext {
+- (void)animateTransition:(id<UIViewControllerContextTransitioning>)transitionContext
+{
     UIView *containerView = transitionContext.containerView;
     UIViewController *to = [transitionContext viewControllerForKey:UITransitionContextToViewControllerKey],
                      *from = [transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
@@ -1287,11 +1318,13 @@ static NSString *sanitizeString(NSString *s) {
 
 - (id<UIViewControllerAnimatedTransitioning>)animationControllerForPresentedController:(UIViewController *)presented
                                                                   presentingController:(UIViewController *)presenting
-                                                                      sourceController:(UIViewController *)source {
+                                                                      sourceController:(UIViewController *)source
+{
     return self;
 }
 
-- (id<UIViewControllerAnimatedTransitioning>)animationControllerForDismissedController:(UIViewController *)dismissed {
+- (id<UIViewControllerAnimatedTransitioning>)animationControllerForDismissedController:(UIViewController *)dismissed
+{
     return self;
 }
 

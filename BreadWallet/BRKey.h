@@ -25,7 +25,9 @@
 
 #import <Foundation/Foundation.h>
 
-typedef struct _BRPubKey { uint8_t u8[33]; } BRPubKey;
+typedef struct _BRPubKey {
+    uint8_t u8[33];
+} BRPubKey;
 
 #define brpubkey_obj(o) [NSValue value:&(o).form withObjCType:@encode(BRPubKey)]
 

@@ -36,7 +36,8 @@
 
 @implementation BRBouncyBurgerButton
 
-- (instancetype)customInit {
+- (instancetype)customInit
+{
     CGFloat x = (self.bounds.size.width + self.contentEdgeInsets.left - self.contentEdgeInsets.right) / 2.0,
             y = (self.bounds.size.height + self.contentEdgeInsets.top - self.contentEdgeInsets.bottom) / 2.0;
 
@@ -51,19 +52,19 @@
     return self;
 }
 
-- (instancetype)initWithCoder:(NSCoder *)aDecoder {
+- (instancetype)initWithCoder:(NSCoder *)aDecoder
+{
     if (!(self = [super initWithCoder:aDecoder])) return nil;
     return [self customInit];
 }
 
-- (instancetype)initWithFrame:(CGRect)frame {
+- (instancetype)initWithFrame:(CGRect)frame
+{
     if (!(self = [super initWithFrame:frame])) return nil;
     return [self customInit];
 }
 
-- (void)setX:(BOOL)x {
-    [self setX:x completion:nil];
-}
+- (void)setX:(BOOL)x { [self setX:x completion:nil]; }
 
 - (void)setX:(BOOL)x completion:(void (^)(BOOL finished))completion;
 {
@@ -93,28 +94,30 @@
         }];
 }
 
-- (void)setTitleColor:(UIColor *)color forState:(UIControlState)state {
+- (void)setTitleColor:(UIColor *)color forState:(UIControlState)state
+{
     [super setTitleColor:color forState:state];
     self.bar1.backgroundColor = self.bar2.backgroundColor = self.bar3.backgroundColor = self.currentTitleColor;
 }
 
-- (void)setHighlighted:(BOOL)highlighted {
+- (void)setHighlighted:(BOOL)highlighted
+{
     super.highlighted = highlighted;
     self.bar1.backgroundColor = self.bar2.backgroundColor = self.bar3.backgroundColor = self.currentTitleColor;
 }
 
-- (void)setEnabled:(BOOL)enabled {
+- (void)setEnabled:(BOOL)enabled
+{
     super.enabled = enabled;
     self.bar1.backgroundColor = self.bar2.backgroundColor = self.bar3.backgroundColor = self.currentTitleColor;
 }
 
-- (void)setSelected:(BOOL)selected {
+- (void)setSelected:(BOOL)selected
+{
     super.selected = selected;
     self.bar1.backgroundColor = self.bar2.backgroundColor = self.bar3.backgroundColor = self.currentTitleColor;
 }
 
-- (CGSize)intrinsicContentSize {
-    return CGSizeMake(BAR_WIDTH, BAR_SPACING * 2 + BAR_HEIGHT);
-}
+- (CGSize)intrinsicContentSize { return CGSizeMake(BAR_WIDTH, BAR_SPACING * 2 + BAR_HEIGHT); }
 
 @end

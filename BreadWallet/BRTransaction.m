@@ -43,11 +43,10 @@
 
 @implementation BRTransaction
 
-+ (instancetype)transactionWithMessage:(NSData *)message {
-    return [[self alloc] initWithMessage:message];
-}
++ (instancetype)transactionWithMessage:(NSData *)message { return [[self alloc] initWithMessage:message]; }
 
-- (instancetype)init {
+- (instancetype)init
+{
     if (!(self = [super init])) return nil;
 
     _version = TX_VERSION;
@@ -64,7 +63,8 @@
     return self;
 }
 
-- (instancetype)initWithMessage:(NSData *)message {
+- (instancetype)initWithMessage:(NSData *)message
+{
     if (!(self = [self init])) return nil;
 
     NSString *address = nil;
@@ -112,7 +112,8 @@
                        inputIndexes:(NSArray *)indexes
                        inputScripts:(NSArray *)scripts
                     outputAddresses:(NSArray *)addresses
-                      outputAmounts:(NSArray *)amounts {
+                      outputAmounts:(NSArray *)amounts
+{
     if (hashes.count == 0 || hashes.count != indexes.count) return nil;
     if (scripts.count > 0 && hashes.count != scripts.count) return nil;
     if (addresses.count != amounts.count) return nil;
@@ -154,40 +155,25 @@
     return self;
 }
 
-- (NSArray *)inputHashes {
-    return self.hashes;
-}
+- (NSArray *)inputHashes { return self.hashes; }
 
-- (NSArray *)inputIndexes {
-    return self.indexes;
-}
+- (NSArray *)inputIndexes { return self.indexes; }
 
-- (NSArray *)inputScripts {
-    return self.inScripts;
-}
+- (NSArray *)inputScripts { return self.inScripts; }
 
-- (NSArray *)inputSignatures {
-    return self.signatures;
-}
+- (NSArray *)inputSignatures { return self.signatures; }
 
-- (NSArray *)inputSequences {
-    return self.sequences;
-}
+- (NSArray *)inputSequences { return self.sequences; }
 
-- (NSArray *)outputAmounts {
-    return self.amounts;
-}
+- (NSArray *)outputAmounts { return self.amounts; }
 
-- (NSArray *)outputAddresses {
-    return self.addresses;
-}
+- (NSArray *)outputAddresses { return self.addresses; }
 
-- (NSArray *)outputScripts {
-    return self.outScripts;
-}
+- (NSArray *)outputScripts { return self.outScripts; }
 
 // size in bytes if signed, or estimated size assuming compact pubkey sigs
-- (size_t)size {
+- (size_t)size
+{
     static const size_t sigSize = 149;  // signature size using a compact pubkey
     //    static const size_t sigSize = 181; // signature size using a non-compact pubkey
 
@@ -196,23 +182,21 @@
            sigSize * self.hashes.count + 34 * self.addresses.count;
 }
 
-- (uint64_t)standardFee {
-    return ((self.size + 999) / 1000) * TX_FEE_PER_KB;
-}
+- (uint64_t)standardFee { return ((self.size + 999) / 1000) * TX_FEE_PER_KB; }
 
 // checks if all signatures exist, but does not verify them
-- (BOOL)isSigned {
+- (BOOL)isSigned
+{
     return (self.signatures.count > 0 && self.signatures.count == self.hashes.count &&
             ![self.signatures containsObject:[NSNull null]])
                ? YES
                : NO;
 }
 
-- (NSData *)toData {
-    return [self toDataWithSubscriptIndex:NSNotFound];
-}
+- (NSData *)toData { return [self toDataWithSubscriptIndex:NSNotFound]; }
 
-- (void)addInputHash:(UInt256)hash index:(NSUInteger)index script:(NSData *)script {
+- (void)addInputHash:(UInt256)hash index:(NSUInteger)index script:(NSData *)script
+{
     [self addInputHash:hash index:index script:script signature:nil sequence:TXIN_SEQUENCE];
 }
 
@@ -220,7 +204,8 @@
                index:(NSUInteger)index
               script:(NSData *)script
            signature:(NSData *)signature
-            sequence:(uint32_t)sequence {
+            sequence:(uint32_t)sequence
+{
     [self.hashes addObject:uint256_obj(hash)];
     [self.indexes addObject:@(index)];
     [self.inScripts addObject:(script) ? script : [NSNull null]];
@@ -228,7 +213,8 @@
     [self.sequences addObject:@(sequence)];
 }
 
-- (void)addOutputAddress:(NSString *)address amount:(uint64_t)amount {
+- (void)addOutputAddress:(NSString *)address amount:(uint64_t)amount
+{
     [self.amounts addObject:@(amount)];
     [self.addresses addObject:address];
     [self.outScripts addObject:[NSMutableData data]];
@@ -252,7 +238,8 @@
     self.inScripts[index] = d;
 }
 
-- (NSArray *)inputAddresses {
+- (NSArray *)inputAddresses
+{
     NSMutableArray *addresses = [NSMutableArray arrayWithCapacity:self.inScripts.count];
     NSInteger i = 0;
 
@@ -267,7 +254,8 @@
     return addresses;
 }
 
-- (void)shuffleOutputOrder {
+- (void)shuffleOutputOrder
+{
     for (NSUInteger i = 0; i + 1 < self.amounts.count; i++) {  // fischer-yates shuffle
         NSUInteger j = i + arc4random_uniform((uint32_t)(self.amounts.count - i));
 
@@ -280,7 +268,8 @@
 
 // Returns the binary transaction data that needs to be hashed and signed with the private key for the tx input at
 // subscriptIndex. A subscriptIndex of NSNotFound will return the entire signed transaction
-- (NSData *)toDataWithSubscriptIndex:(NSUInteger)subscriptIndex {
+- (NSData *)toDataWithSubscriptIndex:(NSUInteger)subscriptIndex
+{
     NSMutableData *d = [NSMutableData dataWithCapacity:10 + 149 * self.hashes.count + 34 * self.addresses.count];
     UInt256 hash;
 
@@ -318,7 +307,8 @@
     return d;
 }
 
-- (BOOL)signWithPrivateKeys:(NSArray *)privateKeys {
+- (BOOL)signWithPrivateKeys:(NSArray *)privateKeys
+{
     NSMutableArray *addresses = [NSMutableArray arrayWithCapacity:privateKeys.count],
                    *keys = [NSMutableArray arrayWithCapacity:privateKeys.count];
 
@@ -357,7 +347,8 @@
 }
 
 // priority = sum(input_amount_in_satoshis*input_age_in_blocks)/size_in_bytes
-- (uint64_t)priorityForAmounts:(NSArray *)amounts withAges:(NSArray *)ages {
+- (uint64_t)priorityForAmounts:(NSArray *)amounts withAges:(NSArray *)ages
+{
     uint64_t p = 0;
 
     if (amounts.count != self.hashes.count || ages.count != self.hashes.count || [ages containsObject:@(0)]) return 0;
@@ -370,7 +361,8 @@
 }
 
 // the block height after which the transaction can be confirmed without a fee, or TX_UNCONFIRMRED for never
-- (uint32_t)blockHeightUntilFreeForAmounts:(NSArray *)amounts withBlockHeights:(NSArray *)heights {
+- (uint32_t)blockHeightUntilFreeForAmounts:(NSArray *)amounts withBlockHeights:(NSArray *)heights
+{
     if (amounts.count != self.hashes.count || heights.count != self.hashes.count || self.size > TX_FREE_MAX_SIZE ||
         [heights containsObject:@(TX_UNCONFIRMED)]) {
         return TX_UNCONFIRMED;
@@ -396,12 +388,14 @@
                       amountTotal);
 }
 
-- (NSUInteger)hash {
+- (NSUInteger)hash
+{
     if (uint256_is_zero(_txHash)) return super.hash;
     return *(const NSUInteger *)&_txHash;
 }
 
-- (BOOL)isEqual:(id)object {
+- (BOOL)isEqual:(id)object
+{
     return self == object || ([object isKindOfClass:[BRTransaction class]] && uint256_eq(_txHash, [object txHash]));
 }
 

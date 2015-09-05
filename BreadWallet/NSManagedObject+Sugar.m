@@ -32,7 +32,8 @@ static NSUInteger _fetchBatchSize = 100;
 
 #pragma mark - create objects
 
-+ (instancetype)managedObject {
++ (instancetype)managedObject
+{
     __block NSEntityDescription *entity = nil;
     __block NSManagedObject *obj = nil;
 
@@ -44,7 +45,8 @@ static NSUInteger _fetchBatchSize = 100;
     return obj;
 }
 
-+ (NSArray *)managedObjectArrayWithLength:(NSUInteger)length {
++ (NSArray *)managedObjectArrayWithLength:(NSUInteger)length
+{
     __block NSEntityDescription *entity = nil;
     NSMutableArray *a = [NSMutableArray arrayWithCapacity:length];
 
@@ -61,11 +63,10 @@ static NSUInteger _fetchBatchSize = 100;
 
 #pragma mark - fetch existing objects
 
-+ (NSArray *)allObjects {
-    return [self fetchObjects:self.fetchRequest];
-}
++ (NSArray *)allObjects { return [self fetchObjects:self.fetchRequest]; }
 
-+ (NSArray *)objectsMatching:(NSString *)predicateFormat, ... {
++ (NSArray *)objectsMatching:(NSString *)predicateFormat, ...
+{
     NSArray *a;
     va_list args;
 
@@ -75,21 +76,21 @@ static NSUInteger _fetchBatchSize = 100;
     return a;
 }
 
-+ (NSArray *)objectsMatching:(NSString *)predicateFormat arguments:(va_list)args {
++ (NSArray *)objectsMatching:(NSString *)predicateFormat arguments:(va_list)args
+{
     NSFetchRequest *request = self.fetchRequest;
 
     request.predicate = [NSPredicate predicateWithFormat:predicateFormat arguments:args];
     return [self fetchObjects:request];
 }
 
-+ (NSArray *)objectsSortedBy:(NSString *)key ascending:(BOOL)ascending {
++ (NSArray *)objectsSortedBy:(NSString *)key ascending:(BOOL)ascending
+{
     return [self objectsSortedBy:key ascending:ascending offset:0 limit:0];
 }
 
-+ (NSArray *)objectsSortedBy:(NSString *)key
-                   ascending:(BOOL)ascending
-                      offset:(NSUInteger)offset
-                       limit:(NSUInteger)limit {
++ (NSArray *)objectsSortedBy:(NSString *)key ascending:(BOOL)ascending offset:(NSUInteger)offset limit:(NSUInteger)limit
+{
     NSFetchRequest *request = self.fetchRequest;
 
     request.sortDescriptors = @[ [NSSortDescriptor sortDescriptorWithKey:key ascending:ascending] ];
@@ -98,7 +99,8 @@ static NSUInteger _fetchBatchSize = 100;
     return [self fetchObjects:request];
 }
 
-+ (NSArray *)fetchObjects:(NSFetchRequest *)request {
++ (NSArray *)fetchObjects:(NSFetchRequest *)request
+{
     __block NSArray *a = nil;
     __block NSError *error = nil;
 
@@ -112,11 +114,10 @@ static NSUInteger _fetchBatchSize = 100;
 
 #pragma mark - count exising objects
 
-+ (NSUInteger)countAllObjects {
-    return [self countObjects:self.fetchRequest];
-}
++ (NSUInteger)countAllObjects { return [self countObjects:self.fetchRequest]; }
 
-+ (NSUInteger)countObjectsMatching:(NSString *)predicateFormat, ... {
++ (NSUInteger)countObjectsMatching:(NSString *)predicateFormat, ...
+{
     NSUInteger count;
     va_list args;
 
@@ -126,14 +127,16 @@ static NSUInteger _fetchBatchSize = 100;
     return count;
 }
 
-+ (NSUInteger)countObjectsMatching:(NSString *)predicateFormat arguments:(va_list)args {
++ (NSUInteger)countObjectsMatching:(NSString *)predicateFormat arguments:(va_list)args
+{
     NSFetchRequest *request = self.fetchRequest;
 
     request.predicate = [NSPredicate predicateWithFormat:predicateFormat arguments:args];
     return [self countObjects:request];
 }
 
-+ (NSUInteger)countObjects:(NSFetchRequest *)request {
++ (NSUInteger)countObjects:(NSFetchRequest *)request
+{
     __block NSUInteger count = 0;
     __block NSError *error = nil;
 
@@ -147,7 +150,8 @@ static NSUInteger _fetchBatchSize = 100;
 
 #pragma mark - delete objects
 
-+ (NSUInteger)deleteObjects:(NSArray *)objects {
++ (NSUInteger)deleteObjects:(NSArray *)objects
+{
     [self.context performBlockAndWait:^{
         for (NSManagedObject *obj in objects) {
             [self.context deleteObject:obj];
@@ -160,18 +164,15 @@ static NSUInteger _fetchBatchSize = 100;
 #pragma mark - core data stack
 
 // call this before any NSManagedObject+Sugar methods to use a concurrency type other than NSMainQueueConcurrencyType
-+ (void)setConcurrencyType:(NSManagedObjectContextConcurrencyType)type {
-    _concurrencyType = type;
-}
++ (void)setConcurrencyType:(NSManagedObjectContextConcurrencyType)type { _concurrencyType = type; }
 
 // set the fetchBatchSize to use when fetching objects, default is 100
-+ (void)setFetchBatchSize:(NSUInteger)fetchBatchSize {
-    _fetchBatchSize = fetchBatchSize;
-}
++ (void)setFetchBatchSize:(NSUInteger)fetchBatchSize { _fetchBatchSize = fetchBatchSize; }
 
 // returns the managed object context for the application, or if the context doesn't already exist, creates it and binds
 // it to the persistent store coordinator for the application
-+ (NSManagedObjectContext *)context {
++ (NSManagedObjectContext *)context
+{
     static dispatch_once_t onceToken = 0;
 
     dispatch_once(&onceToken, ^{
@@ -246,13 +247,15 @@ static NSUInteger _fetchBatchSize = 100;
 }
 
 // sets a different context for NSManagedObject+Sugar methods to use for this type of entity
-+ (void)setContext:(NSManagedObjectContext *)context {
++ (void)setContext:(NSManagedObjectContext *)context
+{
     objc_setAssociatedObject(self, @selector(context), (context ? context : [NSNull null]),
                              OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
 // persists changes (this is called automatically for the main context when the app terminates)
-+ (void)saveContext {
++ (void)saveContext
+{
     if (!self.context.hasChanges) return;
 
     [self.context performBlock:^{
@@ -286,18 +289,18 @@ static NSUInteger _fetchBatchSize = 100;
 #pragma mark - entity methods
 
 // override this if entity name differs from class name
-+ (NSString *)entityName {
-    return NSStringFromClass([self class]);
-}
++ (NSString *)entityName { return NSStringFromClass([self class]); }
 
-+ (NSFetchRequest *)fetchRequest {
++ (NSFetchRequest *)fetchRequest
+{
     NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:self.entityName];
 
     request.fetchBatchSize = _fetchBatchSize;
     return request;
 }
 
-+ (NSFetchedResultsController *)fetchedResultsController:(NSFetchRequest *)request {
++ (NSFetchedResultsController *)fetchedResultsController:(NSFetchRequest *)request
+{
     return [[NSFetchedResultsController alloc] initWithFetchRequest:request
                                                managedObjectContext:self.context
                                                  sectionNameKeyPath:nil
@@ -305,7 +308,8 @@ static NSUInteger _fetchBatchSize = 100;
 }
 
 // id value = entity[@"key"]; thread safe valueForKey:
-- (id)objectForKeyedSubscript:(id<NSCopying>)key {
+- (id)objectForKeyedSubscript:(id<NSCopying>)key
+{
     __block id obj = nil;
 
     [self.managedObjectContext performBlockAndWait:^{
@@ -316,13 +320,15 @@ static NSUInteger _fetchBatchSize = 100;
 }
 
 // entity[@"key"] = value; thread safe setValue:forKey:
-- (void)setObject:(id)obj forKeyedSubscript:(id<NSCopying>)key {
+- (void)setObject:(id)obj forKeyedSubscript:(id<NSCopying>)key
+{
     [self.managedObjectContext performBlockAndWait:^{
         [self setValue:obj forKey:(NSString *)key];
     }];
 }
 
-- (void)deleteObject {
+- (void)deleteObject
+{
     [self.managedObjectContext performBlockAndWait:^{
         [self.managedObjectContext deleteObject:self];
     }];

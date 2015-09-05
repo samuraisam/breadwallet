@@ -28,7 +28,8 @@
 
 @implementation UIImage (Utils)
 
-+ (instancetype)imageWithQRCodeData:(NSData *)data size:(CGSize)size color:(CIColor *)color {
++ (instancetype)imageWithQRCodeData:(NSData *)data size:(CGSize)size color:(CIColor *)color
+{
     CIFilter *qrFilter = [CIFilter filterWithName:@"CIQRCodeGenerator"],
              *maskFilter = [CIFilter filterWithName:@"CIMaskToAlpha"],
              *invertFilter = [CIFilter filterWithName:@"CIColorInvert"],
@@ -66,7 +67,8 @@
     return image;
 }
 
-- (UIImage *)blurWithRadius:(CGFloat)radius {
+- (UIImage *)blurWithRadius:(CGFloat)radius
+{
     UIGraphicsBeginImageContext(self.size);
 
     CGContextRef context = UIGraphicsGetCurrentContext();

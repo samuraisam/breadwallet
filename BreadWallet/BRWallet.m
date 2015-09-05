@@ -34,7 +34,8 @@
 #import "NSManagedObject+Sugar.h"
 
 // chain position of first tx output address that appears in chain
-static NSUInteger txAddressIndex(BRTransaction *tx, NSArray *chain) {
+static NSUInteger txAddressIndex(BRTransaction *tx, NSArray *chain)
+{
     for (NSString *addr in tx.outputAddresses) {
         NSUInteger i = [chain indexOfObject:addr];
 
@@ -65,7 +66,8 @@ static NSUInteger txAddressIndex(BRTransaction *tx, NSArray *chain) {
 - (instancetype)initWithContext:(NSManagedObjectContext *)context
                        sequence:(id<BRKeySequence>)sequence
                 masterPublicKey:(NSData *)masterPublicKey
-                           seed:(NSData * (^)(NSString *authprompt, uint64_t amount))seed {
+                           seed:(NSData * (^)(NSString *authprompt, uint64_t amount))seed
+{
     if (!(self = [super init])) return nil;
 
     self.moc = context;
@@ -112,9 +114,11 @@ static NSUInteger txAddressIndex(BRTransaction *tx, NSArray *chain) {
     return self;
 }
 
-- (NSData *)masterPublicKey {
+- (NSData *)masterPublicKey
+{
     if (!_masterPublicKey) {
-        @autoreleasepool {  // @autoreleasepool ensures sensitive data will be dealocated immediately
+        @autoreleasepool
+        {  // @autoreleasepool ensures sensitive data will be dealocated immediately
             _masterPublicKey = [self.sequence masterPublicKeyFromSeed:self.seed(nil, 0)];
         }
     }
@@ -126,7 +130,8 @@ static NSUInteger txAddressIndex(BRTransaction *tx, NSArray *chain) {
 // found that haven't been used in any transactions. This method returns an array of <gapLimit> unused addresses
 // following the last used address in the chain. The internal chain is used for change addresses and the external chain
 // for receive addresses.
-- (NSArray *)addressesWithGapLimit:(NSUInteger)gapLimit internal:(BOOL)internal {
+- (NSArray *)addressesWithGapLimit:(NSUInteger)gapLimit internal:(BOOL)internal
+{
     NSMutableArray *a = [NSMutableArray arrayWithArray:(internal) ? self.internalAddresses : self.externalAddresses];
     NSUInteger i = a.count;
 
@@ -143,7 +148,8 @@ static NSUInteger txAddressIndex(BRTransaction *tx, NSArray *chain) {
         [self changeAddress];
     }
 
-    @synchronized(self) {
+    @synchronized(self)
+    {
         [a setArray:(internal) ? self.internalAddresses : self.externalAddresses];
         i = a.count;
 
@@ -186,7 +192,8 @@ static NSUInteger txAddressIndex(BRTransaction *tx, NSArray *chain) {
 
 // this sorts transactions by block height in descending order, and makes a best attempt at ordering transactions within
 // each block, however correct transaction ordering cannot be relied upon for determining wallet balance or UTXO set
-- (void)sortTransactions {
+- (void)sortTransactions
+{
     BOOL (^isAscending)(id, id);
     __block __weak BOOL (^_isAscending)(id, id) = isAscending = ^BOOL(BRTransaction *tx1, BRTransaction *tx2) {
         if (!tx1 || !tx2) return NO;
@@ -217,7 +224,8 @@ static NSUInteger txAddressIndex(BRTransaction *tx, NSArray *chain) {
                        }];
 }
 
-- (void)updateBalance {
+- (void)updateBalance
+{
     uint64_t balance = 0, prevBalance = 0, totalSent = 0, totalReceived = 0;
     NSMutableOrderedSet *utxos = [NSMutableOrderedSet orderedSet];
     NSMutableSet *spentOutputs = [NSMutableSet set], *invalidTx = [NSMutableSet set];
@@ -294,52 +302,52 @@ static NSUInteger txAddressIndex(BRTransaction *tx, NSArray *chain) {
 #pragma mark - wallet info
 
 // returns the first unused external address
-- (NSString *)receiveAddress {
+- (NSString *)receiveAddress
+{
     // TODO: limit to 10,000 total addresses and utxos for practical usability with bloom filters
     return [self addressesWithGapLimit:1 internal:NO].lastObject;
 }
 
 // returns the first unused internal address
-- (NSString *)changeAddress {
+- (NSString *)changeAddress
+{
     // TODO: limit to 10,000 total addresses and utxos for practical usability with bloom filters
     return [self addressesWithGapLimit:1 internal:YES].lastObject;
 }
 
 // all previously generated internal and external addresses
-- (NSSet *)addresses {
-    return self.allAddresses;
-}
+- (NSSet *)addresses { return self.allAddresses; }
 
 // NSData objects containing serialized UTXOs
-- (NSArray *)unspentOutputs {
-    return self.utxos.array;
-}
+- (NSArray *)unspentOutputs { return self.utxos.array; }
 
 // BRTransaction objects sorted by date, most recent first
-- (NSArray *)recentTransactions {
+- (NSArray *)recentTransactions
+{
     // TODO: don't include receive transactions that don't have at least one wallet output >= TX_MIN_OUTPUT_AMOUNT
     return self.transactions.array;
 }
 
 // hashes of all wallet transactions
-- (NSSet *)txHashes {
-    return self.allTxHashes;
-}
+- (NSSet *)txHashes { return self.allTxHashes; }
 
 // true if the address is controlled by the wallet
-- (BOOL)containsAddress:(NSString *)address {
+- (BOOL)containsAddress:(NSString *)address
+{
     return (address && [self.allAddresses containsObject:address]) ? YES : NO;
 }
 
 // true if the address was previously used as an input or output in any wallet transaction
-- (BOOL)addressIsUsed:(NSString *)address {
+- (BOOL)addressIsUsed:(NSString *)address
+{
     return (address && [self.usedAddresses containsObject:address]) ? YES : NO;
 }
 
 #pragma mark - transactions
 
 // returns an unsigned transaction that sends the specified amount from the wallet to the given address
-- (BRTransaction *)transactionFor:(uint64_t)amount to:(NSString *)address withFee:(BOOL)fee {
+- (BRTransaction *)transactionFor:(uint64_t)amount to:(NSString *)address withFee:(BOOL)fee
+{
     NSMutableData *script = [NSMutableData data];
 
     [script appendScriptPubKeyForAddress:address];
@@ -395,7 +403,8 @@ static NSUInteger txAddressIndex(BRTransaction *tx, NSArray *chain) {
 }
 
 // sign any inputs in the given transaction that can be signed using private keys from the wallet
-- (BOOL)signTransaction:(BRTransaction *)transaction withPrompt:(NSString *)authprompt {
+- (BOOL)signTransaction:(BRTransaction *)transaction withPrompt:(NSString *)authprompt
+{
     int64_t amount = [self amountSentByTransaction:transaction] - [self amountReceivedFromTransaction:transaction];
     NSMutableOrderedSet *externalIndexes = [NSMutableOrderedSet orderedSet],
                         *internalIndexes = [NSMutableOrderedSet orderedSet];
@@ -408,7 +417,8 @@ static NSUInteger txAddressIndex(BRTransaction *tx, NSArray *chain) {
     [internalIndexes removeObject:@(NSNotFound)];
     [externalIndexes removeObject:@(NSNotFound)];
 
-    @autoreleasepool {  // @autoreleasepool ensures sensitive data will be dealocated immediately
+    @autoreleasepool
+    {  // @autoreleasepool ensures sensitive data will be dealocated immediately
         NSMutableArray *privkeys = [NSMutableArray array];
         NSData *seed = self.seed(authprompt, (amount > 0) ? amount : 0);
 
@@ -421,7 +431,8 @@ static NSUInteger txAddressIndex(BRTransaction *tx, NSArray *chain) {
 }
 
 // true if the given transaction is associated with the wallet (even if it hasn't been registered), false otherwise
-- (BOOL)containsTransaction:(BRTransaction *)transaction {
+- (BOOL)containsTransaction:(BRTransaction *)transaction
+{
     if ([[NSSet setWithArray:transaction.outputAddresses] intersectsSet:self.allAddresses]) return YES;
 
     NSInteger i = 0;
@@ -437,7 +448,8 @@ static NSUInteger txAddressIndex(BRTransaction *tx, NSArray *chain) {
 }
 
 // records the transaction in the wallet, or returns false if it isn't associated with the wallet
-- (BOOL)registerTransaction:(BRTransaction *)transaction {
+- (BOOL)registerTransaction:(BRTransaction *)transaction
+{
     UInt256 txHash = transaction.txHash;
     NSValue *hash = uint256_obj(txHash);
 
@@ -470,7 +482,8 @@ static NSUInteger txAddressIndex(BRTransaction *tx, NSArray *chain) {
 }
 
 // removes a transaction from the wallet along with any transactions that depend on its outputs
-- (void)removeTransaction:(UInt256)txHash {
+- (void)removeTransaction:(UInt256)txHash
+{
     BRTransaction *transaction = self.allTx[uint256_obj(txHash)];
     NSMutableSet *hashes = [NSMutableSet set];
 
@@ -502,12 +515,11 @@ static NSUInteger txAddressIndex(BRTransaction *tx, NSArray *chain) {
 }
 
 // returns the transaction with the given hash if it's been registered in the wallet
-- (BRTransaction *)transactionForHash:(UInt256)txHash {
-    return self.allTx[uint256_obj(txHash)];
-}
+- (BRTransaction *)transactionForHash:(UInt256)txHash { return self.allTx[uint256_obj(txHash)]; }
 
 // true if no previous wallet transactions spend any of the given transaction's inputs, and no input tx is invalid
-- (BOOL)transactionIsValid:(BRTransaction *)transaction {
+- (BOOL)transactionIsValid:(BRTransaction *)transaction
+{
     // TODO: XXX attempted double spends should cause conflicted tx to remain unverified until they're confirmed
     // TODO: XXX conflicted tx with the same wallet outputs should be presented as the same tx to the user
     if (transaction.blockHeight != TX_UNCONFIRMED) return YES;
@@ -532,7 +544,8 @@ static NSUInteger txAddressIndex(BRTransaction *tx, NSArray *chain) {
 }
 
 // returns true if transaction won't be valid by blockHeight + 1 or within the next 10 minutes
-- (BOOL)transactionIsPostdated:(BRTransaction *)transaction atBlockHeight:(uint32_t)blockHeight {
+- (BOOL)transactionIsPostdated:(BRTransaction *)transaction atBlockHeight:(uint32_t)blockHeight
+{
     if (transaction.blockHeight != TX_UNCONFIRMED) return NO;  // confirmed transactions are not postdated
 
     // TODO: XXX consider marking any unconfirmed transaction with a non-final sequence number as postdated
@@ -555,7 +568,8 @@ static NSUInteger txAddressIndex(BRTransaction *tx, NSArray *chain) {
 }
 
 // set the block heights and timestamps for the given transactions
-- (void)setBlockHeight:(int32_t)height andTimestamp:(NSTimeInterval)timestamp forTxHashes:(NSArray *)txHashes {
+- (void)setBlockHeight:(int32_t)height andTimestamp:(NSTimeInterval)timestamp forTxHashes:(NSArray *)txHashes
+{
     NSMutableArray *hashes = [NSMutableArray array];
 
     for (NSValue *hash in txHashes) {
@@ -583,7 +597,8 @@ static NSUInteger txAddressIndex(BRTransaction *tx, NSArray *chain) {
 }
 
 // returns the amount received by the wallet from the transaction (total outputs to change and/or receive addresses)
-- (uint64_t)amountReceivedFromTransaction:(BRTransaction *)transaction {
+- (uint64_t)amountReceivedFromTransaction:(BRTransaction *)transaction
+{
     uint64_t amount = 0;
     NSUInteger n = 0;
 
@@ -597,7 +612,8 @@ static NSUInteger txAddressIndex(BRTransaction *tx, NSArray *chain) {
 }
 
 // retuns the amount sent from the wallet by the trasaction (total wallet outputs consumed, change and fee included)
-- (uint64_t)amountSentByTransaction:(BRTransaction *)transaction {
+- (uint64_t)amountSentByTransaction:(BRTransaction *)transaction
+{
     uint64_t amount = 0;
     NSUInteger i = 0;
 
@@ -614,7 +630,8 @@ static NSUInteger txAddressIndex(BRTransaction *tx, NSArray *chain) {
 }
 
 // returns the fee for the given transaction if all its inputs are from wallet transactions, UINT64_MAX otherwise
-- (uint64_t)feeForTransaction:(BRTransaction *)transaction {
+- (uint64_t)feeForTransaction:(BRTransaction *)transaction
+{
     uint64_t amount = 0;
     NSUInteger i = 0;
 
@@ -634,7 +651,8 @@ static NSUInteger txAddressIndex(BRTransaction *tx, NSArray *chain) {
 }
 
 // historical wallet balance after the given transaction, or current balance if transaction is not registered in wallet
-- (uint64_t)balanceAfterTransaction:(BRTransaction *)transaction {
+- (uint64_t)balanceAfterTransaction:(BRTransaction *)transaction
+{
     NSUInteger i = [self.transactions indexOfObject:transaction];
 
     return (i < self.balanceHistory.count) ? [self.balanceHistory[i] unsignedLongLongValue] : self.balance;
@@ -643,7 +661,8 @@ static NSUInteger txAddressIndex(BRTransaction *tx, NSArray *chain) {
 // Returns the block height after which the transaction is likely to be processed without including a fee. This is based
 // on the default satoshi client settings, but on the real network it's way off. In testing, a 0.01btc transaction that
 // was expected to take an additional 90 days worth of blocks to confirm was confirmed in under an hour by Eligius pool.
-- (uint32_t)blockHeightUntilFree:(BRTransaction *)transaction {
+- (uint32_t)blockHeightUntilFree:(BRTransaction *)transaction
+{
     // TODO: calculate estimated time based on the median priority of free transactions in last 144 blocks (24hrs)
     NSMutableArray *amounts = [NSMutableArray array], *heights = [NSMutableArray array];
     NSUInteger i = 0;
@@ -661,7 +680,8 @@ static NSUInteger txAddressIndex(BRTransaction *tx, NSArray *chain) {
 }
 
 // fee that will be added for a transaction of the given size in bytes
-- (uint64_t)feeForTxSize:(NSUInteger)size {
+- (uint64_t)feeForTxSize:(NSUInteger)size
+{
     uint64_t standardFee =
                  ((size + 999) / 1000) * TX_FEE_PER_KB,  // standard fee based on tx size rounded up to nearest kb
         fee = (((size * self.feePerKb / 1000) + 99) / 100) *
