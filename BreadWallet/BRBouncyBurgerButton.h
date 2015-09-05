@@ -26,7 +26,7 @@
 
 @interface BRBouncyBurgerButton : UIButton
 
-@property (nonatomic, assign) BOOL x;
+@property(nonatomic, assign) BOOL x;
 
 - (void)setX:(BOOL)x completion:(void (^)(BOOL finished))completion;
 

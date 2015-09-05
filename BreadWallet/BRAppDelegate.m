@@ -37,8 +37,7 @@
 
 @implementation BRAppDelegate
 
-- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
-{
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
 
     // use background fetch to stay synced with the blockchain
@@ -80,16 +79,14 @@
 // Constants representing common extension point identifiers are provided further down.
 // If unimplemented, the default behavior is to allow the extension point identifier.
 - (BOOL)application:(UIApplication *)application
-    shouldAllowExtensionPointIdentifier:(NSString *)extensionPointIdentifier
-{
-    return NO; // disable extensions such as custom keyboards for security purposes
+    shouldAllowExtensionPointIdentifier:(NSString *)extensionPointIdentifier {
+    return NO;  // disable extensions such as custom keyboards for security purposes
 }
 
 - (BOOL)application:(UIApplication *)application
             openURL:(NSURL *)url
   sourceApplication:(NSString *)sourceApplication
-         annotation:(id)annotation
-{
+         annotation:(id)annotation {
     if (![url.scheme isEqual:@"bitcoin"] && ![url.scheme isEqual:@"bread"]) {
         [[[UIAlertView alloc] initWithTitle:@"Not a bitcoin URL"
                                     message:url.absoluteString
@@ -111,8 +108,7 @@
 }
 
 - (void)application:(UIApplication *)application
-    performFetchWithCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler
-{
+    performFetchWithCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler {
     NSUserDefaults *defs = [NSUserDefaults standardUserDefaults];
     BRWalletManager *m = [BRWalletManager sharedInstance];
     __block uint64_t balance = m.wallet.balance;
@@ -120,21 +116,16 @@
     __block void (^completion)(UIBackgroundFetchResult) = completionHandler;
     void (^cleanup)() = ^() {
         completion = nil;
-        if (protectedObserver)
-            [[NSNotificationCenter defaultCenter] removeObserver:protectedObserver];
-        if (balanceObserver)
-            [[NSNotificationCenter defaultCenter] removeObserver:balanceObserver];
-        if (syncFinishedObserver)
-            [[NSNotificationCenter defaultCenter] removeObserver:syncFinishedObserver];
-        if (syncFailedObserver)
-            [[NSNotificationCenter defaultCenter] removeObserver:syncFailedObserver];
+        if (protectedObserver) [[NSNotificationCenter defaultCenter] removeObserver:protectedObserver];
+        if (balanceObserver) [[NSNotificationCenter defaultCenter] removeObserver:balanceObserver];
+        if (syncFinishedObserver) [[NSNotificationCenter defaultCenter] removeObserver:syncFinishedObserver];
+        if (syncFailedObserver) [[NSNotificationCenter defaultCenter] removeObserver:syncFailedObserver];
         protectedObserver = balanceObserver = syncFinishedObserver = syncFailedObserver = nil;
     };
 
     if ([BRPeerManager sharedInstance].syncProgress >= 1.0) {
         NSLog(@"background fetch already synced");
-        if (completion)
-            completion(UIBackgroundFetchResultNoData);
+        if (completion) completion(UIBackgroundFetchResultNoData);
         return;
     }
 
@@ -167,7 +158,7 @@
                         [UIApplication sharedApplication].applicationIconBadgeNumber =
                             [UIApplication sharedApplication].applicationIconBadgeNumber + 1;
                         [defs setDouble:[defs doubleForKey:SETTINGS_RECEIVED_AMOUNT_KEY] + (m.wallet.balance - balance)
-                                 forKey:SETTINGS_RECEIVED_AMOUNT_KEY]; // have to use setDouble here, setInteger isn't
+                                 forKey:SETTINGS_RECEIVED_AMOUNT_KEY];  // have to use setDouble here, setInteger isn't
                         // big enough
                         balance = m.wallet.balance;
                         [defs synchronize];
@@ -180,8 +171,7 @@
                                                            queue:nil
                                                       usingBlock:^(NSNotification *note) {
                                                           NSLog(@"background fetch sync finished");
-                                                          if (completion)
-                                                              completion(UIBackgroundFetchResultNewData);
+                                                          if (completion) completion(UIBackgroundFetchResultNewData);
                                                           cleanup();
                                                       }];
 
@@ -191,8 +181,7 @@
                                                            queue:nil
                                                       usingBlock:^(NSNotification *note) {
                                                           NSLog(@"background fetch sync failed");
-                                                          if (completion)
-                                                              completion(UIBackgroundFetchResultFailed);
+                                                          if (completion) completion(UIBackgroundFetchResultFailed);
                                                           cleanup();
                                                       }];
 

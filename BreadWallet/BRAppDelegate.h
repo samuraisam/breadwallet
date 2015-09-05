@@ -31,8 +31,8 @@
 #define BRFileNotification @"BRFileNotification"
 #define SETTINGS_RECEIVED_AMOUNT_KEY @"SETTINGS_RECEIVED_AMOUNT"
 
-@interface BRAppDelegate : UIResponder <UIApplicationDelegate>
+@interface BRAppDelegate : UIResponder<UIApplicationDelegate>
 
-@property (strong, nonatomic) UIWindow *window;
+@property(strong, nonatomic) UIWindow *window;
 
 @end

@@ -30,22 +30,21 @@
 
 #define PHRASE_LENGTH 12
 #define WORDS @"BIP39Words"
-#define IDEO_SP @"\xE3\x80\x80" // ideographic space (utf-8)
+#define IDEO_SP @"\xE3\x80\x80"  // ideographic space (utf-8)
 
 @interface BRRestoreViewController ()
 
-@property (nonatomic, strong) IBOutlet UITextView *textView;
-@property (nonatomic, strong) IBOutlet NSLayoutConstraint *textViewYBottom;
-@property (nonatomic, strong) NSArray *words;
-@property (nonatomic, strong) NSMutableSet *allWords;
-@property (nonatomic, strong) id keyboardObserver, resignActiveObserver;
+@property(nonatomic, strong) IBOutlet UITextView *textView;
+@property(nonatomic, strong) IBOutlet NSLayoutConstraint *textViewYBottom;
+@property(nonatomic, strong) NSArray *words;
+@property(nonatomic, strong) NSMutableSet *allWords;
+@property(nonatomic, strong) id keyboardObserver, resignActiveObserver;
 
 @end
 
 @implementation BRRestoreViewController
 
-- (void)viewDidLoad
-{
+- (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
 
@@ -75,8 +74,8 @@
                                         options:[note.userInfo[UIKeyboardAnimationCurveUserInfoKey] integerValue]
                                      animations:^{
                                          self.textViewYBottom.constant =
-                                             [note.userInfo[UIKeyboardFrameEndUserInfoKey] CGRectValue].size.height
-                                             + 12.0;
+                                             [note.userInfo[UIKeyboardFrameEndUserInfoKey] CGRectValue].size.height +
+                                             12.0;
                                          [self.view layoutIfNeeded];
                                      }
                                      completion:nil];
@@ -90,43 +89,34 @@
                                                           self.textView.text = nil;
                                                       }];
 
-    if (self.navigationController.viewControllers.firstObject != self)
-        return;
+    if (self.navigationController.viewControllers.firstObject != self) return;
 
     self.textView.layer.borderColor = [UIColor colorWithWhite:0.0 alpha:0.25].CGColor;
     self.textView.layer.borderWidth = 0.5;
 }
 
-- (void)viewWillAppear:(BOOL)animated
-{
+- (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
 
     [self.textView becomeFirstResponder];
 }
 
-- (void)viewWillDisappear:(BOOL)animated
-{
+- (void)viewWillDisappear:(BOOL)animated {
     self.textView.text = nil;
 
     [super viewWillDisappear:animated];
 }
 
-- (void)dealloc
-{
-    if (self.keyboardObserver)
-        [[NSNotificationCenter defaultCenter] removeObserver:self.keyboardObserver];
-    if (self.resignActiveObserver)
-        [[NSNotificationCenter defaultCenter] removeObserver:self.resignActiveObserver];
+- (void)dealloc {
+    if (self.keyboardObserver) [[NSNotificationCenter defaultCenter] removeObserver:self.keyboardObserver];
+    if (self.resignActiveObserver) [[NSNotificationCenter defaultCenter] removeObserver:self.resignActiveObserver];
 }
 
-- (void)wipeWithPhrase:(NSString *)phrase
-{
-    @autoreleasepool
-    {
+- (void)wipeWithPhrase:(NSString *)phrase {
+    @autoreleasepool {
         BRWalletManager *m = [BRWalletManager sharedInstance];
 
-        if ([phrase isEqual:@"wipe"])
-            phrase = m.seedPhrase; // this triggers authentication request
+        if ([phrase isEqual:@"wipe"]) phrase = m.seedPhrase;  // this triggers authentication request
 
         if ([[m.sequence masterPublicKeyFromSeed:[m.mnemonic deriveKeyFromPhrase:phrase withPassphrase:nil]]
                 isEqual:m.masterPublicKey]) {
@@ -135,30 +125,26 @@
                                 cancelButtonTitle:NSLocalizedString(@"cancel", nil)
                            destructiveButtonTitle:NSLocalizedString(@"wipe", nil)
                                 otherButtonTitles:nil] showInView:[UIApplication sharedApplication].keyWindow];
-        }
-        else if (phrase) {
+        } else if (phrase) {
             [[[UIAlertView alloc] initWithTitle:@""
                                         message:NSLocalizedString(@"recovery phrase doesn't match", nil)
                                        delegate:nil
                               cancelButtonTitle:NSLocalizedString(@"ok", nil)
                               otherButtonTitles:nil] show];
-        }
-        else
+        } else
             [self.textView becomeFirstResponder];
     }
 }
 
 #pragma mark - IBAction
 
-- (IBAction)cancel:(id)sender
-{
+- (IBAction)cancel:(id)sender {
     [self.navigationController.presentingViewController dismissViewControllerAnimated:YES completion:nil];
 }
 
 #pragma mark - UITextViewDelegate
 
-- (void)textViewDidChange:(UITextView *)textView
-{
+- (void)textViewDidChange:(UITextView *)textView {
     static NSCharacterSet *invalid = nil;
     static dispatch_once_t onceToken = 0;
 
@@ -169,43 +155,38 @@
         invalid = set.invertedSet;
     });
 
-    @autoreleasepool
-    { // @autoreleasepool ensures sensitive data will be dealocated immediately
+    @autoreleasepool {  // @autoreleasepool ensures sensitive data will be dealocated immediately
         BRWalletManager *m = [BRWalletManager sharedInstance];
-        NSMutableString *s
-            = CFBridgingRelease(CFStringCreateMutableCopy(SecureAllocator(), 0, (CFStringRef)textView.text));
+        NSMutableString *s =
+            CFBridgingRelease(CFStringCreateMutableCopy(SecureAllocator(), 0, (CFStringRef)textView.text));
         BOOL done = ([s rangeOfString:@"\n"].location != NSNotFound) ? YES : NO;
 
         while ([s rangeOfCharacterFromSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]].location == 0) {
-            [s deleteCharactersInRange:NSMakeRange(0, 1)]; // trim leading whitespace
+            [s deleteCharactersInRange:NSMakeRange(0, 1)];  // trim leading whitespace
         }
 
         while ([s rangeOfCharacterFromSet:invalid].location != NSNotFound) {
-            [s deleteCharactersInRange:[s rangeOfCharacterFromSet:invalid]]; // remove invalid chars
+            [s deleteCharactersInRange:[s rangeOfCharacterFromSet:invalid]];  // remove invalid chars
         }
 
         [s replaceOccurrencesOfString:@"\n" withString:@" " options:0 range:NSMakeRange(0, s.length)];
 
-        if (![s isEqual:textView.text])
-            textView.text = s;
-        if (!done)
-            return; // not done entering phrase
+        if (![s isEqual:textView.text]) textView.text = s;
+        if (!done) return;  // not done entering phrase
 
         BOOL isLocal = YES;
         NSString *phrase = [m.mnemonic normalizePhrase:s], *incorrect = nil;
         NSArray *a = CFBridgingRelease(
             CFStringCreateArrayBySeparatingStrings(SecureAllocator(), (CFStringRef)phrase, CFSTR(" ")));
 
-        for (NSString *word in a) { // add spaces between words for ideographic langauges
-            if (word.length < 1 || [word characterAtIndex:0] < 0x3000 || [self.allWords containsObject:word])
-                continue;
+        for (NSString *word in a) {  // add spaces between words for ideographic langauges
+            if (word.length < 1 || [word characterAtIndex:0] < 0x3000 || [self.allWords containsObject:word]) continue;
 
             for (NSUInteger i = 0; i < word.length; i++) {
                 for (NSUInteger j = (word.length - i > 8) ? 8 : word.length - i; j; j--) {
                     NSString *w = [word substringWithRange:NSMakeRange(i, j)];
 
-                    if (![self.allWords containsObject:w])
-                        continue;
+                    if (![self.allWords containsObject:w]) continue;
                     [s replaceOccurrencesOfString:w
                                         withString:[NSString stringWithFormat:IDEO_SP @"%@" IDEO_SP, w]
                                            options:0
@@ -222,59 +203,51 @@
             }
         }
 
-        if (![s isEqual:textView.text])
-            textView.text = s;
+        if (![s isEqual:textView.text]) textView.text = s;
         phrase = [m.mnemonic normalizePhrase:s];
         a = CFBridgingRelease(
             CFStringCreateArrayBySeparatingStrings(SecureAllocator(), (CFStringRef)phrase, CFSTR(" ")));
 
         for (NSString *word in a) {
-            if (![self.words containsObject:word])
-                isLocal = NO;
-            if ([self.allWords containsObject:word])
-                continue;
+            if (![self.words containsObject:word]) isLocal = NO;
+            if ([self.allWords containsObject:word]) continue;
             incorrect = word;
             break;
         }
 
-        if ([phrase isEqual:@"wipe"]) { // shortcut word to force the wipe option to appear
+        if ([phrase isEqual:@"wipe"]) {  // shortcut word to force the wipe option to appear
             [self.textView resignFirstResponder];
             [self performSelector:@selector(wipeWithPhrase:) withObject:phrase afterDelay:0.0];
-        }
-        else if (incorrect) {
+        } else if (incorrect) {
             textView.selectedRange = [textView.text.lowercaseString rangeOfString:incorrect];
 
             [[[UIAlertView alloc]
                     initWithTitle:@""
                           message:[NSString
                                       stringWithFormat:NSLocalizedString(@"\"%@\" is not a recovery phrase word", nil),
-                                      incorrect]
+                                                       incorrect]
                          delegate:nil
                 cancelButtonTitle:NSLocalizedString(@"ok", nil)
                 otherButtonTitles:nil] show];
-        }
-        else if (a.count != PHRASE_LENGTH) {
+        } else if (a.count != PHRASE_LENGTH) {
             [[[UIAlertView alloc]
                     initWithTitle:@""
                           message:[NSString
                                       stringWithFormat:NSLocalizedString(@"recovery phrase must have %d words", nil),
-                                      PHRASE_LENGTH]
+                                                       PHRASE_LENGTH]
                          delegate:nil
                 cancelButtonTitle:NSLocalizedString(@"ok", nil)
                 otherButtonTitles:nil] show];
-        }
-        else if (isLocal && ![m.mnemonic phraseIsValid:phrase]) {
+        } else if (isLocal && ![m.mnemonic phraseIsValid:phrase]) {
             [[[UIAlertView alloc] initWithTitle:@""
                                         message:NSLocalizedString(@"bad recovery phrase", nil)
                                        delegate:nil
                               cancelButtonTitle:NSLocalizedString(@"ok", nil)
                               otherButtonTitles:nil] show];
-        }
-        else if (!m.noWallet) {
+        } else if (!m.noWallet) {
             [self.textView resignFirstResponder];
             [self performSelector:@selector(wipeWithPhrase:) withObject:phrase afterDelay:0.0];
-        }
-        else {
+        } else {
             // TODO: offer the user an option to move funds to a new seed if their wallet device was lost or stolen
             m.seedPhrase = phrase;
             textView.text = nil;
@@ -290,8 +263,7 @@
 
 #pragma mark - UIActionSheetDelegate
 
-- (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
-{
+- (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex {
     if (buttonIndex != actionSheet.destructiveButtonIndex) {
         [self.textView becomeFirstResponder];
         return;

@@ -33,8 +33,8 @@
 
 #define BITCOIN_TIMEOUT_CODE 1001
 
-#define SERVICES_NODE_NETWORK 1 // services value indicating a node carries full blocks, not just headers
-#define USER_AGENT                                                                                                     \
+#define SERVICES_NODE_NETWORK 1  // services value indicating a node carries full blocks, not just headers
+#define USER_AGENT \
     [NSString stringWithFormat:@"/breadwallet:%@/", NSBundle.mainBundle.infoDictionary[@"CFBundleShortVersionString"]]
 
 // explanation of message types at: https://en.bitcoin.it/wiki/Protocol_specification
@@ -61,14 +61,14 @@
 #define MSG_FILTERCLEAR @"filterclear"
 #define MSG_MERKLEBLOCK @"merkleblock"
 #define MSG_ALERT @"alert"
-#define MSG_REJECT @"reject" // described in BIP61: https://github.com/bitcoin/bips/blob/master/bip-0061.mediawiki
+#define MSG_REJECT @"reject"  // described in BIP61: https://github.com/bitcoin/bips/blob/master/bip-0061.mediawiki
 
 typedef union _UInt256 UInt256;
 typedef union _UInt128 UInt128;
 
 @class BRPeer, BRTransaction, BRMerkleBlock;
 
-@protocol BRPeerDelegate <NSObject>
+@protocol BRPeerDelegate<NSObject>
 @required
 
 - (void)peerConnected:(BRPeer *)peer;
@@ -87,30 +87,30 @@ typedef union _UInt128 UInt128;
 
 typedef enum : NSInteger { BRPeerStatusDisconnected = 0, BRPeerStatusConnecting, BRPeerStatusConnected } BRPeerStatus;
 
-@interface BRPeer : NSObject <NSStreamDelegate>
+@interface BRPeer : NSObject<NSStreamDelegate>
 
-@property (nonatomic, readonly) id<BRPeerDelegate> delegate;
-@property (nonatomic, readonly) dispatch_queue_t delegateQueue;
+@property(nonatomic, readonly) id<BRPeerDelegate> delegate;
+@property(nonatomic, readonly) dispatch_queue_t delegateQueue;
 
 // set this to the timestamp when the wallet was created to improve initial sync time (interval since refrence date)
-@property (nonatomic, assign) NSTimeInterval earliestKeyTime;
+@property(nonatomic, assign) NSTimeInterval earliestKeyTime;
 
-@property (nonatomic, readonly) BRPeerStatus status;
-@property (nonatomic, readonly) NSString *host;
-@property (nonatomic, readonly) UInt128 address;
-@property (nonatomic, readonly) uint16_t port;
-@property (nonatomic, readonly) uint64_t services;
-@property (nonatomic, readonly) uint32_t version;
-@property (nonatomic, readonly) uint64_t nonce;
-@property (nonatomic, readonly) NSString *useragent;
-@property (nonatomic, readonly) uint32_t lastblock;
-@property (nonatomic, readonly) NSTimeInterval pingTime;
-@property (nonatomic, assign) NSTimeInterval timestamp; // last seen time (interval since refrence date)
-@property (nonatomic, assign) int16_t misbehavin;
+@property(nonatomic, readonly) BRPeerStatus status;
+@property(nonatomic, readonly) NSString *host;
+@property(nonatomic, readonly) UInt128 address;
+@property(nonatomic, readonly) uint16_t port;
+@property(nonatomic, readonly) uint64_t services;
+@property(nonatomic, readonly) uint32_t version;
+@property(nonatomic, readonly) uint64_t nonce;
+@property(nonatomic, readonly) NSString *useragent;
+@property(nonatomic, readonly) uint32_t lastblock;
+@property(nonatomic, readonly) NSTimeInterval pingTime;
+@property(nonatomic, assign) NSTimeInterval timestamp;  // last seen time (interval since refrence date)
+@property(nonatomic, assign) int16_t misbehavin;
 
-@property (nonatomic, assign) BOOL needsFilterUpdate; // set this when wallet addresses need to be added to bloom filter
-@property (nonatomic, assign) uint32_t currentBlockHeight; // set this to local block height (helps detect tarpit nodes)
-@property (nonatomic, assign) BOOL synced; // use this to keep track of peer state
+@property(nonatomic, assign) BOOL needsFilterUpdate;  // set this when wallet addresses need to be added to bloom filter
+@property(nonatomic, assign) uint32_t currentBlockHeight;  // set this to local block height (helps detect tarpit nodes)
+@property(nonatomic, assign) BOOL synced;                  // use this to keep track of peer state
 
 + (instancetype)peerWithAddress:(UInt128)address andPort:(uint16_t)port;
 
@@ -131,6 +131,6 @@ typedef enum : NSInteger { BRPeerStatusDisconnected = 0, BRPeerStatusConnecting,
 - (void)sendGetdataMessageWithTxHashes:(NSArray *)txHashes andBlockHashes:(NSArray *)blockHashes;
 - (void)sendGetaddrMessage;
 - (void)sendPingMessageWithPongHandler:(void (^)(BOOL success))pongHandler;
-- (void)rerequestBlocksFrom:(UInt256)blockHash; // useful to get additional transactions after a bloom filter update
+- (void)rerequestBlocksFrom:(UInt256)blockHash;  // useful to get additional transactions after a bloom filter update
 
 @end

@@ -31,26 +31,25 @@
 #define LABEL_MARGIN 20.0
 #define WRITE_TOGGLE_DELAY 15.0
 
-#define IDEO_SP @"\xE3\x80\x80" // ideographic space (utf-8)
+#define IDEO_SP @"\xE3\x80\x80"  // ideographic space (utf-8)
 
 @interface BRSeedViewController ()
 
 // TODO: create a secure version of UILabel and use it for seedLabel, but make sure there's an accessibility work around
-@property (nonatomic, strong) IBOutlet UILabel *seedLabel, *writeLabel;
-@property (nonatomic, strong) IBOutlet UIButton *writeButton;
-@property (nonatomic, strong) IBOutlet UIToolbar *toolbar;
-@property (nonatomic, strong) IBOutlet UIBarButtonItem *remindButton, *doneButton;
-@property (nonatomic, strong) IBOutlet UIImageView *wallpaper;
+@property(nonatomic, strong) IBOutlet UILabel *seedLabel, *writeLabel;
+@property(nonatomic, strong) IBOutlet UIButton *writeButton;
+@property(nonatomic, strong) IBOutlet UIToolbar *toolbar;
+@property(nonatomic, strong) IBOutlet UIBarButtonItem *remindButton, *doneButton;
+@property(nonatomic, strong) IBOutlet UIImageView *wallpaper;
 
-@property (nonatomic, strong) NSString *seedPhrase;
-@property (nonatomic, strong) id resignActiveObserver, screenshotObserver;
+@property(nonatomic, strong) NSString *seedPhrase;
+@property(nonatomic, strong) id resignActiveObserver, screenshotObserver;
 
 @end
 
 @implementation BRSeedViewController
 
-- (instancetype)customInit
-{
+- (instancetype)customInit {
     BRWalletManager *m = [BRWalletManager sharedInstance];
 
     if (m.noWallet) {
@@ -58,39 +57,30 @@
         [[BRPeerManager sharedInstance] connect];
         [[NSUserDefaults standardUserDefaults] setBool:YES forKey:WALLET_NEEDS_BACKUP_KEY];
         [[NSUserDefaults standardUserDefaults] synchronize];
-    }
-    else
-        self.seedPhrase = m.seedPhrase; // this triggers authentication request
+    } else
+        self.seedPhrase = m.seedPhrase;  // this triggers authentication request
 
-    if (self.seedPhrase.length > 0)
-        _authSuccess = YES;
+    if (self.seedPhrase.length > 0) _authSuccess = YES;
 
     return self;
 }
 
-- (instancetype)init
-{
-    if (!(self = [super init]))
-        return nil;
+- (instancetype)init {
+    if (!(self = [super init])) return nil;
     return [self customInit];
 }
 
-- (instancetype)initWithCoder:(NSCoder *)aDecoder
-{
-    if (!(self = [super initWithCoder:aDecoder]))
-        return nil;
+- (instancetype)initWithCoder:(NSCoder *)aDecoder {
+    if (!(self = [super initWithCoder:aDecoder])) return nil;
     return [self customInit];
 }
 
-- (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
-{
-    if (!(self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil]))
-        return nil;
+- (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
+    if (!(self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil])) return nil;
     return [self customInit];
 }
 
-- (void)viewDidLoad
-{
+- (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
 
@@ -100,17 +90,15 @@
                                                       target:self
                                                       action:@selector(done:)];
 
-    @autoreleasepool
-    { // @autoreleasepool ensures sensitive data will be dealocated immediately
-        if (self.seedPhrase.length > 0 && [self.seedPhrase characterAtIndex:0] > 0x3000) { // ideographic language
+    @autoreleasepool {  // @autoreleasepool ensures sensitive data will be dealocated immediately
+        if (self.seedPhrase.length > 0 && [self.seedPhrase characterAtIndex:0] > 0x3000) {  // ideographic language
             CGRect r;
             NSMutableString *s = CFBridgingRelease(CFStringCreateMutable(SecureAllocator(), 0)),
                             *l = CFBridgingRelease(CFStringCreateMutable(SecureAllocator(), 0));
 
             for (NSString *w in CFBridgingRelease(CFStringCreateArrayBySeparatingStrings(
                      SecureAllocator(), (CFStringRef)self.seedPhrase, CFSTR(" ")))) {
-                if (l.length > 0)
-                    [l appendString:IDEO_SP];
+                if (l.length > 0) [l appendString:IDEO_SP];
                 [l appendString:w];
                 r = [l boundingRectWithSize:CGRectInfinite.size
                                     options:NSStringDrawingUsesLineFragmentOrigin
@@ -121,28 +109,25 @@
                 if (r.size.width + LABEL_MARGIN * 2.0 >= self.view.bounds.size.width) {
                     [s appendString:@"\n"];
                     l.string = w;
-                }
-                else if (s.length > 0)
+                } else if (s.length > 0)
                     [s appendString:IDEO_SP];
 
                 [s appendString:w];
             }
 
             self.seedLabel.text = s;
-        }
-        else
+        } else
             self.seedLabel.text = self.seedPhrase;
 
         self.seedPhrase = nil;
     }
 
 #if DEBUG
-    self.seedLabel.userInteractionEnabled = YES; // allow clipboard copy only for debug builds
+    self.seedLabel.userInteractionEnabled = YES;  // allow clipboard copy only for debug builds
 #endif
 }
 
-- (void)viewWillAppear:(BOOL)animated
-{
+- (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
 
     NSTimeInterval delay = WRITE_TOGGLE_DELAY;
@@ -152,9 +137,8 @@
     // remove done button if we're not the root of the nav stack
     if (self.navigationController.viewControllers.firstObject != self) {
         self.toolbar.hidden = YES;
-    }
-    else
-        delay *= 2; // extra delay before showing toggle when starting a new wallet
+    } else
+        delay *= 2;  // extra delay before showing toggle when starting a new wallet
 
     if ([[NSUserDefaults standardUserDefaults] boolForKey:WALLET_NEEDS_BACKUP_KEY]) {
         [self performSelector:@selector(showWriteToggle) withObject:nil afterDelay:delay];
@@ -166,8 +150,7 @@
                      }];
 }
 
-- (void)viewDidAppear:(BOOL)animated
-{
+- (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
 
     if (!self.resignActiveObserver) {
@@ -200,8 +183,7 @@
                                          delegate:nil
                                 cancelButtonTitle:NSLocalizedString(@"ok", nil)
                                 otherButtonTitles:nil] show];
-                        }
-                        else {
+                        } else {
                             [[BRWalletManager sharedInstance] setSeedPhrase:nil];
                             [self.navigationController.presentingViewController dismissViewControllerAnimated:NO
                                                                                                    completion:nil];
@@ -222,32 +204,25 @@
     }
 }
 
-- (void)viewWillDisappear:(BOOL)animated
-{
+- (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
 
     // don't leave the seed phrase laying around in memory any longer than necessary
     self.seedLabel.text = @"";
     [NSObject cancelPreviousPerformRequestsWithTarget:self];
-    if (self.resignActiveObserver)
-        [[NSNotificationCenter defaultCenter] removeObserver:self.resignActiveObserver];
+    if (self.resignActiveObserver) [[NSNotificationCenter defaultCenter] removeObserver:self.resignActiveObserver];
     self.resignActiveObserver = nil;
-    if (self.screenshotObserver)
-        [[NSNotificationCenter defaultCenter] removeObserver:self.screenshotObserver];
+    if (self.screenshotObserver) [[NSNotificationCenter defaultCenter] removeObserver:self.screenshotObserver];
     self.screenshotObserver = nil;
 }
 
-- (void)dealloc
-{
+- (void)dealloc {
     [NSObject cancelPreviousPerformRequestsWithTarget:self];
-    if (self.resignActiveObserver)
-        [[NSNotificationCenter defaultCenter] removeObserver:self.resignActiveObserver];
-    if (self.screenshotObserver)
-        [[NSNotificationCenter defaultCenter] removeObserver:self.screenshotObserver];
+    if (self.resignActiveObserver) [[NSNotificationCenter defaultCenter] removeObserver:self.resignActiveObserver];
+    if (self.screenshotObserver) [[NSNotificationCenter defaultCenter] removeObserver:self.screenshotObserver];
 }
 
-- (void)showWriteToggle
-{
+- (void)showWriteToggle {
     self.writeLabel.alpha = self.writeButton.alpha = 0.0;
     self.writeLabel.hidden = self.writeButton.hidden = NO;
 
@@ -259,26 +234,22 @@
 
 #pragma mark - IBAction
 
-- (IBAction)done:(id)sender
-{
-    if (self.navigationController.viewControllers.firstObject != self)
-        return;
+- (IBAction)done:(id)sender {
+    if (self.navigationController.viewControllers.firstObject != self) return;
 
     self.navigationController.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
     [self.navigationController.presentingViewController.presentingViewController dismissViewControllerAnimated:YES
                                                                                                     completion:nil];
 }
 
-- (IBAction)toggleWrite:(id)sender
-{
+- (IBAction)toggleWrite:(id)sender {
     NSUserDefaults *defs = [NSUserDefaults standardUserDefaults];
 
     if ([defs boolForKey:WALLET_NEEDS_BACKUP_KEY]) {
         [self.toolbar setItems:@[ self.toolbar.items[0], self.doneButton ] animated:YES];
         [self.writeButton setImage:[UIImage imageNamed:@"checkbox-checked"] forState:UIControlStateNormal];
         [defs removeObjectForKey:WALLET_NEEDS_BACKUP_KEY];
-    }
-    else {
+    } else {
         [self.toolbar setItems:@[ self.toolbar.items[0], self.remindButton ] animated:YES];
         [self.writeButton setImage:[UIImage imageNamed:@"checkbox-empty"] forState:UIControlStateNormal];
         [defs setBool:YES forKey:WALLET_NEEDS_BACKUP_KEY];

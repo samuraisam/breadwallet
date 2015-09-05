@@ -36,20 +36,20 @@
 
 @class BRTransaction;
 
-@interface BRPeerManager : NSObject <BRPeerDelegate, UIAlertViewDelegate>
+@interface BRPeerManager : NSObject<BRPeerDelegate, UIAlertViewDelegate>
 
-@property (nonatomic, readonly) BOOL connected;
-@property (nonatomic, readonly) uint32_t lastBlockHeight;
-@property (nonatomic, readonly) uint32_t estimatedBlockHeight; // last block height reported by current download peer
-@property (nonatomic, readonly) double syncProgress;
-@property (nonatomic, readonly) NSUInteger peerCount; // number of connected peers
+@property(nonatomic, readonly) BOOL connected;
+@property(nonatomic, readonly) uint32_t lastBlockHeight;
+@property(nonatomic, readonly) uint32_t estimatedBlockHeight;  // last block height reported by current download peer
+@property(nonatomic, readonly) double syncProgress;
+@property(nonatomic, readonly) NSUInteger peerCount;  // number of connected peers
 
 + (instancetype)sharedInstance;
 
 - (void)connect;
 - (void)rescan;
 - (void)publishTransaction:(BRTransaction *)transaction completion:(void (^)(NSError *error))completion;
-- (NSUInteger)relayCountForTransaction:(UInt256)txHash; // number of connected peers that have relayed the transaction
-- (NSTimeInterval)timestampForBlockHeight:(uint32_t)blockHeight; // seconds since reference date, 00:00:00 01/01/01 GMT
+- (NSUInteger)relayCountForTransaction:(UInt256)txHash;  // number of connected peers that have relayed the transaction
+- (NSTimeInterval)timestampForBlockHeight:(uint32_t)blockHeight;  // seconds since reference date, 00:00:00 01/01/01 GMT
 
 @end

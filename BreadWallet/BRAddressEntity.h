@@ -28,8 +28,8 @@
 
 @interface BRAddressEntity : NSManagedObject
 
-@property (nonatomic, retain) NSString *address;
-@property (nonatomic) int32_t index;
-@property (nonatomic) BOOL internal;
+@property(nonatomic, retain) NSString *address;
+@property(nonatomic) int32_t index;
+@property(nonatomic) BOOL internal;
 
 @end

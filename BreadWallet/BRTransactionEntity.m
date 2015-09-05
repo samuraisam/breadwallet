@@ -42,15 +42,13 @@
 @dynamic outputs;
 @dynamic lockTime;
 
-+ (void)setContext:(NSManagedObjectContext *)context
-{
++ (void)setContext:(NSManagedObjectContext *)context {
     [super setContext:context];
     [BRTxInputEntity setContext:context];
     [BRTxOutputEntity setContext:context];
 }
 
-- (instancetype)setAttributesFromTx:(BRTransaction *)tx
-{
+- (instancetype)setAttributesFromTx:(BRTransaction *)tx {
     [self.managedObjectContext performBlockAndWait:^{
         NSMutableOrderedSet *inputs = [self mutableOrderedSetValueForKey:@"inputs"];
         NSMutableOrderedSet *outputs = [self mutableOrderedSetValueForKey:@"outputs"];
@@ -93,23 +91,20 @@
     return self;
 }
 
-- (BRTransaction *)transaction
-{
+- (BRTransaction *)transaction {
     BRTransaction *tx = [BRTransaction new];
 
     [self.managedObjectContext performBlockAndWait:^{
         NSData *txHash = self.txHash;
 
-        if (txHash.length == sizeof(UInt256))
-            tx.txHash = *(const UInt256 *)txHash.bytes;
+        if (txHash.length == sizeof(UInt256)) tx.txHash = *(const UInt256 *)txHash.bytes;
         tx.lockTime = self.lockTime;
         tx.blockHeight = self.blockHeight;
         tx.timestamp = self.timestamp;
 
         for (BRTxInputEntity *e in self.inputs) {
             txHash = e.txHash;
-            if (txHash.length != sizeof(UInt256))
-                continue;
+            if (txHash.length != sizeof(UInt256)) continue;
             [tx addInputHash:*(const UInt256 *)txHash.bytes
                        index:e.n
                       script:nil
@@ -125,9 +120,8 @@
     return tx;
 }
 
-- (void)deleteObject
-{
-    for (BRTxInputEntity *e in self.inputs) { // mark inputs as unspent
+- (void)deleteObject {
+    for (BRTxInputEntity *e in self.inputs) {  // mark inputs as unspent
         [[BRTxOutputEntity objectsMatching:@"txHash == %@ && n == %d", e.txHash, e.n].lastObject setSpent:NO];
     }
 

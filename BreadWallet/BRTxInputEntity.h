@@ -30,11 +30,11 @@
 
 @interface BRTxInputEntity : NSManagedObject
 
-@property (nonatomic, retain) NSData *txHash;
-@property (nonatomic) int32_t n;
-@property (nonatomic, retain) NSData *signature;
-@property (nonatomic) int32_t sequence;
-@property (nonatomic, retain) BRTransactionEntity *transaction;
+@property(nonatomic, retain) NSData *txHash;
+@property(nonatomic) int32_t n;
+@property(nonatomic, retain) NSData *signature;
+@property(nonatomic) int32_t sequence;
+@property(nonatomic, retain) BRTransactionEntity *transaction;
 
 - (instancetype)setAttributesFromTx:(BRTransaction *)tx inputIndex:(NSUInteger)index;
 

@@ -29,12 +29,12 @@
 
 #define SATOSHIS 100000000
 #define MAX_MONEY (21000000LL * SATOSHIS)
-#define BTC @"\xC9\x83" // capital B with stroke (utf-8)
-#define BITS @"\xC6\x80" // lowercase b with stroke (utf-8)
-#define NARROW_NBSP @"\xE2\x80\xAF" // narrow no-break space (utf-8)
-#define LDQUOTE @"\xE2\x80\x9C" // left double quote (utf-8)
-#define RDQUOTE @"\xE2\x80\x9D" // right double quote (utf-8)
-#define DISPLAY_NAME                                                                                                   \
+#define BTC @"\xC9\x83"              // capital B with stroke (utf-8)
+#define BITS @"\xC6\x80"             // lowercase b with stroke (utf-8)
+#define NARROW_NBSP @"\xE2\x80\xAF"  // narrow no-break space (utf-8)
+#define LDQUOTE @"\xE2\x80\x9C"      // left double quote (utf-8)
+#define RDQUOTE @"\xE2\x80\x9D"      // right double quote (utf-8)
+#define DISPLAY_NAME \
     [NSString stringWithFormat:LDQUOTE @"%@" RDQUOTE, NSBundle.mainBundle.infoDictionary[@"CFBundleDisplayName"]]
 
 #define WALLET_NEEDS_BACKUP_KEY @"WALLET_NEEDS_BACKUP"
@@ -42,34 +42,34 @@
 
 @protocol BRMnemonic;
 
-@interface BRWalletManager : NSObject <UIAlertViewDelegate, UITextFieldDelegate, UITextViewDelegate>
+@interface BRWalletManager : NSObject<UIAlertViewDelegate, UITextFieldDelegate, UITextViewDelegate>
 
-@property (nonatomic, readonly) BRWallet *wallet;
-@property (nonatomic, readonly) BOOL noWallet; // true if keychain is available and we know that no wallet exists on it
-@property (nonatomic, strong) id<BRKeySequence> sequence;
-@property (nonatomic, strong) id<BRMnemonic> mnemonic;
-@property (nonatomic, readonly) NSData *masterPublicKey; // master public key used to generate wallet addresses
-@property (nonatomic, copy) NSString *seedPhrase; // requesting seedPhrase will trigger authentication
-@property (nonatomic, readonly) NSTimeInterval seedCreationTime; // interval since refrence date, 00:00:00 01/01/01 GMT
-@property (nonatomic, readonly) NSTimeInterval secureTime; // last known time from an ssl server connection
-@property (nonatomic, assign) uint64_t spendingLimit; // amount that can be spent using touch id without pin entry
-@property (nonatomic, readonly, getter=isTouchIdEnabled) BOOL touchIdEnabled; // true if touch id is enabled
-@property (nonatomic, readonly, getter=isPasscodeEnabled) BOOL passcodeEnabled; // true if device passcode is enabled
-@property (nonatomic, assign) BOOL didAuthenticate; // true if the user authenticated after this was last set to false
-@property (nonatomic, readonly) NSNumberFormatter *format; // bitcoin currency formatter
-@property (nonatomic, readonly) NSNumberFormatter *localFormat; // local currency formatter
-@property (nonatomic, copy) NSString *localCurrencyCode; // local currency ISO code
-@property (nonatomic, readonly) double localCurrencyPrice; // exchange rate in local currency units per bitcoin
-@property (nonatomic, readonly) NSArray *currencyCodes; // list of supported local currency codes
-@property (nonatomic, readonly) NSArray *currencyNames; // names for local currency codes
+@property(nonatomic, readonly) BRWallet *wallet;
+@property(nonatomic, readonly) BOOL noWallet;  // true if keychain is available and we know that no wallet exists on it
+@property(nonatomic, strong) id<BRKeySequence> sequence;
+@property(nonatomic, strong) id<BRMnemonic> mnemonic;
+@property(nonatomic, readonly) NSData *masterPublicKey;          // master public key used to generate wallet addresses
+@property(nonatomic, copy) NSString *seedPhrase;                 // requesting seedPhrase will trigger authentication
+@property(nonatomic, readonly) NSTimeInterval seedCreationTime;  // interval since refrence date, 00:00:00 01/01/01 GMT
+@property(nonatomic, readonly) NSTimeInterval secureTime;        // last known time from an ssl server connection
+@property(nonatomic, assign) uint64_t spendingLimit;  // amount that can be spent using touch id without pin entry
+@property(nonatomic, readonly, getter=isTouchIdEnabled) BOOL touchIdEnabled;    // true if touch id is enabled
+@property(nonatomic, readonly, getter=isPasscodeEnabled) BOOL passcodeEnabled;  // true if device passcode is enabled
+@property(nonatomic, assign) BOOL didAuthenticate;  // true if the user authenticated after this was last set to false
+@property(nonatomic, readonly) NSNumberFormatter *format;       // bitcoin currency formatter
+@property(nonatomic, readonly) NSNumberFormatter *localFormat;  // local currency formatter
+@property(nonatomic, copy) NSString *localCurrencyCode;         // local currency ISO code
+@property(nonatomic, readonly) double localCurrencyPrice;       // exchange rate in local currency units per bitcoin
+@property(nonatomic, readonly) NSArray *currencyCodes;          // list of supported local currency codes
+@property(nonatomic, readonly) NSArray *currencyNames;          // names for local currency codes
 
 + (instancetype)sharedInstance;
 
-- (NSString *)generateRandomSeed; // generates a random seed, saves to keychain and returns the associated seedPhrase
-- (NSData *)seedWithPrompt:(NSString *)authprompt forAmount:(uint64_t)amount; // authenticates user and returns seed
-- (NSString *)seedPhraseWithPrompt:(NSString *)authprompt; // authenticates user and returns seedPhrase
-- (BOOL)authenticateWithPrompt:(NSString *)authprompt andTouchId:(BOOL)touchId; // prompts user to authenticate
-- (BOOL)setPin; // prompts the user to set or change wallet pin and returns true if the pin was successfully set
+- (NSString *)generateRandomSeed;  // generates a random seed, saves to keychain and returns the associated seedPhrase
+- (NSData *)seedWithPrompt:(NSString *)authprompt forAmount:(uint64_t)amount;  // authenticates user and returns seed
+- (NSString *)seedPhraseWithPrompt:(NSString *)authprompt;  // authenticates user and returns seedPhrase
+- (BOOL)authenticateWithPrompt:(NSString *)authprompt andTouchId:(BOOL)touchId;  // prompts user to authenticate
+- (BOOL)setPin;  // prompts the user to set or change wallet pin and returns true if the pin was successfully set
 
 // queries chain.com and calls the completion block with unspent outputs for the given address
 - (void)utxosForAddress:(NSString *)address

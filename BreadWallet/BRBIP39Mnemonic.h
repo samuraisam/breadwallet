@@ -31,7 +31,7 @@
 
 #define BIP39_CREATION_TIME (1388534400.0 - NSTimeIntervalSince1970)
 
-@interface BRBIP39Mnemonic : NSObject <BRMnemonic>
+@interface BRBIP39Mnemonic : NSObject<BRMnemonic>
 
 - (NSString *)encodePhrase:(NSData *)data;
 - (NSData *)decodePhrase:(NSString *)phrase;

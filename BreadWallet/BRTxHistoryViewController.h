@@ -25,7 +25,8 @@
 
 #import <UIKit/UIKit.h>
 
-@interface BRTxHistoryViewController : UITableViewController <UIAlertViewDelegate, UINavigationControllerDelegate,
-                                           UIViewControllerTransitioningDelegate, UIViewControllerAnimatedTransitioning>
+@interface BRTxHistoryViewController
+    : UITableViewController<UIAlertViewDelegate, UINavigationControllerDelegate, UIViewControllerTransitioningDelegate,
+                            UIViewControllerAnimatedTransitioning>
 
 @end

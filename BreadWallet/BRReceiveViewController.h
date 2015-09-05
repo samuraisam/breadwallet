@@ -30,11 +30,11 @@
 @class BRPaymentRequest;
 
 @interface BRReceiveViewController
-    : UIViewController <UIActionSheetDelegate, BRAmountViewControllerDelegate, MFMessageComposeViewControllerDelegate,
-          MFMailComposeViewControllerDelegate, UINavigationControllerDelegate, UIViewControllerTransitioningDelegate,
-          UIViewControllerAnimatedTransitioning>
+    : UIViewController<UIActionSheetDelegate, BRAmountViewControllerDelegate, MFMessageComposeViewControllerDelegate,
+                       MFMailComposeViewControllerDelegate, UINavigationControllerDelegate,
+                       UIViewControllerTransitioningDelegate, UIViewControllerAnimatedTransitioning>
 
-@property (nonatomic, strong) BRPaymentRequest *paymentRequest;
+@property(nonatomic, strong) BRPaymentRequest *paymentRequest;
 
 - (IBAction)tip:(id)sender;
 - (void)updateAddress;

@@ -28,8 +28,7 @@
 
 @implementation UIImage (Utils)
 
-+ (instancetype)imageWithQRCodeData:(NSData *)data size:(CGSize)size color:(CIColor *)color
-{
++ (instancetype)imageWithQRCodeData:(NSData *)data size:(CGSize)size color:(CIColor *)color {
     CIFilter *qrFilter = [CIFilter filterWithName:@"CIQRCodeGenerator"],
              *maskFilter = [CIFilter filterWithName:@"CIMaskToAlpha"],
              *invertFilter = [CIFilter filterWithName:@"CIColorInvert"],
@@ -44,8 +43,7 @@
         [invertFilter setValue:maskFilter.outputImage forKey:@"inputImage"];
         [colorFilter setValue:invertFilter.outputImage forKey:@"inputImage"];
         [colorFilter setValue:color forKey:@"inputColor0"];
-    }
-    else
+    } else
         [maskFilter setValue:qrFilter.outputImage forKey:@"inputImage"], filter = maskFilter;
 
     UIGraphicsBeginImageContext(size);
@@ -57,8 +55,8 @@
 
     if (context) {
         CGContextSetInterpolationQuality(context, kCGInterpolationNone);
-        CGContextRotateCTM(context, M_PI); // flip
-        CGContextScaleCTM(context, -1.0, 1.0); // mirror
+        CGContextRotateCTM(context, M_PI);      // flip
+        CGContextScaleCTM(context, -1.0, 1.0);  // mirror
         CGContextDrawImage(context, CGContextGetClipBoundingBox(context), img);
         image = UIGraphicsGetImageFromCurrentImageContext();
     }
@@ -68,29 +66,27 @@
     return image;
 }
 
-- (UIImage *)blurWithRadius:(CGFloat)radius
-{
+- (UIImage *)blurWithRadius:(CGFloat)radius {
     UIGraphicsBeginImageContext(self.size);
 
     CGContextRef context = UIGraphicsGetCurrentContext();
-    CGRect rect = { CGPointZero, self.size };
+    CGRect rect = {CGPointZero, self.size};
     uint32_t r = floor(radius * [UIScreen mainScreen].scale * 3.0 * sqrt(2.0 * M_PI) / 4.0 + 0.5);
 
     CGContextScaleCTM(context, 1.0, -1.0);
     CGContextTranslateCTM(context, 0.0, -self.size.height);
     CGContextDrawImage(context, rect, self.CGImage);
 
-    vImage_Buffer inbuf = { CGBitmapContextGetData(context), CGBitmapContextGetHeight(context),
-        CGBitmapContextGetWidth(context), CGBitmapContextGetBytesPerRow(context) };
+    vImage_Buffer inbuf = {CGBitmapContextGetData(context), CGBitmapContextGetHeight(context),
+                           CGBitmapContextGetWidth(context), CGBitmapContextGetBytesPerRow(context)};
 
     UIGraphicsBeginImageContext(self.size);
     context = UIGraphicsGetCurrentContext();
 
-    vImage_Buffer outbuf = { CGBitmapContextGetData(context), CGBitmapContextGetHeight(context),
-        CGBitmapContextGetWidth(context), CGBitmapContextGetBytesPerRow(context) };
+    vImage_Buffer outbuf = {CGBitmapContextGetData(context), CGBitmapContextGetHeight(context),
+                            CGBitmapContextGetWidth(context), CGBitmapContextGetBytesPerRow(context)};
 
-    if (r % 2 == 0)
-        r++; // make sure radius is odd for three box-blur method
+    if (r % 2 == 0) r++;  // make sure radius is odd for three box-blur method
     vImageBoxConvolve_ARGB8888(&inbuf, &outbuf, NULL, 0, 0, r, r, 0, kvImageEdgeExtend);
     vImageBoxConvolve_ARGB8888(&outbuf, &inbuf, NULL, 0, 0, r, r, 0, kvImageEdgeExtend);
     vImageBoxConvolve_ARGB8888(&inbuf, &outbuf, NULL, 0, 0, r, r, 0, kvImageEdgeExtend);
@@ -102,9 +98,9 @@
     context = UIGraphicsGetCurrentContext();
     CGContextScaleCTM(context, 1.0, -1.0);
     CGContextTranslateCTM(context, 0.0, -self.size.height);
-    CGContextDrawImage(context, rect, self.CGImage); // draw base image
+    CGContextDrawImage(context, rect, self.CGImage);  // draw base image
     CGContextSaveGState(context);
-    CGContextDrawImage(context, rect, img.CGImage); // draw effect image
+    CGContextDrawImage(context, rect, img.CGImage);  // draw effect image
     CGContextRestoreGState(context);
     img = UIGraphicsGetImageFromCurrentImageContext();
     UIGraphicsEndImageContext();

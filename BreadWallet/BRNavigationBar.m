@@ -27,8 +27,7 @@
 
 @implementation BRNavigationBar
 
-- (void)drawRect:(CGRect)rect
-{
+- (void)drawRect:(CGRect)rect {
     // Drawing code
 }
 

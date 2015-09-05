@@ -32,12 +32,12 @@
 
 @interface BRTransactionEntity : NSManagedObject
 
-@property (nonatomic, retain) NSData *txHash;
-@property (nonatomic) int32_t blockHeight;
-@property (nonatomic) NSTimeInterval timestamp;
-@property (nonatomic, retain) NSOrderedSet *inputs;
-@property (nonatomic, retain) NSOrderedSet *outputs;
-@property (nonatomic) int32_t lockTime;
+@property(nonatomic, retain) NSData *txHash;
+@property(nonatomic) int32_t blockHeight;
+@property(nonatomic) NSTimeInterval timestamp;
+@property(nonatomic, retain) NSOrderedSet *inputs;
+@property(nonatomic, retain) NSOrderedSet *outputs;
+@property(nonatomic) int32_t lockTime;
 
 - (instancetype)setAttributesFromTx:(BRTransaction *)tx;
 - (BRTransaction *)transaction;

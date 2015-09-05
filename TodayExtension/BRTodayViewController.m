@@ -32,33 +32,30 @@
 #define SCAN_URL @"bread://x-callback-url/scanqr"
 #define OPEN_URL @"bread://"
 
-@interface BRTodayViewController () <NCWidgetProviding>
+@interface BRTodayViewController ()<NCWidgetProviding>
 
-@property (nonatomic, weak) IBOutlet UIImageView *qrImage, *qrOverlay;
-@property (nonatomic, weak) IBOutlet UILabel *addressLabel;
-@property (nonatomic, weak) IBOutlet UIView *noDataViewContainer;
-@property (nonatomic, weak) IBOutlet UIView *topViewContainer;
-@property (nonatomic, strong) NSData *qrCodeData;
-@property (nonatomic, strong) NSUserDefaults *appGroupUserDefault;
-@property (nonatomic, strong) BRBubbleView *bubbleView;
+@property(nonatomic, weak) IBOutlet UIImageView *qrImage, *qrOverlay;
+@property(nonatomic, weak) IBOutlet UILabel *addressLabel;
+@property(nonatomic, weak) IBOutlet UIView *noDataViewContainer;
+@property(nonatomic, weak) IBOutlet UIView *topViewContainer;
+@property(nonatomic, strong) NSData *qrCodeData;
+@property(nonatomic, strong) NSUserDefaults *appGroupUserDefault;
+@property(nonatomic, strong) BRBubbleView *bubbleView;
 
 @end
 
 @implementation BRTodayViewController
 
-- (void)viewDidLoad
-{
+- (void)viewDidLoad {
     [super viewDidLoad];
 
     [self updateReceiveMoneyUI];
 }
 
-- (void)widgetPerformUpdateWithCompletionHandler:(void (^)(NCUpdateResult))completionHandler
-{
+- (void)widgetPerformUpdateWithCompletionHandler:(void (^)(NCUpdateResult))completionHandler {
     [self.bubbleView popOut];
     self.bubbleView = nil;
-    if (!completionHandler)
-        return;
+    if (!completionHandler) return;
 
     // Perform any setup necessary in order to update the view.
     NSData *data = [self.appGroupUserDefault objectForKey:APP_GROUP_REQUEST_DATA_KEY];
@@ -70,30 +67,25 @@
         self.noDataViewContainer.hidden = YES;
         self.topViewContainer.hidden = NO;
         completionHandler(NCUpdateResultNoData);
-    }
-    else if (self.qrCodeData) {
+    } else if (self.qrCodeData) {
         self.qrCodeData = data;
         self.noDataViewContainer.hidden = YES;
         self.topViewContainer.hidden = NO;
         [self updateReceiveMoneyUI];
         completionHandler(NCUpdateResultNewData);
-    }
-    else {
+    } else {
         self.noDataViewContainer.hidden = NO;
         self.topViewContainer.hidden = YES;
         completionHandler(NCUpdateResultFailed);
     }
 }
 
-- (NSUserDefaults *)appGroupUserDefault
-{
-    if (!_appGroupUserDefault)
-        _appGroupUserDefault = [[NSUserDefaults alloc] initWithSuiteName:APP_GROUP_ID];
+- (NSUserDefaults *)appGroupUserDefault {
+    if (!_appGroupUserDefault) _appGroupUserDefault = [[NSUserDefaults alloc] initWithSuiteName:APP_GROUP_ID];
     return _appGroupUserDefault;
 }
 
-- (void)updateReceiveMoneyUI
-{
+- (void)updateReceiveMoneyUI {
     self.qrCodeData = [self.appGroupUserDefault objectForKey:APP_GROUP_REQUEST_DATA_KEY];
 
     if (self.qrCodeData && self.qrImage.bounds.size.width > 0) {
@@ -108,33 +100,31 @@
 
 #pragma mark - NCWidgetProviding
 
-- (UIEdgeInsets)widgetMarginInsetsForProposedMarginInsets:(UIEdgeInsets)defaultMarginInsets { return UIEdgeInsetsZero; }
+- (UIEdgeInsets)widgetMarginInsetsForProposedMarginInsets:(UIEdgeInsets)defaultMarginInsets {
+    return UIEdgeInsetsZero;
+}
 
 #pragma mark - UI Events
 
-- (IBAction)scanButtonTapped:(UIButton *)sender
-{
+- (IBAction)scanButtonTapped:(UIButton *)sender {
     [self.extensionContext openURL:[NSURL URLWithString:SCAN_URL] completionHandler:nil];
 }
 
-- (IBAction)openAppButtonTapped:(id)sender
-{
+- (IBAction)openAppButtonTapped:(id)sender {
     [self.extensionContext openURL:[NSURL URLWithString:OPEN_URL] completionHandler:nil];
 }
 
-- (IBAction)qrImageTapped:(id)sender
-{
+- (IBAction)qrImageTapped:(id)sender {
     // UIMenuControl doesn't seem to work in an NCWidget, so use a BRBubbleView that looks nearly the same
     if (self.bubbleView) {
-        if (CGRectContainsPoint(
-                self.bubbleView.frame, [(UITapGestureRecognizer *)sender locationInView:self.bubbleView.superview])) {
+        if (CGRectContainsPoint(self.bubbleView.frame,
+                                [(UITapGestureRecognizer *)sender locationInView:self.bubbleView.superview])) {
             [UIPasteboard generalPasteboard].string = self.addressLabel.text;
         }
 
         [self.bubbleView popOut];
         self.bubbleView = nil;
-    }
-    else {
+    } else {
         self.bubbleView =
             [BRBubbleView viewWithText:NSLocalizedString(@"Copy", nil)
                               tipPoint:CGPointMake(self.addressLabel.center.x, self.addressLabel.frame.origin.y - 5.0)
@@ -143,7 +133,7 @@
         self.bubbleView.font = [UIFont systemFontOfSize:14.0];
         self.bubbleView.backgroundColor = [UIColor colorWithWhite:0.15 alpha:1.0];
         [self.addressLabel.superview addSubview:self.bubbleView];
-        [self.bubbleView becomeFirstResponder]; // this will cause bubbleview to hide when it loses firstresponder
+        [self.bubbleView becomeFirstResponder];  // this will cause bubbleview to hide when it loses firstresponder
         // status
         [UIView animateWithDuration:0.2
                          animations:^{
@@ -152,8 +142,7 @@
     }
 }
 
-- (IBAction)widgetTapped:(id)sender
-{
+- (IBAction)widgetTapped:(id)sender {
     [self.bubbleView popOut];
     self.bubbleView = nil;
 }

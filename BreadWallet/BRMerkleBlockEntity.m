@@ -61,8 +61,7 @@
     return self;
 }
 
-- (BRMerkleBlock *)merkleBlock
-{
+- (BRMerkleBlock *)merkleBlock {
     __block BRMerkleBlock *block = nil;
 
     [self.managedObjectContext performBlockAndWait:^{

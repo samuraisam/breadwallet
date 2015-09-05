@@ -31,25 +31,24 @@
 
 @interface BRAmountViewController ()
 
-@property (nonatomic, strong) IBOutlet UITextField *amountField;
-@property (nonatomic, strong) IBOutlet UILabel *localCurrencyLabel, *addressLabel;
-@property (nonatomic, strong) IBOutlet UIBarButtonItem *payButton, *lock;
-@property (nonatomic, strong) IBOutlet UIButton *delButton, *decimalButton;
-@property (nonatomic, strong) IBOutlet UIImageView *wallpaper;
-@property (nonatomic, strong) IBOutlet UIView *logo;
+@property(nonatomic, strong) IBOutlet UITextField *amountField;
+@property(nonatomic, strong) IBOutlet UILabel *localCurrencyLabel, *addressLabel;
+@property(nonatomic, strong) IBOutlet UIBarButtonItem *payButton, *lock;
+@property(nonatomic, strong) IBOutlet UIButton *delButton, *decimalButton;
+@property(nonatomic, strong) IBOutlet UIImageView *wallpaper;
+@property(nonatomic, strong) IBOutlet UIView *logo;
 
-@property (nonatomic, assign) uint64_t amount;
-@property (nonatomic, strong) NSCharacterSet *charset;
-@property (nonatomic, strong) UILabel *swapLeftLabel, *swapRightLabel;
-@property (nonatomic, assign) BOOL swapped;
-@property (nonatomic, strong) id balanceObserver, backgroundObserver;
+@property(nonatomic, assign) uint64_t amount;
+@property(nonatomic, strong) NSCharacterSet *charset;
+@property(nonatomic, strong) UILabel *swapLeftLabel, *swapRightLabel;
+@property(nonatomic, assign) BOOL swapped;
+@property(nonatomic, strong) id balanceObserver, backgroundObserver;
 
 @end
 
 @implementation BRAmountViewController
 
-- (void)viewDidLoad
-{
+- (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
 
@@ -86,11 +85,11 @@
                      queue:nil
                 usingBlock:^(NSNotification *note) {
                     if ([BRPeerManager sharedInstance].syncProgress < 1.0)
-                        return; // wait for sync before updating balance
+                        return;  // wait for sync before updating balance
 
                     self.navigationItem.title =
                         [NSString stringWithFormat:@"%@ (%@)", [m stringForAmount:m.wallet.balance],
-                                  [m localCurrencyStringForAmount:m.wallet.balance]];
+                                                   [m localCurrencyStringForAmount:m.wallet.balance]];
                 }];
 
     self.backgroundObserver =
@@ -102,28 +101,22 @@
                                                       }];
 }
 
-- (void)dealloc
-{
-    if (self.balanceObserver)
-        [[NSNotificationCenter defaultCenter] removeObserver:self.balanceObserver];
-    if (self.backgroundObserver)
-        [[NSNotificationCenter defaultCenter] removeObserver:self.backgroundObserver];
+- (void)dealloc {
+    if (self.balanceObserver) [[NSNotificationCenter defaultCenter] removeObserver:self.balanceObserver];
+    if (self.backgroundObserver) [[NSNotificationCenter defaultCenter] removeObserver:self.backgroundObserver];
 }
 
-- (void)viewWillAppear:(BOOL)animated
-{
+- (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
 
-    self.addressLabel.text
-        = (self.to.length > 0) ? [NSString stringWithFormat:NSLocalizedString(@"to: %@", nil), self.to] : nil;
+    self.addressLabel.text =
+        (self.to.length > 0) ? [NSString stringWithFormat:NSLocalizedString(@"to: %@", nil), self.to] : nil;
     self.wallpaper.hidden = NO;
 
     if (self.navigationController.viewControllers.firstObject != self) {
         self.navigationItem.leftBarButtonItem = nil;
-        if ([BRWalletManager sharedInstance].didAuthenticate)
-            [self unlock:nil];
-    }
-    else {
+        if ([BRWalletManager sharedInstance].didAuthenticate) [self unlock:nil];
+    } else {
         self.payButton.title = NSLocalizedString(@"request", nil);
         self.navigationItem.rightBarButtonItem = self.payButton;
     }
@@ -132,17 +125,14 @@
     [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationFade];
 }
 
-- (void)viewWillDisappear:(BOOL)animated
-{
+- (void)viewWillDisappear:(BOOL)animated {
     self.amount = 0;
-    if (self.navigationController.viewControllers.firstObject != self)
-        self.wallpaper.hidden = animated;
+    if (self.navigationController.viewControllers.firstObject != self) self.wallpaper.hidden = animated;
 
     [super viewWillDisappear:animated];
 }
 
-- (void)updateLocalCurrencyLabel
-{
+- (void)updateLocalCurrencyLabel {
     BRWalletManager *m = [BRWalletManager sharedInstance];
     uint64_t amount = (self.swapped) ? [m amountForLocalCurrencyString:self.amountField.text]
                                      : [m amountForString:self.amountField.text];
@@ -150,26 +140,23 @@
     self.swapLeftLabel.hidden = YES;
     self.localCurrencyLabel.hidden = NO;
     self.localCurrencyLabel.text =
-        [NSString stringWithFormat:@"(%@)",
-                  (self.swapped) ? [m stringForAmount:amount] : [m localCurrencyStringForAmount:amount]];
+        [NSString stringWithFormat:@"(%@)", (self.swapped) ? [m stringForAmount:amount]
+                                                           : [m localCurrencyStringForAmount:amount]];
     self.localCurrencyLabel.textColor = (amount > 0) ? [UIColor grayColor] : [UIColor colorWithWhite:0.75 alpha:1.0];
 }
 
 #pragma mark - IBAction
 
-- (IBAction)unlock:(id)sender
-{
+- (IBAction)unlock:(id)sender {
     BRWalletManager *manager = [BRWalletManager sharedInstance];
 
-    if (sender && !manager.didAuthenticate && ![manager authenticateWithPrompt:nil andTouchId:YES])
-        return;
+    if (sender && !manager.didAuthenticate && ![manager authenticateWithPrompt:nil andTouchId:YES]) return;
 
     self.navigationItem.titleView = nil;
     [self.navigationItem setRightBarButtonItem:self.payButton animated:(sender) ? YES : NO];
 }
 
-- (IBAction)number:(id)sender
-{
+- (IBAction)number:(id)sender {
     NSUInteger l = [self.amountField.text rangeOfCharacterFromSet:self.charset options:NSBackwardsSearch].location;
 
     l = (l < self.amountField.text.length) ? l + 1 : self.amountField.text.length;
@@ -178,8 +165,7 @@
                     replacementString:((UIButton *)sender).titleLabel.text];
 }
 
-- (IBAction)del:(id)sender
-{
+- (IBAction)del:(id)sender {
     NSUInteger l = [self.amountField.text rangeOfCharacterFromSet:self.charset options:NSBackwardsSearch].location;
 
     if (l < self.amountField.text.length) {
@@ -187,32 +173,28 @@
     }
 }
 
-- (IBAction)pay:(id)sender
-{
+- (IBAction)pay:(id)sender {
     BRWalletManager *manager = [BRWalletManager sharedInstance];
 
     self.amount = (self.swapped) ? [manager amountForLocalCurrencyString:self.amountField.text]
                                  : [manager amountForString:self.amountField.text];
 
-    if (self.amount == 0)
-        return;
+    if (self.amount == 0) return;
 
     [self.delegate amountViewController:self selectedAmount:self.amount];
 }
 
-- (IBAction)done:(id)sender
-{
+- (IBAction)done:(id)sender {
     [self.navigationController.presentingViewController dismissViewControllerAnimated:YES completion:nil];
 }
 
-- (IBAction)swapCurrency:(id)sender
-{
+- (IBAction)swapCurrency:(id)sender {
     self.swapped = !self.swapped;
 
     if (self.swapLeftLabel.hidden) {
         self.swapLeftLabel.text = self.localCurrencyLabel.text;
-        self.swapLeftLabel.textColor = (self.amountField.text.length > 0) ? self.amountField.textColor
-                                                                          : [UIColor colorWithWhite:0.75 alpha:1.0];
+        self.swapLeftLabel.textColor =
+            (self.amountField.text.length > 0) ? self.amountField.textColor : [UIColor colorWithWhite:0.75 alpha:1.0];
         self.swapLeftLabel.frame = self.localCurrencyLabel.frame;
         [self.localCurrencyLabel.superview addSubview:self.swapLeftLabel];
         self.swapLeftLabel.hidden = NO;
@@ -220,10 +202,10 @@
     }
 
     if (self.swapRightLabel.hidden) {
-        self.swapRightLabel.text = (self.amountField.text.length > 0) ? self.amountField.text
-                                                                      : self.amountField.placeholder;
-        self.swapRightLabel.textColor = (self.amountField.text.length > 0) ? self.amountField.textColor
-                                                                           : [UIColor colorWithWhite:0.75 alpha:1.0];
+        self.swapRightLabel.text =
+            (self.amountField.text.length > 0) ? self.amountField.text : self.amountField.placeholder;
+        self.swapRightLabel.textColor =
+            (self.amountField.text.length > 0) ? self.amountField.textColor : [UIColor colorWithWhite:0.75 alpha:1.0];
         self.swapRightLabel.frame = self.amountField.frame;
         [self.amountField.superview addSubview:self.swapRightLabel];
         self.swapRightLabel.hidden = NO;
@@ -237,22 +219,21 @@
         [m amountForLocalCurrencyString:(self.swapped) ? [s substringWithRange:NSMakeRange(1, s.length - 2)] : s];
 
     self.localCurrencyLabel.text =
-        [NSString stringWithFormat:@"(%@)",
-                  (self.swapped) ? [m stringForAmount:amount] : [m localCurrencyStringForAmount:amount]];
+        [NSString stringWithFormat:@"(%@)", (self.swapped) ? [m stringForAmount:amount]
+                                                           : [m localCurrencyStringForAmount:amount]];
     self.amountField.text = (self.swapped) ? [m localCurrencyStringForAmount:amount] : [m stringForAmount:amount];
 
     if (amount == 0) {
         self.amountField.placeholder = self.amountField.text;
         self.amountField.text = nil;
-    }
-    else
+    } else
         self.amountField.placeholder = nil;
 
     [self.view layoutIfNeeded];
 
-    CGPoint p = CGPointMake(self.localCurrencyLabel.frame.origin.x + self.localCurrencyLabel.bounds.size.width / 2.0
-            + self.amountField.bounds.size.width / 2.0,
-        self.localCurrencyLabel.center.y / 2.0 + self.amountField.center.y / 2.0);
+    CGPoint p = CGPointMake(self.localCurrencyLabel.frame.origin.x + self.localCurrencyLabel.bounds.size.width / 2.0 +
+                                self.amountField.bounds.size.width / 2.0,
+                            self.localCurrencyLabel.center.y / 2.0 + self.amountField.center.y / 2.0);
 
     [UIView animateWithDuration:0.1
                           delay:0.0
@@ -273,12 +254,12 @@
             self.swapLeftLabel.transform = CGAffineTransformMakeScale(0.85, 0.85);
             self.swapRightLabel.transform = CGAffineTransformMakeScale(1.0 / 0.85, 1.0 / 0.85);
             self.swapLeftLabel.text = self.localCurrencyLabel.text;
-            self.swapRightLabel.text = (self.amountField.text.length > 0) ? self.amountField.text
-                                                                          : self.amountField.placeholder;
+            self.swapRightLabel.text =
+                (self.amountField.text.length > 0) ? self.amountField.text : self.amountField.placeholder;
             self.swapLeftLabel.textColor = self.localCurrencyLabel.textColor;
             self.swapRightLabel.textColor = (self.amountField.text.length > 0)
-                ? self.amountField.textColor
-                : [UIColor colorWithWhite:0.75 alpha:1.0];
+                                                ? self.amountField.textColor
+                                                : [UIColor colorWithWhite:0.75 alpha:1.0];
             [self.swapLeftLabel sizeToFit];
             [self.swapRightLabel sizeToFit];
             self.swapLeftLabel.center = self.swapRightLabel.center = p;
@@ -307,8 +288,7 @@
         }];
 }
 
-- (IBAction)pressSwapButton:(id)sender
-{
+- (IBAction)pressSwapButton:(id)sender {
     if (self.swapLeftLabel.hidden) {
         self.swapLeftLabel.text = self.localCurrencyLabel.text;
         self.swapLeftLabel.frame = self.localCurrencyLabel.frame;
@@ -320,16 +300,16 @@
     self.swapLeftLabel.textColor = self.localCurrencyLabel.textColor;
 
     if (self.swapRightLabel.hidden) {
-        self.swapRightLabel.text = (self.amountField.text.length > 0) ? self.amountField.text
-                                                                      : self.amountField.placeholder;
+        self.swapRightLabel.text =
+            (self.amountField.text.length > 0) ? self.amountField.text : self.amountField.placeholder;
         self.swapRightLabel.frame = self.amountField.frame;
         [self.amountField.superview addSubview:self.swapRightLabel];
         self.swapRightLabel.hidden = NO;
         self.amountField.hidden = YES;
     }
 
-    self.swapRightLabel.textColor = (self.amountField.text.length > 0) ? self.amountField.textColor
-                                                                       : [UIColor colorWithWhite:0.75 alpha:1.0];
+    self.swapRightLabel.textColor =
+        (self.amountField.text.length > 0) ? self.amountField.textColor : [UIColor colorWithWhite:0.75 alpha:1.0];
 
     [UIView animateWithDuration:0.1
                      animations:^{
@@ -343,8 +323,7 @@
                      }];
 }
 
-- (IBAction)releaseSwapButton:(id)sender
-{
+- (IBAction)releaseSwapButton:(id)sender {
     [UIView animateWithDuration:0.1
         animations:^{
             // self.swapLeftLabel.transform = CGAffineTransformIdentity;
@@ -360,49 +339,43 @@
 
 - (BOOL)textField:(UITextField *)textField
     shouldChangeCharactersInRange:(NSRange)range
-                replacementString:(NSString *)string
-{
+                replacementString:(NSString *)string {
     BRWalletManager *manager = [BRWalletManager sharedInstance];
     NSNumberFormatter *numberFormatter = (self.swapped) ? manager.localFormat : manager.format;
     NSUInteger mindigits = numberFormatter.minimumFractionDigits;
     NSUInteger point = [textField.text rangeOfString:numberFormatter.currencyDecimalSeparator].location;
     NSUInteger loc;
-    NSString *textVal = textField.text ? [textField.text stringByReplacingCharactersInRange:range withString:string]
-                                       : string;
+    NSString *textVal =
+        textField.text ? [textField.text stringByReplacingCharactersInRange:range withString:string] : string;
 
     numberFormatter.minimumFractionDigits = 0;
     textVal = [numberFormatter stringFromNumber:[numberFormatter numberFromString:textVal]];
     loc = [textField.text rangeOfCharacterFromSet:self.charset options:NSBackwardsSearch].location;
     loc = (loc < textField.text.length) ? loc + 1 : textField.text.length;
 
-    if (!string.length && point != NSNotFound) { // delete trailing char
+    if (!string.length && point != NSNotFound) {  // delete trailing char
         textVal = [textField.text stringByReplacingCharactersInRange:range withString:string];
-        if ([textVal isEqual:[numberFormatter stringFromNumber:@0]])
-            textVal = @"";
-    }
-    else if ((string.length > 0 && textField.text.length > 0 && textVal == nil)
-        || (point != NSNotFound && loc - point > numberFormatter.maximumFractionDigits)) {
+        if ([textVal isEqual:[numberFormatter stringFromNumber:@0]]) textVal = @"";
+    } else if ((string.length > 0 && textField.text.length > 0 && textVal == nil) ||
+               (point != NSNotFound && loc - point > numberFormatter.maximumFractionDigits)) {
         numberFormatter.minimumFractionDigits = mindigits;
-        return NO; // too many digits
-    }
-    else if ([string isEqual:numberFormatter.currencyDecimalSeparator]
-        && (!textField.text.length || point == NSNotFound)) {
+        return NO;  // too many digits
+    } else if ([string isEqual:numberFormatter.currencyDecimalSeparator] &&
+               (!textField.text.length || point == NSNotFound)) {
         if (!textField.text.length)
-            textVal = [numberFormatter stringFromNumber:@0]; // if first char is '.', prepend a zero
+            textVal = [numberFormatter stringFromNumber:@0];  // if first char is '.', prepend a zero
         loc = [textVal rangeOfCharacterFromSet:self.charset options:NSBackwardsSearch].location;
         loc = (loc < textVal.length) ? loc + 1 : textVal.length;
         textVal = [textVal stringByReplacingCharactersInRange:NSMakeRange(loc, 0)
                                                    withString:numberFormatter.currencyDecimalSeparator];
-    }
-    else if ([string isEqual:@"0"]) {
-        if (!textField.text.length) { // if first digit is zero, append a '.'
+    } else if ([string isEqual:@"0"]) {
+        if (!textField.text.length) {  // if first digit is zero, append a '.'
             textVal = [numberFormatter stringFromNumber:@0];
             loc = [textVal rangeOfCharacterFromSet:self.charset options:NSBackwardsSearch].location;
             loc = (loc < textVal.length) ? loc + 1 : textVal.length;
             textVal = [textVal stringByReplacingCharactersInRange:NSMakeRange(loc, 0)
                                                        withString:numberFormatter.currencyDecimalSeparator];
-        }
-        else if (point != NSNotFound) { // handle multiple zeros after '.'
+        } else if (point != NSNotFound) {  // handle multiple zeros after '.'
             textVal = [textField.text stringByReplacingCharactersInRange:NSMakeRange(loc, 0) withString:@"0"];
         }
     }
@@ -418,8 +391,7 @@
     //    }
     numberFormatter.minimumFractionDigits = mindigits;
     textField.text = textVal;
-    if (textVal.length > 0 && textField.placeholder.length > 0)
-        textField.placeholder = nil;
+    if (textVal.length > 0 && textField.placeholder.length > 0) textField.placeholder = nil;
 
     if (textVal.length == 0 && textField.placeholder.length == 0) {
         textField.placeholder = (self.swapped) ? [manager localCurrencyStringForAmount:0] : [manager stringForAmount:0];
@@ -428,8 +400,7 @@
     if (self.navigationController.viewControllers.firstObject != self) {
         if (!manager.didAuthenticate && textVal.length == 0 && self.navigationItem.rightBarButtonItem != self.lock) {
             [self.navigationItem setRightBarButtonItem:self.lock animated:YES];
-        }
-        else if (textVal.length > 0 && self.navigationItem.rightBarButtonItem != self.payButton) {
+        } else if (textVal.length > 0 && self.navigationItem.rightBarButtonItem != self.payButton) {
             [self.navigationItem setRightBarButtonItem:self.payButton animated:YES];
         }
     }

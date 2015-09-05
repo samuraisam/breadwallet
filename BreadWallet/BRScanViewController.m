@@ -27,33 +27,30 @@
 
 @interface BRScanViewController ()
 
-@property (nonatomic, strong) IBOutlet UIView *cameraView;
-@property (nonatomic, strong) IBOutlet UIToolbar *toolbar;
+@property(nonatomic, strong) IBOutlet UIView *cameraView;
+@property(nonatomic, strong) IBOutlet UIToolbar *toolbar;
 
-@property (nonatomic, strong) AVCaptureSession *session;
-@property (nonatomic, strong) AVCaptureVideoPreviewLayer *preview;
-@property (nonatomic, assign) UIStatusBarStyle barStyle;
+@property(nonatomic, strong) AVCaptureSession *session;
+@property(nonatomic, strong) AVCaptureVideoPreviewLayer *preview;
+@property(nonatomic, assign) UIStatusBarStyle barStyle;
 
 @end
 
 @implementation BRScanViewController
 
-- (void)viewDidLoad
-{
+- (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
 
     AVCaptureDevice *device = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
 
-    if (!device.hasTorch)
-        self.toolbar.items = @[ self.toolbar.items[0] ];
+    if (!device.hasTorch) self.toolbar.items = @[ self.toolbar.items[0] ];
 
     [self.toolbar setBackgroundImage:[UIImage new] forToolbarPosition:UIBarPositionAny barMetrics:UIBarMetricsDefault];
     [self.toolbar setShadowImage:[UIImage new] forToolbarPosition:UIToolbarPositionAny];
 }
 
-- (void)viewWillAppear:(BOOL)animated
-{
+- (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
 
     self.barStyle = [UIApplication sharedApplication].statusBarStyle;
@@ -63,11 +60,11 @@
         [[[UIAlertView alloc]
                 initWithTitle:[NSString
                                   stringWithFormat:NSLocalizedString(@"%@ is not allowed to access the camera", nil),
-                                  NSBundle.mainBundle.infoDictionary[@"CFBundleDisplayName"]]
+                                                   NSBundle.mainBundle.infoDictionary[@"CFBundleDisplayName"]]
                       message:[NSString stringWithFormat:NSLocalizedString(@"\nallow camera access in\n"
                                                                             "Settings->Privacy->Camera->%@",
-                                                             nil),
-                                        NSBundle.mainBundle.infoDictionary[@"CFBundleDisplayName"]]
+                                                                           nil),
+                                                         NSBundle.mainBundle.infoDictionary[@"CFBundleDisplayName"]]
                      delegate:nil
             cancelButtonTitle:NSLocalizedString(@"ok", nil)
             otherButtonTitles:nil] show];
@@ -79,8 +76,7 @@
     AVCaptureDeviceInput *input = [AVCaptureDeviceInput deviceInputWithDevice:device error:&error];
     AVCaptureMetadataOutput *output = [AVCaptureMetadataOutput new];
 
-    if (error)
-        NSLog(@"%@", error.localizedDescription);
+    if (error) NSLog(@"%@", error.localizedDescription);
 
     if ([device lockForConfiguration:&error]) {
         if (device.isAutoFocusRangeRestrictionSupported) {
@@ -95,8 +91,7 @@
     }
 
     self.session = [AVCaptureSession new];
-    if (input)
-        [self.session addInput:input];
+    if (input) [self.session addInput:input];
     [self.session addOutput:output];
     [output setMetadataObjectsDelegate:self.delegate queue:dispatch_get_main_queue()];
 
@@ -114,15 +109,13 @@
     });
 }
 
-- (void)viewWillDisappear:(BOOL)animated
-{
+- (void)viewWillDisappear:(BOOL)animated {
     [[UIApplication sharedApplication] setStatusBarStyle:self.barStyle animated:animated];
 
     [super viewWillDisappear:animated];
 }
 
-- (void)viewDidDisappear:(BOOL)animated
-{
+- (void)viewDidDisappear:(BOOL)animated {
     [self.session stopRunning];
     self.session = nil;
     [self.preview removeFromSuperlayer];
@@ -131,12 +124,13 @@
     [super viewDidDisappear:animated];
 }
 
-- (void)stop { [self.session removeOutput:self.session.outputs.firstObject]; }
+- (void)stop {
+    [self.session removeOutput:self.session.outputs.firstObject];
+}
 
 #pragma mark - IBAction
 
-- (IBAction)flash:(id)sender
-{
+- (IBAction)flash:(id)sender {
     NSError *error = nil;
     AVCaptureDevice *device = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
 
@@ -146,6 +140,8 @@
     }
 }
 
-- (IBAction)done:(id)sender { [self.presentingViewController dismissViewControllerAnimated:YES completion:nil]; }
+- (IBAction)done:(id)sender {
+    [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
+}
 
 @end

@@ -29,22 +29,21 @@
 
 @interface BRWelcomeViewController ()
 
-@property (nonatomic, assign) BOOL hasAppeared, animating;
-@property (nonatomic, strong) id foregroundObserver, backgroundObserver;
-@property (nonatomic, strong) UINavigationController *seedNav;
+@property(nonatomic, assign) BOOL hasAppeared, animating;
+@property(nonatomic, strong) id foregroundObserver, backgroundObserver;
+@property(nonatomic, strong) UINavigationController *seedNav;
 
-@property (nonatomic, strong) IBOutlet UIView *paralax, *wallpaper;
-@property (nonatomic, strong) IBOutlet UILabel *startLabel, *recoverLabel, *warningLabel;
-@property (nonatomic, strong) IBOutlet UIButton *newwalletButton, *recoverButton, *generateButton, *showButton;
-@property (nonatomic, strong) IBOutlet NSLayoutConstraint *logoXCenter, *walletXCenter, *restoreXCenter, *paralaxXLeft,
+@property(nonatomic, strong) IBOutlet UIView *paralax, *wallpaper;
+@property(nonatomic, strong) IBOutlet UILabel *startLabel, *recoverLabel, *warningLabel;
+@property(nonatomic, strong) IBOutlet UIButton *newwalletButton, *recoverButton, *generateButton, *showButton;
+@property(nonatomic, strong) IBOutlet NSLayoutConstraint *logoXCenter, *walletXCenter, *restoreXCenter, *paralaxXLeft,
     *wallpaperXLeft;
 
 @end
 
 @implementation BRWelcomeViewController
 
-- (void)viewDidLoad
-{
+- (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
 
@@ -77,18 +76,13 @@
                                                       }];
 }
 
-- (void)dealloc
-{
-    if (self.navigationController.delegate == self)
-        self.navigationController.delegate = nil;
-    if (self.foregroundObserver)
-        [[NSNotificationCenter defaultCenter] removeObserver:self.foregroundObserver];
-    if (self.backgroundObserver)
-        [[NSNotificationCenter defaultCenter] removeObserver:self.backgroundObserver];
+- (void)dealloc {
+    if (self.navigationController.delegate == self) self.navigationController.delegate = nil;
+    if (self.foregroundObserver) [[NSNotificationCenter defaultCenter] removeObserver:self.foregroundObserver];
+    if (self.backgroundObserver) [[NSNotificationCenter defaultCenter] removeObserver:self.backgroundObserver];
 }
 
-- (void)viewWillAppear:(BOOL)animated
-{
+- (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
 
     [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent animated:animated];
@@ -96,18 +90,16 @@
     if (self.hasAppeared) {
         self.logoXCenter.constant = self.view.frame.size.width;
         self.navigationItem.titleView.hidden = NO;
-    }
-    else {
+    } else {
         self.walletXCenter.constant = -self.view.frame.size.width;
         self.restoreXCenter.constant = -self.view.frame.size.width;
     }
 }
 
-- (void)viewDidAppear:(BOOL)animated
-{
+- (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
 
-    dispatch_async(dispatch_get_main_queue(), ^{ // animation sometimes doesn't work if run directly in viewDidAppear
+    dispatch_async(dispatch_get_main_queue(), ^{  // animation sometimes doesn't work if run directly in viewDidAppear
 #if SNAPSHOT
         [[UIApplication sharedApplication] setStatusBarHidden:NO];
         self.navigationItem.titleView.hidden = NO;
@@ -118,7 +110,7 @@
         return;
 #endif
 
-        if (![BRWalletManager sharedInstance].noWallet) { // sanity check
+        if (![BRWalletManager sharedInstance].noWallet) {  // sanity check
             [self.navigationController.presentingViewController dismissViewControllerAnimated:NO completion:nil];
         }
 
@@ -167,8 +159,7 @@
     });
 }
 
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
-{
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
     [super prepareForSegue:segue sender:sender];
 
     //    [segue.destinationViewController setTransitioningDelegate:self];
@@ -206,7 +197,7 @@
                                                              "phrase or they can spend your bitcoins.\n"]
                           withString:NSLocalizedString(@"\nDO NOT let anyone see your recovery\n"
                                                         "phrase or they can spend your bitcoins.\n",
-                                         nil)];
+                                                       nil)];
         [s replaceCharactersInRange:
                 [s.string rangeOfString:@"\nNEVER type your recovery phrase into\n"
                                          "password managers or elsewhere.\nOther devices may be infected.\n"]
@@ -218,10 +209,8 @@
     }
 }
 
-- (void)animateWallpaper
-{
-    if (self.animating)
-        return;
+- (void)animateWallpaper {
+    if (self.animating) return;
     self.animating = YES;
     self.wallpaperXLeft.constant = -240.0;
 
@@ -238,8 +227,7 @@
 
 #pragma mark IBAction
 
-- (IBAction)generate:(id)sender
-{
+- (IBAction)generate:(id)sender {
     if (![BRWalletManager sharedInstance].passcodeEnabled) {
         [[[UIAlertView alloc]
                 initWithTitle:NSLocalizedString(@"turn device passcode on", nil)
@@ -268,8 +256,7 @@
                      }];
 }
 
-- (IBAction)show:(id)sender
-{
+- (IBAction)show:(id)sender {
     [self.navigationController presentViewController:self.seedNav
                                             animated:YES
                                           completion:^{
@@ -286,11 +273,12 @@
 
 // This is used for percent driven interactive transitions, as well as for container controllers that have companion
 // animations that might need to synchronize with the main animation.
-- (NSTimeInterval)transitionDuration:(id<UIViewControllerContextTransitioning>)transitionContext { return 0.35; }
+- (NSTimeInterval)transitionDuration:(id<UIViewControllerContextTransitioning>)transitionContext {
+    return 0.35;
+}
 
 // This method can only be a nop if the transition is interactive and not a percentDriven interactive transition.
-- (void)animateTransition:(id<UIViewControllerContextTransitioning>)transitionContext
-{
+- (void)animateTransition:(id<UIViewControllerContextTransitioning>)transitionContext {
     UIView *v = transitionContext.containerView;
     UIViewController *to = [transitionContext viewControllerForKey:UITransitionContextToViewControllerKey],
                      *from = [transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
@@ -312,8 +300,7 @@
             [self.paralax.superview layoutIfNeeded];
         }
         completion:^(BOOL finished) {
-            if (to == self)
-                [from.view removeFromSuperview];
+            if (to == self) [from.view removeFromSuperview];
             [transitionContext completeTransition:YES];
         }];
 }
@@ -323,8 +310,7 @@
 - (id<UIViewControllerAnimatedTransitioning>)navigationController:(UINavigationController *)navigationController
                                   animationControllerForOperation:(UINavigationControllerOperation)operation
                                                fromViewController:(UIViewController *)fromVC
-                                                 toViewController:(UIViewController *)toVC
-{
+                                                 toViewController:(UIViewController *)toVC {
     return self;
 }
 
@@ -334,13 +320,11 @@
 
 - (id<UIViewControllerAnimatedTransitioning>)animationControllerForPresentedController:(UIViewController *)presented
                                                                   presentingController:(UIViewController *)presenting
-                                                                      sourceController:(UIViewController *)source
-{
+                                                                      sourceController:(UIViewController *)source {
     return self;
 }
 
-- (id<UIViewControllerAnimatedTransitioning>)animationControllerForDismissedController:(UIViewController *)dismissed
-{
+- (id<UIViewControllerAnimatedTransitioning>)animationControllerForDismissedController:(UIViewController *)dismissed {
     return self;
 }
 

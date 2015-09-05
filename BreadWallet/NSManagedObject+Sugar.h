@@ -61,14 +61,14 @@
 // sets a different context for NSManagedObject+Sugar methods to use for this type of entity
 + (void)setContext:(NSManagedObjectContext *)context;
 
-+ (void)saveContext; // persists changes (this is called automatically for the main context when the app terminates)
++ (void)saveContext;  // persists changes (this is called automatically for the main context when the app terminates)
 
-+ (NSString *)entityName; // override this if entity name differs from class name
++ (NSString *)entityName;  // override this if entity name differs from class name
 + (NSFetchRequest *)fetchRequest;
 + (NSFetchedResultsController *)fetchedResultsController:(NSFetchRequest *)request;
 
-- (id)objectForKeyedSubscript:(id<NSCopying>)key; // id value = entity[@"key"]; thread safe valueForKey:
-- (void)setObject:(id)obj forKeyedSubscript:(id<NSCopying>)key; // entity[@"key"] = value; thread safe setValue:forKey:
+- (id)objectForKeyedSubscript:(id<NSCopying>)key;                // id value = entity[@"key"]; thread safe valueForKey:
+- (void)setObject:(id)obj forKeyedSubscript:(id<NSCopying>)key;  // entity[@"key"] = value; thread safe setValue:forKey:
 - (void)deleteObject;
 
 @end

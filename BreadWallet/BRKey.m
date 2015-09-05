@@ -40,8 +40,7 @@
 static secp256k1_context_t *_ctx = NULL;
 
 // add 256bit big endian ints (mod secp256k1 order)
-UInt256 secp256k1_mod_add(UInt256 a, UInt256 b)
-{
+UInt256 secp256k1_mod_add(UInt256 a, UInt256 b) {
     secp256k1_scalar_t as, bs, rs;
     UInt256 r;
 
@@ -56,8 +55,7 @@ UInt256 secp256k1_mod_add(UInt256 a, UInt256 b)
 }
 
 // multiply 256bit big endian ints (mod secp256k1 order)
-UInt256 secp256k1_mod_mul(UInt256 a, UInt256 b)
-{
+UInt256 secp256k1_mod_mul(UInt256 a, UInt256 b) {
     secp256k1_scalar_t as, bs, rs;
     UInt256 r;
 
@@ -72,16 +70,13 @@ UInt256 secp256k1_mod_mul(UInt256 a, UInt256 b)
 }
 
 // add secp256k1 ec-points
-int secp256k1_point_add(void *r, const void *a, const void *b, int compressed)
-{
+int secp256k1_point_add(void *r, const void *a, const void *b, int compressed) {
     secp256k1_ge_t ap, bp, rp;
     secp256k1_gej_t aj, rj;
     int size = 0;
 
-    if (!secp256k1_eckey_pubkey_parse(&ap, a, 33))
-        return 0;
-    if (!secp256k1_eckey_pubkey_parse(&bp, b, 33))
-        return 0;
+    if (!secp256k1_eckey_pubkey_parse(&ap, a, 33)) return 0;
+    if (!secp256k1_eckey_pubkey_parse(&bp, b, 33)) return 0;
     secp256k1_gej_set_ge(&aj, &ap);
     secp256k1_ge_clear(&ap);
     secp256k1_gej_add_ge(&rj, &aj, &bp);
@@ -95,13 +90,11 @@ int secp256k1_point_add(void *r, const void *a, const void *b, int compressed)
 }
 
 // multiply ec-point by 256bit big endian int
-int secp256k1_point_mul(void *r, const void *p, UInt256 i, int compressed)
-{
+int secp256k1_point_mul(void *r, const void *p, UInt256 i, int compressed) {
     static dispatch_once_t onceToken = 0;
 
     dispatch_once(&onceToken, ^{
-        if (!_ctx)
-            _ctx = secp256k1_context_create(SECP256K1_CONTEXT_SIGN | SECP256K1_CONTEXT_VERIFY);
+        if (!_ctx) _ctx = secp256k1_context_create(SECP256K1_CONTEXT_SIGN | SECP256K1_CONTEXT_VERIFY);
     });
 
     secp256k1_scalar_t is, zs;
@@ -112,15 +105,13 @@ int secp256k1_point_mul(void *r, const void *p, UInt256 i, int compressed)
     secp256k1_scalar_set_b32(&is, (const unsigned char *)&i, NULL);
 
     if (p) {
-        if (!secp256k1_eckey_pubkey_parse(&pp, p, 33))
-            return 0;
+        if (!secp256k1_eckey_pubkey_parse(&pp, p, 33)) return 0;
         secp256k1_gej_set_ge(&pj, &pp);
         secp256k1_ge_clear(&pp);
         secp256k1_scalar_clear(&zs);
         secp256k1_ecmult(&_ctx->ecmult_ctx, &rj, &pj, &is, &zs);
         secp256k1_gej_clear(&pj);
-    }
-    else
+    } else
         secp256k1_ecmult_gen(&_ctx->ecmult_gen_ctx, &rj, &is);
 
     secp256k1_scalar_clear(&is);
@@ -133,57 +124,53 @@ int secp256k1_point_mul(void *r, const void *p, UInt256 i, int compressed)
 
 @interface BRKey ()
 
-@property (nonatomic, assign) UInt256 seckey;
-@property (nonatomic, strong) NSData *pubkey;
-@property (nonatomic, assign) BOOL compressed;
+@property(nonatomic, assign) UInt256 seckey;
+@property(nonatomic, strong) NSData *pubkey;
+@property(nonatomic, assign) BOOL compressed;
 
 @end
 
 @implementation BRKey
 
-+ (instancetype)keyWithPrivateKey:(NSString *)privateKey { return [[self alloc] initWithPrivateKey:privateKey]; }
++ (instancetype)keyWithPrivateKey:(NSString *)privateKey {
+    return [[self alloc] initWithPrivateKey:privateKey];
+}
 
-+ (instancetype)keyWithSecret:(UInt256)secret compressed:(BOOL)compressed
-{
++ (instancetype)keyWithSecret:(UInt256)secret compressed:(BOOL)compressed {
     return [[self alloc] initWithSecret:secret compressed:compressed];
 }
 
-+ (instancetype)keyWithPublicKey:(NSData *)publicKey { return [[self alloc] initWithPublicKey:publicKey]; }
++ (instancetype)keyWithPublicKey:(NSData *)publicKey {
+    return [[self alloc] initWithPublicKey:publicKey];
+}
 
-- (instancetype)init
-{
+- (instancetype)init {
     static dispatch_once_t onceToken = 0;
 
     dispatch_once(&onceToken, ^{
-        if (!_ctx)
-            _ctx = secp256k1_context_create(SECP256K1_CONTEXT_SIGN | SECP256K1_CONTEXT_VERIFY);
+        if (!_ctx) _ctx = secp256k1_context_create(SECP256K1_CONTEXT_SIGN | SECP256K1_CONTEXT_VERIFY);
     });
 
     return (self = [super init]);
 }
 
-- (instancetype)initWithSecret:(UInt256)secret compressed:(BOOL)compressed
-{
-    if (!(self = [self init]))
-        return nil;
+- (instancetype)initWithSecret:(UInt256)secret compressed:(BOOL)compressed {
+    if (!(self = [self init])) return nil;
 
     _seckey = secret;
     _compressed = compressed;
     return (secp256k1_ec_seckey_verify(_ctx, (const unsigned char *)&_seckey)) ? self : nil;
 }
 
-- (instancetype)initWithPrivateKey:(NSString *)privateKey
-{
-    if (!(self = [self init]))
-        return nil;
+- (instancetype)initWithPrivateKey:(NSString *)privateKey {
+    if (!(self = [self init])) return nil;
 
     // mini private key format
     if ((privateKey.length == 30 || privateKey.length == 22) && [privateKey characterAtIndex:0] == 'S') {
-        if (![privateKey isValidBitcoinPrivateKey])
-            return nil;
+        if (![privateKey isValidBitcoinPrivateKey]) return nil;
 
-        _seckey = [CFBridgingRelease(CFStringCreateExternalRepresentation(
-            SecureAllocator(), (CFStringRef)privateKey, kCFStringEncodingUTF8, 0)) SHA256];
+        _seckey = [CFBridgingRelease(CFStringCreateExternalRepresentation(SecureAllocator(), (CFStringRef)privateKey,
+                                                                          kCFStringEncodingUTF8, 0)) SHA256];
         _compressed = NO;
         return self;
     }
@@ -195,35 +182,28 @@ int secp256k1_point_mul(void *r, const void *p, UInt256 i, int compressed)
     version = BITCOIN_PRIVKEY_TEST;
 #endif
 
-    if (!d || d.length == 28)
-        d = privateKey.base58ToData;
-    if (d.length < sizeof(UInt256) || d.length > sizeof(UInt256) + 2)
-        d = privateKey.hexToData;
+    if (!d || d.length == 28) d = privateKey.base58ToData;
+    if (d.length < sizeof(UInt256) || d.length > sizeof(UInt256) + 2) d = privateKey.hexToData;
 
     if ((d.length == sizeof(UInt256) + 1 || d.length == sizeof(UInt256) + 2) && *(const uint8_t *)d.bytes == version) {
         _seckey = *(const UInt256 *)((const uint8_t *)d.bytes + 1);
         _compressed = (d.length == sizeof(UInt256) + 2) ? YES : NO;
-    }
-    else if (d.length == sizeof(UInt256))
+    } else if (d.length == sizeof(UInt256))
         _seckey = *(const UInt256 *)d.bytes;
 
     return (secp256k1_ec_seckey_verify(_ctx, (const unsigned char *)&_seckey)) ? self : nil;
 }
 
-- (instancetype)initWithPublicKey:(NSData *)publicKey
-{
-    if (!(self = [self init]))
-        return nil;
+- (instancetype)initWithPublicKey:(NSData *)publicKey {
+    if (!(self = [self init])) return nil;
 
     self.pubkey = publicKey;
     self.compressed = (self.pubkey.length == 33) ? YES : NO;
     return (secp256k1_ec_pubkey_verify(_ctx, self.publicKey.bytes, (int)self.publicKey.length)) ? self : nil;
 }
 
-- (NSString *)privateKey
-{
-    if (uint256_is_zero(_seckey))
-        return nil;
+- (NSString *)privateKey {
+    if (uint256_is_zero(_seckey)) return nil;
 
     NSMutableData *d = [NSMutableData secureDataWithCapacity:sizeof(UInt256) + 2];
     uint8_t version = BITCOIN_PRIVKEY;
@@ -234,13 +214,11 @@ int secp256k1_point_mul(void *r, const void *p, UInt256 i, int compressed)
 
     [d appendBytes:&version length:1];
     [d appendBytes:&_seckey length:sizeof(_seckey)];
-    if (self.compressed)
-        [d appendBytes:"\x01" length:1];
+    if (self.compressed) [d appendBytes:"\x01" length:1];
     return [NSString base58checkWithData:d];
 }
 
-- (NSData *)publicKey
-{
+- (NSData *)publicKey {
     if (!self.pubkey.length && !uint256_is_zero(_seckey)) {
         NSMutableData *d = [NSMutableData secureDataWithLength:self.compressed ? 33 : 65];
         int len = 0;
@@ -253,10 +231,11 @@ int secp256k1_point_mul(void *r, const void *p, UInt256 i, int compressed)
     return self.pubkey;
 }
 
-- (UInt160)hash160 { return self.publicKey.hash160; }
+- (UInt160)hash160 {
+    return self.publicKey.hash160;
+}
 
-- (NSString *)address
-{
+- (NSString *)address {
     NSMutableData *d = [NSMutableData secureDataWithCapacity:160 / 8 + 1];
     uint8_t version = BITCOIN_PUBKEY_ADDRESS;
     UInt160 hash160 = self.hash160;
@@ -270,8 +249,7 @@ int secp256k1_point_mul(void *r, const void *p, UInt256 i, int compressed)
     return [NSString base58checkWithData:d];
 }
 
-- (NSData *)sign:(UInt256)md
-{
+- (NSData *)sign:(UInt256)md {
     if (uint256_is_zero(_seckey)) {
         NSLog(@"%s: can't sign with a public key", __func__);
         return nil;
@@ -281,21 +259,19 @@ int secp256k1_point_mul(void *r, const void *p, UInt256 i, int compressed)
     int len = (int)s.length;
 
     if (secp256k1_ecdsa_sign(_ctx, md.u8, s.mutableBytes, &len, (const unsigned char *)&_seckey,
-            secp256k1_nonce_function_rfc6979, NULL)) {
+                             secp256k1_nonce_function_rfc6979, NULL)) {
         s.length = len;
         return s;
-    }
-    else
+    } else
         return nil;
 }
 
-- (BOOL)verify:(UInt256)md signature:(NSData *)sig
-{
+- (BOOL)verify:(UInt256)md signature:(NSData *)sig {
     // success is 1, all other values are fail
-    return (secp256k1_ecdsa_verify(
-                _ctx, md.u8, sig.bytes, (int)sig.length, self.publicKey.bytes, (int)self.publicKey.length) == 1)
-        ? YES
-        : NO;
+    return (secp256k1_ecdsa_verify(_ctx, md.u8, sig.bytes, (int)sig.length, self.publicKey.bytes,
+                                   (int)self.publicKey.length) == 1)
+               ? YES
+               : NO;
 }
 
 @end

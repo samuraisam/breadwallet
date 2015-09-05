@@ -29,7 +29,7 @@
 
 @interface BRTxDetailViewController : UITableViewController
 
-@property (nonatomic, strong) BRTransaction *transaction;
-@property (nonatomic, strong) NSString *txDateString;
+@property(nonatomic, strong) BRTransaction *transaction;
+@property(nonatomic, strong) NSString *txDateString;
 
 @end

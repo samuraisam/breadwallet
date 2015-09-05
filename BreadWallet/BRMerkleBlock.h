@@ -25,33 +25,33 @@
 
 #import <Foundation/Foundation.h>
 
-#define BLOCK_DIFFICULTY_INTERVAL 2016 // number of blocks between difficulty target adjustments
+#define BLOCK_DIFFICULTY_INTERVAL 2016  // number of blocks between difficulty target adjustments
 #define BLOCK_UNKNOWN_HEIGHT INT32_MAX
 
 typedef union _UInt256 UInt256;
 
 @interface BRMerkleBlock : NSObject
 
-@property (nonatomic, readonly) UInt256 blockHash;
-@property (nonatomic, readonly) uint32_t version;
-@property (nonatomic, readonly) UInt256 prevBlock;
-@property (nonatomic, readonly) UInt256 merkleRoot;
-@property (nonatomic, readonly) uint32_t timestamp; // time interval since unix epoch
-@property (nonatomic, readonly) uint32_t target;
-@property (nonatomic, readonly) uint32_t nonce;
-@property (nonatomic, readonly) uint32_t totalTransactions;
-@property (nonatomic, readonly) NSData *hashes;
-@property (nonatomic, readonly) NSData *flags;
-@property (nonatomic, assign) uint32_t height;
+@property(nonatomic, readonly) UInt256 blockHash;
+@property(nonatomic, readonly) uint32_t version;
+@property(nonatomic, readonly) UInt256 prevBlock;
+@property(nonatomic, readonly) UInt256 merkleRoot;
+@property(nonatomic, readonly) uint32_t timestamp;  // time interval since unix epoch
+@property(nonatomic, readonly) uint32_t target;
+@property(nonatomic, readonly) uint32_t nonce;
+@property(nonatomic, readonly) uint32_t totalTransactions;
+@property(nonatomic, readonly) NSData *hashes;
+@property(nonatomic, readonly) NSData *flags;
+@property(nonatomic, assign) uint32_t height;
 
-@property (nonatomic, readonly) NSArray *txHashes; // the matched tx hashes in the block
+@property(nonatomic, readonly) NSArray *txHashes;  // the matched tx hashes in the block
 
 // true if merkle tree and timestamp are valid, and proof-of-work matches the stated difficulty target
 // NOTE: This only checks if the block difficulty matches the difficulty target in the header. It does not check if the
 // target is correct for the block's height in the chain. Use verifyDifficultyFromPreviousBlock: for that.
-@property (nonatomic, readonly, getter=isValid) BOOL valid;
+@property(nonatomic, readonly, getter=isValid) BOOL valid;
 
-@property (nonatomic, readonly, getter=toData) NSData *data;
+@property(nonatomic, readonly, getter=toData) NSData *data;
 
 // message can be either a merkleblock or header message
 + (instancetype)blockWithMessage:(NSData *)message;

@@ -25,7 +25,7 @@
 
 #import <Foundation/Foundation.h>
 
-@protocol BRMnemonic <NSObject>
+@protocol BRMnemonic<NSObject>
 @required
 
 - (NSString *)encodePhrase:(NSData *)data;
