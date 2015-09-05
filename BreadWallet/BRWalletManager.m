@@ -71,17 +71,17 @@
 
 static BOOL setKeychainData(NSData *data, NSString *key, BOOL authenticated)
 {
-    if (! key) return NO;
-
+    if (!key) return NO;
+    
     id accessible = (authenticated) ? (__bridge id)kSecAttrAccessibleWhenUnlockedThisDeviceOnly :
-                    (__bridge id)kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly;
+    (__bridge id)kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly;
     NSDictionary *query = @{(__bridge id)kSecClass:(__bridge id)kSecClassGenericPassword,
                             (__bridge id)kSecAttrService:SEC_ATTR_SERVICE,
                             (__bridge id)kSecAttrAccount:key};
     
     if (SecItemCopyMatching((__bridge CFDictionaryRef)query, NULL) == errSecItemNotFound) {
-        if (! data) return YES;
-
+        if (!data) return YES;
+        
         NSDictionary *item = @{(__bridge id)kSecClass:(__bridge id)kSecClassGenericPassword,
                                (__bridge id)kSecAttrService:SEC_ATTR_SERVICE,
                                (__bridge id)kSecAttrAccount:key,
@@ -94,14 +94,14 @@ static BOOL setKeychainData(NSData *data, NSString *key, BOOL authenticated)
         return NO;
     }
     
-    if (! data) {
+    if (!data) {
         OSStatus status = SecItemDelete((__bridge CFDictionaryRef)query);
-
+        
         if (status == noErr) return YES;
         NSLog(@"SecItemDelete error status %d", (int)status);
         return NO;
     }
-
+    
     NSDictionary *update = @{(__bridge id)kSecAttrAccessible:accessible,
                              (__bridge id)kSecValueData:data};
     OSStatus status = SecItemUpdate((__bridge CFDictionaryRef)query, (__bridge CFDictionaryRef)update);
@@ -119,11 +119,11 @@ static NSData *getKeychainData(NSString *key, NSError **error)
                             (__bridge id)kSecReturnData:@YES};
     CFDataRef result = nil;
     OSStatus status = SecItemCopyMatching((__bridge CFDictionaryRef)query, (CFTypeRef *)&result);
-
+    
     if (status == errSecItemNotFound) return nil;
     if (status == noErr) return CFBridgingRelease(result);
     if (error) *error = [NSError errorWithDomain:@"BreadWallet" code:status
-                         userInfo:@{NSLocalizedDescriptionKey:@"SecItemCopyMatching error"}];
+                                        userInfo:@{NSLocalizedDescriptionKey:@"SecItemCopyMatching error"}];
     return nil;
 }
 
@@ -131,7 +131,7 @@ static BOOL setKeychainInt(int64_t i, NSString *key, BOOL authenticated)
 {
     @autoreleasepool {
         NSMutableData *d = [NSMutableData secureDataWithLength:sizeof(int64_t)];
-
+        
         *(int64_t *)d.mutableBytes = i;
         return setKeychainData(d, key, authenticated);
     }
@@ -141,7 +141,7 @@ static int64_t getKeychainInt(NSString *key, NSError **error)
 {
     @autoreleasepool {
         NSData *d = getKeychainData(key, error);
-
+        
         return (d.length == sizeof(int64_t)) ? *(int64_t *)d.bytes : 0;
     }
 }
@@ -166,7 +166,7 @@ static NSString *getKeychainString(NSString *key, NSError **error)
     }
 }
 
-@interface BRWalletManager()
+@interface BRWalletManager ()
 
 @property (nonatomic, strong) BRWallet *wallet;
 @property (nonatomic, strong) Reachability *reachability;
@@ -188,18 +188,18 @@ static NSString *getKeychainString(NSString *key, NSError **error)
 {
     static id singleton = nil;
     static dispatch_once_t onceToken = 0;
-
+    
     dispatch_once(&onceToken, ^{
         singleton = [self new];
     });
-
+    
     return singleton;
 }
 
 - (instancetype)init
 {
-    if (! (self = [super init])) return nil;
-
+    if (!(self = [super init])) return nil;
+    
     [NSManagedObject setConcurrencyType:NSPrivateQueueConcurrencyType];
     self.sequence = [BRBIP32Sequence new];
     self.mnemonic = [BRBIP39Mnemonic new];
@@ -222,14 +222,14 @@ static NSString *getKeychainString(NSString *key, NSError **error)
     self.localFormat.numberStyle = NSNumberFormatterCurrencyStyle;
     self.localFormat.generatesDecimalNumbers = YES;
     self.localFormat.negativeFormat = self.format.negativeFormat;
-
+    
     self.protectedObserver =
-        [[NSNotificationCenter defaultCenter] addObserverForName:UIApplicationProtectedDataDidBecomeAvailable object:nil
-        queue:nil usingBlock:^(NSNotification *note) {
-            [self protectedInit];
-        }];
-
-    if ([UIApplication sharedApplication].protectedDataAvailable) [self protectedInit];
+    [[NSNotificationCenter defaultCenter] addObserverForName:UIApplicationProtectedDataDidBecomeAvailable object:nil
+                                                       queue:nil usingBlock:^(NSNotification *note) {
+                                                           [self protectedInit];
+                                                       }];
+    
+    if ([UIApplication sharedApplication].protectedDataAvailable)[self protectedInit];
     return self;
 }
 
@@ -237,33 +237,33 @@ static NSString *getKeychainString(NSString *key, NSError **error)
 {
     NSUserDefaults *defs = [NSUserDefaults standardUserDefaults];
     
-    if (self.protectedObserver) [[NSNotificationCenter defaultCenter] removeObserver:self.protectedObserver];
+    if (self.protectedObserver)[[NSNotificationCenter defaultCenter] removeObserver:self.protectedObserver];
     self.protectedObserver = nil;
     _currencyCodes = [defs arrayForKey:CURRENCY_CODES_KEY];
     _currencyNames = [defs arrayForKey:CURRENCY_NAMES_KEY];
     _currencyPrices = [defs arrayForKey:CURRENCY_PRICES_KEY];
     self.localCurrencyCode = ([defs stringForKey:LOCAL_CURRENCY_CODE_KEY]) ?
-        [defs stringForKey:LOCAL_CURRENCY_CODE_KEY] : [[NSLocale currentLocale] objectForKey:NSLocaleCurrencyCode];
+    [defs stringForKey:LOCAL_CURRENCY_CODE_KEY] :[[NSLocale currentLocale] objectForKey:NSLocaleCurrencyCode];
     [self updateExchangeRate];
 }
 
 - (void)dealloc
 {
-    if (self.protectedObserver) [[NSNotificationCenter defaultCenter] removeObserver:self.protectedObserver];
+    if (self.protectedObserver)[[NSNotificationCenter defaultCenter] removeObserver:self.protectedObserver];
     [NSObject cancelPreviousPerformRequestsWithTarget:self];
 }
 
 - (BRWallet *)wallet
 {
     if (_wallet) return _wallet;
-
+    
     if (getKeychainData(SEED_KEY, nil)) { // upgrade from old keychain scheme
         @autoreleasepool {
             NSString *seedPhrase = getKeychainString(MNEMONIC_KEY, nil);
-
+            
             NSLog(@"upgrading to authenticated keychain scheme");
-            if (! setKeychainData([self.sequence masterPublicKeyFromSeed:[self.mnemonic deriveKeyFromPhrase:seedPhrase
-                                   withPassphrase:nil]], MASTER_PUBKEY_KEY, NO)) return _wallet;
+            if (!setKeychainData([self.sequence masterPublicKeyFromSeed:[self.mnemonic deriveKeyFromPhrase:seedPhrase
+                                                                                            withPassphrase:nil]], MASTER_PUBKEY_KEY, NO)) return _wallet;
             if (setKeychainString(seedPhrase, MNEMONIC_KEY, YES)) setKeychainData(nil, SEED_KEY, NO);
         }
     }
@@ -271,17 +271,17 @@ static NSString *getKeychainString(NSString *key, NSError **error)
     uint64_t feePerKb = 0;
     NSData *mpk = self.masterPublicKey;
     
-    if (! mpk) return _wallet;
+    if (!mpk) return _wallet;
     
     @synchronized(self) {
         if (_wallet) return _wallet;
-            
+        
         _wallet =
-            [[BRWallet alloc] initWithContext:[NSManagedObject context] sequence:self.sequence
-            masterPublicKey:mpk seed:^NSData *(NSString *authprompt, uint64_t amount) {
-                return [self seedWithPrompt:authprompt forAmount:amount];
-            }];
-
+        [[BRWallet alloc] initWithContext:[NSManagedObject context] sequence:self.sequence
+                          masterPublicKey:mpk seed:^NSData *(NSString *authprompt, uint64_t amount) {
+                              return [self seedWithPrompt:authprompt forAmount:amount];
+                          }];
+        
         _wallet.feePerKb = DEFAULT_FEE_PER_KB;
         feePerKb = [[NSUserDefaults standardUserDefaults] doubleForKey:FEE_PER_KB_KEY];
         if (feePerKb >= DEFAULT_FEE_PER_KB && feePerKb <= MAX_FEE_PER_KB) _wallet.feePerKb = feePerKb;
@@ -289,8 +289,8 @@ static NSString *getKeychainString(NSString *key, NSError **error)
         // verify that keychain matches core data, with different access and backup policies it's possible to diverge
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
             BRKey *k = [BRKey keyWithPublicKey:[self.sequence publicKey:0 internal:NO masterPublicKey:mpk]];
-                    
-            if (_wallet.addresses.count > 0 && ! [_wallet containsAddress:k.address]) {
+            
+            if (_wallet.addresses.count > 0 && ![_wallet containsAddress:k.address]) {
                 NSLog(@"wallet doesn't contain address: %@", k.address);
 #if DEBUG
                 abort(); // don't wipe core data for debug builds
@@ -302,12 +302,12 @@ static NSString *getKeychainString(NSString *key, NSError **error)
                 }];
                 
                 _wallet = nil;
-                    
+                
                 dispatch_async(dispatch_get_main_queue(), ^{
                     [[NSNotificationCenter defaultCenter] postNotificationName:BRWalletManagerSeedChangedNotification
-                     object:nil];
+                                                                        object:nil];
                     [[NSNotificationCenter defaultCenter] postNotificationName:BRWalletBalanceChangedNotification
-                     object:nil];
+                                                                        object:nil];
                 });
             }
         });
@@ -343,7 +343,7 @@ static NSString *getKeychainString(NSString *key, NSError **error)
 {
     @autoreleasepool { // @autoreleasepool ensures sensitive data will be dealocated immediately
         if (seedPhrase) seedPhrase = [self.mnemonic normalizePhrase:seedPhrase];
-
+        
         [[NSManagedObject context] performBlockAndWait:^{
             [BRAddressEntity deleteObjects:[BRAddressEntity allObjects]];
             [BRTransactionEntity deleteObjects:[BRTransactionEntity allObjects]];
@@ -357,20 +357,20 @@ static NSString *getKeychainString(NSString *key, NSError **error)
         setKeychainData(nil, PIN_FAIL_COUNT_KEY, NO);
         setKeychainData(nil, PIN_FAIL_HEIGHT_KEY, NO);
         
-        if (! setKeychainString(seedPhrase, MNEMONIC_KEY, YES)) {
+        if (!setKeychainString(seedPhrase, MNEMONIC_KEY, YES)) {
             NSLog(@"error setting wallet seed");
-
+            
             if (seedPhrase) {
                 [[[UIAlertView alloc] initWithTitle:@"couldn't create wallet"
-                  message:@"error adding master private key to iOS keychain, make sure app has keychain entitlements"
-                  delegate:self cancelButtonTitle:@"abort" otherButtonTitles:nil] show];
+                                            message:@"error adding master private key to iOS keychain, make sure app has keychain entitlements"
+                                           delegate:self cancelButtonTitle:@"abort" otherButtonTitles:nil] show];
             }
-
+            
             return;
         }
         
-        NSData *masterPubKey = (seedPhrase) ? [self.sequence masterPublicKeyFromSeed:[self.mnemonic
-                                               deriveKeyFromPhrase:seedPhrase withPassphrase:nil]] : nil;
+        NSData *masterPubKey = (seedPhrase) ?[self.sequence masterPublicKeyFromSeed:[self.mnemonic
+                                                                                     deriveKeyFromPhrase:seedPhrase withPassphrase:nil]] : nil;
         
         setKeychainData(masterPubKey, MASTER_PUBKEY_KEY, NO);
         _wallet = nil;
@@ -386,7 +386,7 @@ static NSString *getKeychainString(NSString *key, NSError **error)
 - (NSTimeInterval)seedCreationTime
 {
     NSData *d = getKeychainData(CREATION_TIME_KEY, nil);
-
+    
     return (d.length < sizeof(NSTimeInterval)) ? BIP39_CREATION_TIME : *(const NSTimeInterval *)d.bytes;
 }
 
@@ -402,7 +402,7 @@ static NSString *getKeychainString(NSString *key, NSError **error)
 {
     NSError *error = nil;
     
-    if (! [LAContext class]) return YES; // we can only check for passcode on iOS 8 and above
+    if (![LAContext class]) return YES;  // we can only check for passcode on iOS 8 and above
     if ([[LAContext new] canEvaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics error:&error]) return YES;
     return (error && error.code == LAErrorPasscodeNotSet) ? NO : YES;
 }
@@ -430,10 +430,10 @@ static NSString *getKeychainString(NSString *key, NSError **error)
 - (NSData *)seedWithPrompt:(NSString *)authprompt forAmount:(uint64_t)amount
 {
     BOOL touchid = (self.wallet.totalSent + amount < getKeychainInt(SPEND_LIMIT_KEY, nil)) ? YES : NO;
-
-    if (! [self authenticateWithPrompt:authprompt andTouchId:touchid]) return nil;
+    
+    if (![self authenticateWithPrompt:authprompt andTouchId:touchid]) return nil;
     // BUG: if user manually chooses to enter pin, spending limit is reset without including the tx being authorized
-    if (! touchid) setKeychainInt(self.wallet.totalSent + amount + self.spendingLimit, SPEND_LIMIT_KEY, NO);
+    if (!touchid) setKeychainInt(self.wallet.totalSent + amount + self.spendingLimit, SPEND_LIMIT_KEY, NO);
     return [self.mnemonic deriveKeyFromPhrase:getKeychainString(MNEMONIC_KEY, nil) withPassphrase:nil];
 }
 
@@ -458,9 +458,9 @@ static NSString *getKeychainString(NSString *key, NSError **error)
             context.localizedFallbackTitle = NSLocalizedString(@"passcode", nil);
             
             [context evaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics
-             localizedReason:(authprompt.length > 0 ? authprompt : @" ") reply:^(BOOL success, NSError *error) {
-                authcode = (success) ? 1 : error.code;
-            }];
+                    localizedReason:(authprompt.length > 0 ? authprompt : @" ") reply:^(BOOL success, NSError *error) {
+                        authcode = (success) ? 1 : error.code;
+                    }];
             
             while (authcode == 0) {
                 [[NSRunLoop mainRunLoop] limitDateForMode:NSDefaultRunLoopMode];
@@ -503,12 +503,12 @@ static NSString *getKeychainString(NSString *key, NSError **error)
 {
     NSError *error = nil;
     NSString *pin = getKeychainString(PIN_KEY, &error);
-
+    
     if (error) return NO; // error reading pin from keychain
     if (pin.length != 4) return [self setPin]; // no pin set
-
+    
     uint64_t total = self.wallet.totalSent, limit = self.spendingLimit,
-             failCount = getKeychainInt(PIN_FAIL_COUNT_KEY, nil);
+    failCount = getKeychainInt(PIN_FAIL_COUNT_KEY, nil);
     
     if (failCount >= 3) {
         uint64_t failHeight = getKeychainInt(PIN_FAIL_HEIGHT_KEY, nil);
@@ -519,13 +519,13 @@ static NSString *getKeychainString(NSString *key, NSError **error)
             NSString *unit = NSLocalizedString(@"minutes", nil);
             
             if (wait < 2.0) wait = 1.0, unit = NSLocalizedString(@"minute", nil);
-
+            
             if (wait >= 60.0) {
                 wait /= 60.0;
                 unit = (wait < 2.0) ? NSLocalizedString(@"hour", nil) : NSLocalizedString(@"hours", nil);
             }
-        
-            if (! self.alertView.isVisible) {
+            
+            if (!self.alertView.isVisible) {
                 self.alertView = [UIAlertView new];
                 [self.alertView addButtonWithTitle:NSLocalizedString(@"reset", nil)];
                 [self.alertView addButtonWithTitle:NSLocalizedString(@"ok", nil)];
@@ -538,7 +538,7 @@ static NSString *getKeychainString(NSString *key, NSError **error)
             self.alertView.message = [NSString stringWithFormat:NSLocalizedString(@"\ntry again in %d %@", nil),
                                       (int)wait, unit];
             self.alertView.delegate = self;
-            if (! self.alertView.isVisible) [self.alertView show];
+            if (!self.alertView.isVisible)[self.alertView show];
             return NO;
         }
         
@@ -546,7 +546,7 @@ static NSString *getKeychainString(NSString *key, NSError **error)
                     [NSString stringWithFormat:NSLocalizedString(@"\n%d attempts remaining\n", nil), 8 - failCount])
                    stringByAppendingString:(message) ? message : @""];
     }
-
+    
     //TODO: replace all alert views with darkened initial warning screen type dialog
     self.didPresent = NO;
     self.alertView = [[UIAlertView alloc]
@@ -558,47 +558,47 @@ static NSString *getKeychainString(NSString *key, NSError **error)
     [self.alertView show];
     [self.pinField becomeFirstResponder];
     
-    for (;;) {
-        while ((! self.didPresent || self.alertView.visible) && self.pinField.text.length < 4) {
+    for (;; ) {
+        while ((!self.didPresent || self.alertView.visible) && self.pinField.text.length < 4) {
             [[NSRunLoop mainRunLoop] limitDateForMode:NSDefaultRunLoopMode];
         }
         
-        if (! self.alertView.visible) break; // user canceled
+        if (!self.alertView.visible) break;  // user canceled
         
         // count unique attempts before checking success
-        if (! [self.failedPins containsObject:self.pinField.text]) setKeychainInt(++failCount, PIN_FAIL_COUNT_KEY, NO);
-
+        if (![self.failedPins containsObject:self.pinField.text]) setKeychainInt(++failCount, PIN_FAIL_COUNT_KEY, NO);
+        
         if ([self.pinField.text isEqual:pin]) { // successful pin attempt
             self.pinField.text = nil;
             [self.failedPins removeAllObjects];
             self.didAuthenticate = YES;
-
+            
             dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
                 setKeychainInt(0, PIN_FAIL_COUNT_KEY, NO);
                 setKeychainInt(0, PIN_FAIL_HEIGHT_KEY, NO);
                 if (limit > 0) setKeychainInt(total + limit, SPEND_LIMIT_KEY, NO);
             });
-
+            
             return YES;
         }
-
-        if (! [self.failedPins containsObject:self.pinField.text]) {
-            [self.failedPins addObject:self.pinField.text];
         
+        if (![self.failedPins containsObject:self.pinField.text]) {
+            [self.failedPins addObject:self.pinField.text];
+            
             if (failCount >= 8) { // wipe wallet after 8 failed pin attempts and 24+ hours of lockout
                 self.seedPhrase = nil;
                 
                 dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC/10), dispatch_get_main_queue(), ^{
                     abort();
                 });
-            
+                
                 return NO;
             }
-        
+            
             if (self.secureTime + NSTimeIntervalSince1970 > getKeychainInt(PIN_FAIL_HEIGHT_KEY, nil)) {
                 setKeychainInt(self.secureTime + NSTimeIntervalSince1970, PIN_FAIL_HEIGHT_KEY, NO);
             }
-
+            
             if (failCount >= 3) return [self authenticatePinWithTitle:title message:message]; // wallet disabled
         }
         
@@ -607,17 +607,17 @@ static NSString *getKeychainString(NSString *key, NSError **error)
         // walking the view hierarchy is prone to breaking, but it's still functional even if the animation doesn't work
         UIView *v = self.pinField.superview.superview.superview;
         CGPoint p = v.center;
-                
+        
         [UIView animateWithDuration:0.05 delay:0.1 options:UIViewAnimationOptionCurveEaseInOut animations:^{ // shake
             v.center = CGPointMake(p.x + 30.0, p.y);
         } completion:^(BOOL finished) {
             [UIView animateWithDuration:0.5 delay:0.0 usingSpringWithDamping:0.2 initialSpringVelocity:0.0 options:0
-            animations:^{ v.center = p; } completion:^(BOOL finished) {
-                [self textField:self.pinField shouldChangeCharactersInRange:NSMakeRange(0, 0) replacementString:@""];
-            }];
+                             animations:^{ v.center = p; } completion:^(BOOL finished) {
+                                 [self textField:self.pinField shouldChangeCharactersInRange:NSMakeRange(0, 0) replacementString:@""];
+                             }];
         }];
     }
-
+    
     return NO;
 }
 
@@ -628,15 +628,15 @@ static NSString *getKeychainString(NSString *key, NSError **error)
     NSString *pin = getKeychainString(PIN_KEY, &error);
     NSString *title = [NSString stringWithFormat:CIRCLE @"\t" CIRCLE @"\t" CIRCLE @"\t" CIRCLE @"\n%@",
                        [NSString stringWithFormat:NSLocalizedString(@"choose passcode for %@", nil), DISPLAY_NAME]];
-
+    
     if (error) return NO; // error reading existing pin from keychain
-
+    
     if (pin.length == 4) {
-        if (! [self authenticatePinWithTitle:NSLocalizedString(@"enter old passcode", nil) message:nil]) return NO;
-
+        if (![self authenticatePinWithTitle:NSLocalizedString(@"enter old passcode", nil) message:nil]) return NO;
+        
         UIView *v = self.pinField.superview.superview.superview;
         CGPoint p = v.center;
-
+        
         [UIView animateWithDuration:0.1 delay:0.1 options:UIViewAnimationOptionCurveEaseIn animations:^{
             v.center = CGPointMake(p.x - v.bounds.size.width, p.y);
         } completion:^(BOOL finished) {
@@ -644,25 +644,25 @@ static NSString *getKeychainString(NSString *key, NSError **error)
             self.alertView.message = nil;
             v.center = CGPointMake(p.x + v.bounds.size.width*2, p.y);
             [UIView animateWithDuration:0.3 delay:0.0 usingSpringWithDamping:0.8 initialSpringVelocity:0 options:0
-             animations:^{ v.center = p; } completion:nil];
+                             animations:^{ v.center = p; } completion:nil];
         }];
     }
     else {
         self.didPresent = NO;
         self.alertView = [[UIAlertView alloc] initWithTitle:title message:@" " delegate:self cancelButtonTitle:nil
-                          otherButtonTitles:nil];
+                                          otherButtonTitles:nil];
         self.pinField = nil; // reset pinField so a new one is created
         [self.alertView setValue:self.pinField forKey:@"accessoryView"];
         [self.alertView show];
         [self.pinField becomeFirstResponder];
     }
     
-    for (;;) {
-        while ((! self.didPresent || self.alertView.visible) && self.pinField.text.length < 4) {
+    for (;; ) {
+        while ((!self.didPresent || self.alertView.visible) && self.pinField.text.length < 4) {
             [[NSRunLoop mainRunLoop] limitDateForMode:NSDefaultRunLoopMode];
         }
-    
-        if (! self.alertView.visible) break;
+        
+        if (!self.alertView.visible) break;
         pin = self.pinField.text;
         self.pinField.text = nil;
         
@@ -677,15 +677,15 @@ static NSString *getKeychainString(NSString *key, NSError **error)
             v.center = CGPointMake(p.x + v.bounds.size.width*2, p.y);
             [self textField:self.pinField shouldChangeCharactersInRange:NSMakeRange(0, 0) replacementString:@""];
             [UIView animateWithDuration:0.3 delay:0.0 usingSpringWithDamping:0.8 initialSpringVelocity:0 options:0
-             animations:^{ v.center = p; } completion:nil];
+                             animations:^{ v.center = p; } completion:nil];
         }];
-
+        
         while (self.alertView.visible && self.pinField.text.length < 4) {
             [[NSRunLoop mainRunLoop] limitDateForMode:NSDefaultRunLoopMode];
         }
-
-        if (! self.alertView.visible) break;
-    
+        
+        if (!self.alertView.visible) break;
+        
         if ([self.pinField.text isEqual:pin]) {
             self.pinField.text = nil;
             setKeychainString(pin, PIN_KEY, NO);
@@ -700,10 +700,10 @@ static NSString *getKeychainString(NSString *key, NSError **error)
             v.center = CGPointMake(p.x + 30.0, p.y);
         } completion:^(BOOL finished) {
             [UIView animateWithDuration:0.5 delay:0.0 usingSpringWithDamping:0.2 initialSpringVelocity:0.0 options:0
-            animations:^{ v.center = p; } completion:^(BOOL finished) {
-                self.alertView.title = title;
-                [self textField:self.pinField shouldChangeCharactersInRange:NSMakeRange(0, 0) replacementString:@""];
-            }];
+                             animations:^{ v.center = p; } completion:^(BOOL finished) {
+                                 self.alertView.title = title;
+                                 [self textField:self.pinField shouldChangeCharactersInRange:NSMakeRange(0, 0) replacementString:@""];
+                             }];
         }];
     }
     
@@ -714,7 +714,7 @@ static NSString *getKeychainString(NSString *key, NSError **error)
 - (uint64_t)spendingLimit
 {
     // it's ok to store this in userdefaults because increasing the value only takes effect after successful pin entry
-    if (! [[NSUserDefaults standardUserDefaults] objectForKey:SPEND_LIMIT_AMOUNT_KEY]) return SATOSHIS;
+    if (![[NSUserDefaults standardUserDefaults] objectForKey:SPEND_LIMIT_AMOUNT_KEY]) return SATOSHIS;
     
     return [[NSUserDefaults standardUserDefaults] doubleForKey:SPEND_LIMIT_AMOUNT_KEY];
 }
@@ -759,23 +759,23 @@ static NSString *getKeychainString(NSString *key, NSError **error)
     
     if (i == NSNotFound) code = DEFAULT_CURRENCY_CODE, i = [_currencyCodes indexOfObject:DEFAULT_CURRENCY_CODE];
     _localCurrencyCode = [code copy];
-
+    
     if (i < _currencyPrices.count && self.secureTime + 3*24*60*60 > [NSDate timeIntervalSinceReferenceDate]) {
         self.localPrice = _currencyPrices[i]; // don't use exchange rate data more than 72hrs out of date
     }
     else self.localPrice = @(0);
-
+    
     self.localFormat.currencyCode = _localCurrencyCode;
     self.localFormat.maximum =
-        [[NSDecimalNumber decimalNumberWithDecimal:self.localPrice.decimalValue]
-         decimalNumberByMultiplyingBy:(id)[NSDecimalNumber numberWithLongLong:MAX_MONEY/SATOSHIS]];
+    [[NSDecimalNumber decimalNumberWithDecimal:self.localPrice.decimalValue]
+     decimalNumberByMultiplyingBy:(id)[NSDecimalNumber numberWithLongLong:MAX_MONEY/SATOSHIS]];
     
     if ([self.localCurrencyCode isEqual:[[NSLocale currentLocale] objectForKey:NSLocaleCurrencyCode]]) {
         [defs removeObjectForKey:LOCAL_CURRENCY_CODE_KEY];
     }
-    else [defs setObject:self.localCurrencyCode forKey:LOCAL_CURRENCY_CODE_KEY];
+    else[defs setObject:self.localCurrencyCode forKey:LOCAL_CURRENCY_CODE_KEY];
     
-    if (! _wallet) return;
+    if (!_wallet) return;
     
     dispatch_async(dispatch_get_main_queue(), ^{
         [[NSNotificationCenter defaultCenter] postNotificationName:BRWalletBalanceChangedNotification object:nil];
@@ -787,63 +787,63 @@ static NSString *getKeychainString(NSString *key, NSError **error)
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(updateExchangeRate) object:nil];
     [self performSelector:@selector(updateExchangeRate) withObject:nil afterDelay:60.0];
     if (self.reachability.currentReachabilityStatus == NotReachable) return;
-
+    
     NSURLRequest *req = [NSURLRequest requestWithURL:[NSURL URLWithString:TICKER_URL]
-                         cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:10.0];
-
+                                         cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:10.0];
+    
     [[[NSURLSession sharedSession] dataTaskWithRequest:req
-    completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
-        if (error) {
-            NSLog(@"%@", error);
-            return;
-        }
-
-        NSUserDefaults *defs = [NSUserDefaults standardUserDefaults];
-        NSDictionary *json = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
-        NSMutableArray *codes = [NSMutableArray array], *names = [NSMutableArray array], *rates =[NSMutableArray array];
-        
-        if ([response isKindOfClass:[NSHTTPURLResponse class]]) { // store server timestamp
-            NSString *date = ((NSHTTPURLResponse *)response).allHeaderFields[@"Date"];
-            NSTimeInterval now = [[[NSDataDetector dataDetectorWithTypes:NSTextCheckingTypeDate error:nil]
-                                   matchesInString:date options:0 range:NSMakeRange(0, date.length)].lastObject
-                                  date].timeIntervalSinceReferenceDate;
-            
-            if (now > self.secureTime) [defs setDouble:now forKey:SECURE_TIME_KEY];
-        }
-
-        if (error || ! [json isKindOfClass:[NSDictionary class]] || ! [json[@"data"] isKindOfClass:[NSArray class]]) {
-            NSLog(@"unexpected response from %@:\n%@", req.URL.host,
-                  [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]);
-            return;
-        }
-        
-        for (NSDictionary *d in json[@"data"]) {
-            if (! [d isKindOfClass:[NSDictionary class]] || ! [d[@"code"] isKindOfClass:[NSString class]] ||
-                ! [d[@"name"] isKindOfClass:[NSString class]] || ! [d[@"rate"] isKindOfClass:[NSNumber class]]) {
-                NSLog(@"unexpected response from %@:\n%@", req.URL.host,
-                      [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]);
-                return;
-            }
-           
-            if ([d[@"code"] isEqual:@"BTC"]) continue;
-            [codes addObject:d[@"code"]];
-            [names addObject:d[@"name"]];
-            [rates addObject:d[@"rate"]];
-        }
-
-        _currencyCodes = codes;
-        _currencyNames = names;
-        _currencyPrices = rates;
-        self.localCurrencyCode = _localCurrencyCode; // update localCurrencyPrice and localFormat.maximum
-        [defs setObject:self.currencyCodes forKey:CURRENCY_CODES_KEY];
-        [defs setObject:self.currencyNames forKey:CURRENCY_NAMES_KEY];
-        [defs setObject:self.currencyPrices forKey:CURRENCY_PRICES_KEY];
-        [defs synchronize];
-        NSLog(@"exchange rate updated to %@/%@", [self localCurrencyStringForAmount:SATOSHIS],
-              [self stringForAmount:SATOSHIS]);
-        
-        [self updateFeePerKb];
-    }] resume];
+                                     completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+                                         if (error) {
+                                             NSLog(@"%@", error);
+                                             return;
+                                         }
+                                         
+                                         NSUserDefaults *defs = [NSUserDefaults standardUserDefaults];
+                                         NSDictionary *json = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
+                                         NSMutableArray *codes = [NSMutableArray array], *names = [NSMutableArray array], *rates =[NSMutableArray array];
+                                         
+                                         if ([response isKindOfClass:[NSHTTPURLResponse class]]) { // store server timestamp
+                                             NSString *date = ((NSHTTPURLResponse *)response).allHeaderFields[@"Date"];
+                                             NSTimeInterval now = [[[NSDataDetector dataDetectorWithTypes:NSTextCheckingTypeDate error:nil]
+                                                                    matchesInString:date options:0 range:NSMakeRange(0, date.length)].lastObject
+                                                                   date].timeIntervalSinceReferenceDate;
+                                             
+                                             if (now > self.secureTime) [defs setDouble:now forKey:SECURE_TIME_KEY];
+                                         }
+                                         
+                                         if (error || ![json isKindOfClass:[NSDictionary class]] || ![json[@"data"] isKindOfClass:[NSArray class]]) {
+                                             NSLog(@"unexpected response from %@:\n%@", req.URL.host,
+                                                   [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]);
+                                             return;
+                                         }
+                                         
+                                         for (NSDictionary *d in json[@"data"]) {
+                                             if (![d isKindOfClass:[NSDictionary class]] || ![d[@"code"] isKindOfClass:[NSString class]] ||
+                                                 ![d[@"name"] isKindOfClass:[NSString class]] || ![d[@"rate"] isKindOfClass:[NSNumber class]]) {
+                                                 NSLog(@"unexpected response from %@:\n%@", req.URL.host,
+                                                       [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]);
+                                                 return;
+                                             }
+                                             
+                                             if ([d[@"code"] isEqual:@"BTC"]) continue;
+                                             [codes addObject:d[@"code"]];
+                                             [names addObject:d[@"name"]];
+                                             [rates addObject:d[@"rate"]];
+                                         }
+                                         
+                                         _currencyCodes = codes;
+                                         _currencyNames = names;
+                                         _currencyPrices = rates;
+                                         self.localCurrencyCode = _localCurrencyCode; // update localCurrencyPrice and localFormat.maximum
+                                         [defs setObject:self.currencyCodes forKey:CURRENCY_CODES_KEY];
+                                         [defs setObject:self.currencyNames forKey:CURRENCY_NAMES_KEY];
+                                         [defs setObject:self.currencyPrices forKey:CURRENCY_PRICES_KEY];
+                                         [defs synchronize];
+                                         NSLog(@"exchange rate updated to %@/%@", [self localCurrencyStringForAmount:SATOSHIS],
+                                               [self stringForAmount:SATOSHIS]);
+                                         
+                                         [self updateFeePerKb];
+                                     }] resume];
 }
 
 #pragma mark - floating fees
@@ -853,109 +853,109 @@ static NSString *getKeychainString(NSString *key, NSError **error)
     if (self.reachability.currentReachabilityStatus == NotReachable) return;
     
     NSURLRequest *req = [NSURLRequest requestWithURL:[NSURL URLWithString:FEE_PER_KB_URL]
-                         cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:10.0];
+                                         cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:10.0];
     
     [[[NSURLSession sharedSession] dataTaskWithRequest:req
-    completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
-        if (error) {
-            NSLog(@"%@", error);
-            return;
-        }
-        
-        NSDictionary *json = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
-        
-        if (error || ! [json isKindOfClass:[NSDictionary class]] ||
-            ! [json[@"fee_per_kb"] isKindOfClass:[NSNumber class]]) {
-            NSLog(@"unexpected response from %@:\n%@", req.URL.host,
-                  [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]);
-            return;
-        }
-        
-        uint64_t feePerKb = [json[@"fee_per_kb"] unsignedLongLongValue];
-
-        if (feePerKb >= DEFAULT_FEE_PER_KB && feePerKb <= MAX_FEE_PER_KB) {
-            _wallet.feePerKb = feePerKb;
-            [[NSUserDefaults standardUserDefaults] setDouble:feePerKb forKey:FEE_PER_KB_KEY];
-        }
-    }] resume];
+                                     completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+                                         if (error) {
+                                             NSLog(@"%@", error);
+                                             return;
+                                         }
+                                         
+                                         NSDictionary *json = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
+                                         
+                                         if (error || ![json isKindOfClass:[NSDictionary class]] ||
+                                             ![json[@"fee_per_kb"] isKindOfClass:[NSNumber class]]) {
+                                             NSLog(@"unexpected response from %@:\n%@", req.URL.host,
+                                                   [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]);
+                                             return;
+                                         }
+                                         
+                                         uint64_t feePerKb = [json[@"fee_per_kb"] unsignedLongLongValue];
+                                         
+                                         if (feePerKb >= DEFAULT_FEE_PER_KB && feePerKb <= MAX_FEE_PER_KB) {
+                                             _wallet.feePerKb = feePerKb;
+                                             [[NSUserDefaults standardUserDefaults] setDouble:feePerKb forKey:FEE_PER_KB_KEY];
+                                         }
+                                     }] resume];
 }
 
 #pragma mark - query unspent outputs
 
 // queries chain.com and calls the completion block with unspent outputs for the given address
 - (void)utxosForAddress:(NSString *)address
-completion:(void (^)(NSArray *utxos, NSArray *amounts, NSArray *scripts, NSError *error))completion
+             completion:(void (^)(NSArray *utxos, NSArray *amounts, NSArray *scripts, NSError *error))completion
 {
     NSURL *u = [NSURL URLWithString:[NSString stringWithFormat:UNSPENT_URL, @"bitcoin", address]];
 #if BITCOIN_TESTNET
     u = [NSURL URLWithString:[NSString stringWithFormat:UNSPENT_URL, @"testnet3", address]];
 #endif
     NSURLRequest *req = [NSURLRequest requestWithURL:u cachePolicy:NSURLRequestReloadIgnoringCacheData
-                         timeoutInterval:20.0];
+                                     timeoutInterval:20.0];
     
     [[[NSURLSession sharedSession] dataTaskWithRequest:req
-    completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
-        if (error) {
-            completion(nil, nil, nil, error);
-            return;
-        }
-        
-        NSDictionary *json = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
-        NSMutableArray *utxos = [NSMutableArray array], *amounts = [NSMutableArray array],
-                       *scripts = [NSMutableArray array];
-        BRUTXO o;
-        
-        if (error) {
-            completion(nil, nil, nil, error);
-            return;
-        }
-        
-        if (! [json isKindOfClass:[NSArray class]]) {
-            completion(nil, nil, nil,
-                       [NSError errorWithDomain:@"BreadWallet" code:417 userInfo:@{NSLocalizedDescriptionKey:
-                        [NSString stringWithFormat:NSLocalizedString(@"unexpected response from %@", nil), u.host]}]);
-            return;
-        }
-        
-        for (NSDictionary *utxo in json) {
-            if (! [utxo isKindOfClass:[NSDictionary class]] ||
-                ! [utxo[@"transaction_hash"] isKindOfClass:[NSString class]] ||
-                [utxo[@"transaction_hash"] hexToData].length != sizeof(UInt256) ||
-                ! [utxo[@"output_index"] isKindOfClass:[NSNumber class]] ||
-                ! [utxo[@"script_hex"] isKindOfClass:[NSString class]] ||
-                ! [utxo[@"script_hex"] hexToData] ||
-                ! [utxo[@"script_type"] isKindOfClass:[NSString class]] ||
-                ! [utxo[@"value"] isKindOfClass:[NSNumber class]]) {
-                completion(nil, nil, nil,
-                           [NSError errorWithDomain:@"BreadWallet" code:417 userInfo:@{NSLocalizedDescriptionKey:
-                            [NSString stringWithFormat:NSLocalizedString(@"unexpected response from %@",nil),u.host]}]);
-                return;
-            }
-            
-            if (! [utxo[@"script_type"] isEqual:@"pubkeyhash"] && ! [utxo[@"script_type"] isEqual:@"pubkey"]) continue;
-            o.hash = *(const UInt256 *)[[utxo[@"transaction_hash"] hexToData] reverse].bytes;
-            o.n = [utxo[@"output_index"] unsignedIntValue];
-            [utxos addObject:brutxo_obj(o)];
-            [amounts addObject:utxo[@"value"]];
-            [scripts addObject:[utxo[@"script_hex"] hexToData]];
-        }
-        
-        completion(utxos, amounts, scripts, nil);
-    }] resume];
+                                     completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+                                         if (error) {
+                                             completion(nil, nil, nil, error);
+                                             return;
+                                         }
+                                         
+                                         NSDictionary *json = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
+                                         NSMutableArray *utxos = [NSMutableArray array], *amounts = [NSMutableArray array],
+                                         *scripts = [NSMutableArray array];
+                                         BRUTXO o;
+                                         
+                                         if (error) {
+                                             completion(nil, nil, nil, error);
+                                             return;
+                                         }
+                                         
+                                         if (![json isKindOfClass:[NSArray class]]) {
+                                             completion(nil, nil, nil,
+                                                        [NSError errorWithDomain:@"BreadWallet" code:417 userInfo:@{NSLocalizedDescriptionKey:
+                                                                                                                        [NSString stringWithFormat:NSLocalizedString(@"unexpected response from %@", nil), u.host]}]);
+                                             return;
+                                         }
+                                         
+                                         for (NSDictionary *utxo in json) {
+                                             if (![utxo isKindOfClass:[NSDictionary class]] ||
+                                                 ![utxo[@"transaction_hash"] isKindOfClass:[NSString class]] ||
+                                                 [utxo[@"transaction_hash"] hexToData].length != sizeof(UInt256) ||
+                                                 ![utxo[@"output_index"] isKindOfClass:[NSNumber class]] ||
+                                                 ![utxo[@"script_hex"] isKindOfClass:[NSString class]] ||
+                                                 ![utxo[@"script_hex"] hexToData] ||
+                                                 ![utxo[@"script_type"] isKindOfClass:[NSString class]] ||
+                                                 ![utxo[@"value"] isKindOfClass:[NSNumber class]]) {
+                                                 completion(nil, nil, nil,
+                                                            [NSError errorWithDomain:@"BreadWallet" code:417 userInfo:@{NSLocalizedDescriptionKey:
+                                                                                                                            [NSString stringWithFormat:NSLocalizedString(@"unexpected response from %@",nil),u.host]}]);
+                                                 return;
+                                             }
+                                             
+                                             if (![utxo[@"script_type"] isEqual:@"pubkeyhash"] && ![utxo[@"script_type"] isEqual:@"pubkey"]) continue;
+                                             o.hash = *(const UInt256 *)[[utxo[@"transaction_hash"] hexToData] reverse].bytes;
+                                             o.n = [utxo[@"output_index"] unsignedIntValue];
+                                             [utxos addObject:brutxo_obj(o)];
+                                             [amounts addObject:utxo[@"value"]];
+                                             [scripts addObject:[utxo[@"script_hex"] hexToData]];
+                                         }
+                                         
+                                         completion(utxos, amounts, scripts, nil);
+                                     }] resume];
 }
 
 // given a private key, queries chain.com for unspent outputs and calls the completion block with a signed transaction
 // that will sweep the balance into the wallet (doesn't publish the tx)
 - (void)sweepPrivateKey:(NSString *)privKey withFee:(BOOL)fee
-completion:(void (^)(BRTransaction *tx, uint64_t fee, NSError *error))completion
+             completion:(void (^)(BRTransaction *tx, uint64_t fee, NSError *error))completion
 {
-    if (! completion) return;
-
+    if (!completion) return;
+    
     if ([privKey isValidBitcoinBIP38Key]) {
         UIAlertView *v = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"password protected key", nil)
-                          message:nil delegate:self cancelButtonTitle:NSLocalizedString(@"cancel", nil)
-                          otherButtonTitles:NSLocalizedString(@"ok", nil), nil];
-
+                                                    message:nil delegate:self cancelButtonTitle:NSLocalizedString(@"cancel", nil)
+                                          otherButtonTitles:NSLocalizedString(@"ok", nil), nil];
+        
         v.alertViewStyle = UIAlertViewStyleSecureTextInput;
         [v textFieldAtIndex:0].returnKeyType = UIReturnKeyDone;
         [v textFieldAtIndex:0].placeholder = NSLocalizedString(@"password", nil);
@@ -965,18 +965,18 @@ completion:(void (^)(BRTransaction *tx, uint64_t fee, NSError *error))completion
         self.sweepCompletion = completion;
         return;
     }
-
+    
     BRKey *key = [BRKey keyWithPrivateKey:privKey];
-
-    if (! key.address) {
+    
+    if (!key.address) {
         completion(nil, 0, [NSError errorWithDomain:@"BreadWallet" code:187 userInfo:@{NSLocalizedDescriptionKey:
-                            NSLocalizedString(@"not a valid private key", nil)}]);
+                                                                                           NSLocalizedString(@"not a valid private key", nil)}]);
         return;
     }
-
+    
     if ([self.wallet containsAddress:key.address]) {
         completion(nil, 0, [NSError errorWithDomain:@"BreadWallet" code:187 userInfo:@{NSLocalizedDescriptionKey:
-                            NSLocalizedString(@"this private key is already in your wallet", nil)}]);
+                                                                                           NSLocalizedString(@"this private key is already in your wallet", nil)}]);
         return;
     }
     
@@ -984,12 +984,12 @@ completion:(void (^)(BRTransaction *tx, uint64_t fee, NSError *error))completion
         BRTransaction *tx = [BRTransaction new];
         uint64_t balance = 0, feeAmount = 0;
         NSUInteger i = 0;
-
+        
         if (error) {
             completion(nil, 0, error);
             return;
         }
-
+        
         //TODO: make sure not to create a transaction larger than TX_MAX_SIZE
         for (NSValue *output in utxos) {
             BRUTXO o;
@@ -998,31 +998,31 @@ completion:(void (^)(BRTransaction *tx, uint64_t fee, NSError *error))completion
             [tx addInputHash:o.hash index:o.n script:scripts[i]];
             balance += [amounts[i++] unsignedLongLongValue];
         }
-     
+        
         if (balance == 0) {
             completion(nil, 0, [NSError errorWithDomain:@"BreadWallet" code:417 userInfo:@{NSLocalizedDescriptionKey:
-                                NSLocalizedString(@"this private key is empty", nil)}]);
+                                                                                               NSLocalizedString(@"this private key is empty", nil)}]);
             return;
         }
-     
+        
         // we will be adding a wallet output (34 bytes), also non-compact pubkey sigs are larger by 32bytes each
         if (fee) feeAmount = [self.wallet feeForTxSize:tx.size + 34 + (key.publicKey.length - 33)*tx.inputHashes.count];
-     
+        
         if (feeAmount + TX_MIN_OUTPUT_AMOUNT > balance) {
             completion(nil, 0, [NSError errorWithDomain:@"BreadWallet" code:417 userInfo:@{NSLocalizedDescriptionKey:
-                                NSLocalizedString(@"transaction fees would cost more than the funds available on this "
-                                                  "private key (due to tiny \"dust\" deposits)",nil)}]);
+                                                                                               NSLocalizedString(@"transaction fees would cost more than the funds available on this "
+                                                                                                                 "private key (due to tiny \"dust\" deposits)",nil)}]);
             return;
         }
-     
+        
         [tx addOutputAddress:self.wallet.changeAddress amount:balance - feeAmount];
-     
-        if (! [tx signWithPrivateKeys:@[privKey]]) {
+        
+        if (![tx signWithPrivateKeys:@[privKey]]) {
             completion(nil, 0, [NSError errorWithDomain:@"BreadWallet" code:401 userInfo:@{NSLocalizedDescriptionKey:
-                                NSLocalizedString(@"error signing transaction", nil)}]);
+                                                                                               NSLocalizedString(@"error signing transaction", nil)}]);
             return;
         }
-     
+        
         completion(tx, feeAmount, nil);
     }];
 }
@@ -1031,15 +1031,15 @@ completion:(void (^)(BRTransaction *tx, uint64_t fee, NSError *error))completion
 
 - (int64_t)amountForString:(NSString *)string
 {
-    if (! string.length) return 0;
+    if (!string.length) return 0;
     return [[NSDecimalNumber decimalNumberWithDecimal:[self.format numberFromString:string].decimalValue]
-             decimalNumberByMultiplyingByPowerOf10:self.format.maximumFractionDigits].longLongValue;
+            decimalNumberByMultiplyingByPowerOf10:self.format.maximumFractionDigits].longLongValue;
 }
 
 - (NSString *)stringForAmount:(int64_t)amount
 {
     return [self.format stringFromNumber:[(id)[NSDecimalNumber numberWithLongLong:amount]
-            decimalNumberByMultiplyingByPowerOf10:-self.format.maximumFractionDigits]];
+                                          decimalNumberByMultiplyingByPowerOf10:-self.format.maximumFractionDigits]];
 }
 
 // NOTE: For now these local currency methods assume that a satoshi has a smaller value than the smallest unit of any
@@ -1047,21 +1047,21 @@ completion:(void (^)(BRTransaction *tx, uint64_t fee, NSError *error))completion
 - (int64_t)amountForLocalCurrencyString:(NSString *)string
 {
     if ([string hasPrefix:@"<"]) string = [string substringFromIndex:1];
-
+    
     NSNumber *n = [self.localFormat numberFromString:string];
     int64_t price = [[NSDecimalNumber decimalNumberWithDecimal:self.localPrice.decimalValue]
-                      decimalNumberByMultiplyingByPowerOf10:self.localFormat.maximumFractionDigits].longLongValue,
-            local = [[NSDecimalNumber decimalNumberWithDecimal:n.decimalValue]
-                      decimalNumberByMultiplyingByPowerOf10:self.localFormat.maximumFractionDigits].longLongValue,
-            overflowbits = 0, p = 10, min, max, amount;
-
+                     decimalNumberByMultiplyingByPowerOf10:self.localFormat.maximumFractionDigits].longLongValue,
+    local = [[NSDecimalNumber decimalNumberWithDecimal:n.decimalValue]
+             decimalNumberByMultiplyingByPowerOf10:self.localFormat.maximumFractionDigits].longLongValue,
+    overflowbits = 0, p = 10, min, max, amount;
+    
     if (local == 0 || price < 1) return 0;
     while (llabs(local) + 1 > INT64_MAX/SATOSHIS) local /= 2, overflowbits++; // make sure we won't overflow an int64_t
     min = llabs(local)*SATOSHIS/price + 1; // minimum amount that safely matches local currency string
     max = (llabs(local) + 1)*SATOSHIS/price - 1; // maximum amount that safely matches local currency string
     amount = (min + max)/2; // average min and max
     while (overflowbits > 0) local *= 2, min *= 2, max *= 2, amount *= 2, overflowbits--;
-
+    
     if (amount >= MAX_MONEY) return (local < 0) ? -MAX_MONEY : MAX_MONEY;
     while ((amount/p)*p >= min && p <= INT64_MAX/10) p *= 10; // lowest decimal precision matching local currency string
     p /= 10;
@@ -1076,8 +1076,8 @@ completion:(void (^)(BRTransaction *tx, uint64_t fee, NSError *error))completion
     NSDecimalNumber *n = [[[NSDecimalNumber decimalNumberWithDecimal:self.localPrice.decimalValue]
                            decimalNumberByMultiplyingBy:(id)[NSDecimalNumber numberWithLongLong:llabs(amount)]]
                           decimalNumberByDividingBy:(id)[NSDecimalNumber numberWithLongLong:SATOSHIS]],
-                     *min = [[NSDecimalNumber one]
-                             decimalNumberByMultiplyingByPowerOf10:-self.localFormat.maximumFractionDigits];
+    *min = [[NSDecimalNumber one]
+            decimalNumberByMultiplyingByPowerOf10:-self.localFormat.maximumFractionDigits];
     
     // if the amount is too small to be represented in local currency (but is != 0) then return a string like "$0.01"
     if ([n compare:min] == NSOrderedAscending) n = min;
@@ -1091,7 +1091,7 @@ completion:(void (^)(BRTransaction *tx, uint64_t fee, NSError *error))completion
 replacementString:(NSString *)string
 {
     NSUInteger l = textField.text.length + string.length - range.length;
-
+    
     self.alertView.title = [NSString stringWithFormat:@"%@\t%@\t%@\t%@%@", (l > 0 ? DOT : CIRCLE),
                             (l > 1 ? DOT : CIRCLE), (l > 2 ? DOT : CIRCLE), (l > 3 ? DOT : CIRCLE),
                             [self.alertView.title substringFromIndex:7]];
@@ -1103,7 +1103,7 @@ replacementString:(NSString *)string
 {
     if ([LAContext class]) return; // fix is needed for iOS 7 only
     textField.superview.superview.superview.superview.superview.center =
-        CGPointMake([UIScreen mainScreen].bounds.size.width/2.0, [UIScreen mainScreen].bounds.size.height/2.0 - 108.0);
+    CGPointMake([UIScreen mainScreen].bounds.size.width/2.0, [UIScreen mainScreen].bounds.size.height/2.0 - 108.0);
 }
 
 #pragma mark - UITextViewDelegate
@@ -1114,11 +1114,11 @@ replacementString:(NSString *)string
         if ([textView.text rangeOfString:@"\n"].location != NSNotFound) {
             NSString *phrase = [self.mnemonic normalizePhrase:textView.text];
             
-            if (! [[self.sequence masterPublicKeyFromSeed:[self.mnemonic deriveKeyFromPhrase:phrase
-                                                           withPassphrase:nil]] isEqual:self.masterPublicKey]) {
+            if (![[self.sequence masterPublicKeyFromSeed:[self.mnemonic deriveKeyFromPhrase:phrase
+                                                                             withPassphrase:nil]] isEqual:self.masterPublicKey]) {
                 self.alertView.title = NSLocalizedString(@"recovery phrase doesn't match", nil);
                 [self.alertView performSelector:@selector(setTitle:)
-                 withObject:NSLocalizedString(@"recovery phrase", nil) afterDelay:3.0];
+                                     withObject:NSLocalizedString(@"recovery phrase", nil) afterDelay:3.0];
             }
             else {
                 setKeychainData(nil, SPEND_LIMIT_KEY, NO);
@@ -1136,7 +1136,7 @@ replacementString:(NSString *)string
 {
     if ([LAContext class]) return; // fix is needed for iOS 7 only
     textView.superview.superview.superview.superview.superview.center =
-        CGPointMake([UIScreen mainScreen].bounds.size.width/2.0, [UIScreen mainScreen].bounds.size.height/2.0 - 108.0);
+    CGPointMake([UIScreen mainScreen].bounds.size.width/2.0, [UIScreen mainScreen].bounds.size.height/2.0 - 108.0);
 }
 
 #pragma mark - UIAlertViewDelegate
@@ -1144,14 +1144,14 @@ replacementString:(NSString *)string
 - (void)didPresentAlertView:(UIAlertView *)alertView
 {
     self.didPresent = YES;
-    if (_pinField && ! _pinField.isFirstResponder) [_pinField becomeFirstResponder]; // fix for iOS 7 missing keyboard
+    if (_pinField && !_pinField.isFirstResponder)[_pinField becomeFirstResponder];   // fix for iOS 7 missing keyboard
 }
 
 - (void)alertView:(UIAlertView *)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex
 {
     [NSObject cancelPreviousPerformRequestsWithTarget:alertView];
     if (alertView == self.alertView) self.alertView = nil;
-    if (_pinField.isFirstResponder) [self hideKeyboard];
+    if (_pinField.isFirstResponder)[self hideKeyboard];
     _pinField = nil;
     
     if (buttonIndex == alertView.cancelButtonIndex) {
@@ -1162,16 +1162,16 @@ replacementString:(NSString *)string
     }
     else if (self.sweepKey && self.sweepCompletion) {
         NSString *passphrase = [alertView textFieldAtIndex:0].text;
-
+        
         dispatch_async(dispatch_get_main_queue(), ^{
             BRKey *key = [BRKey keyWithBIP38Key:self.sweepKey andPassphrase:passphrase];
-
-            if (! key) {
+            
+            if (!key) {
                 UIAlertView *v = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"password protected key", nil)
-                                  message:NSLocalizedString(@"bad password, try again", nil) delegate:self
-                                  cancelButtonTitle:NSLocalizedString(@"cancel", nil)
-                                  otherButtonTitles:NSLocalizedString(@"ok", nil), nil];
-
+                                                            message:NSLocalizedString(@"bad password, try again", nil) delegate:self
+                                                  cancelButtonTitle:NSLocalizedString(@"cancel", nil)
+                                                  otherButtonTitles:NSLocalizedString(@"ok", nil), nil];
+                
                 v.alertViewStyle = UIAlertViewStyleSecureTextInput;
                 [v textFieldAtIndex:0].returnKeyType = UIReturnKeyDone;
                 [v textFieldAtIndex:0].placeholder = NSLocalizedString(@"password", nil);
@@ -1186,13 +1186,13 @@ replacementString:(NSString *)string
     }
     else if (buttonIndex >= 0 && [[alertView buttonTitleAtIndex:buttonIndex] isEqual:NSLocalizedString(@"reset",nil)]) {
         UITextView *t = [[UITextView alloc] initWithFrame:CGRectMake(0, 0, 260, 180)];
-            
+        
         t.keyboardType = UIKeyboardTypeASCIICapable;
         t.returnKeyType = UIReturnKeyDone;
         t.delegate = self;
         t.font = [UIFont fontWithName:@"HelveticaNeue" size:15.0];
         self.alertView = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"recovery phrase", nil) message:nil
-                          delegate:nil cancelButtonTitle:NSLocalizedString(@"cancel", nil) otherButtonTitles:nil];
+                                                   delegate:nil cancelButtonTitle:NSLocalizedString(@"cancel", nil) otherButtonTitles:nil];
         [self.alertView setValue:t forKey:@"accessoryView"];
         [self.alertView show];
         [t becomeFirstResponder];
