@@ -39,13 +39,13 @@
 #import "NSManagedObject+Sugar.h"
 #import "Reachability.h"
 #import <LocalAuthentication/LocalAuthentication.h>
+#import "breadwallet-Swift.h"
 
 #define CIRCLE  @"\xE2\x97\x8C" // dotted circle (utf-8)
 #define DOT     @"\xE2\x97\x8F" // black circle (utf-8)
 
 #define UNSPENT_URL    @"https://api.chain.com/v2/%@/addresses/%@/unspents?api-key-id=eed0d7697a880144bb854676f88d123f"
 #define TICKER_URL     @"https://bitpay.com/rates"
-#define FEE_PER_KB_URL @"https://api.breadwallet.com/v1/fee-per-kb"
 
 #define SEED_ENTROPY_LENGTH   (128/8)
 #define SEC_ATTR_SERVICE      @"org.voisine.breadwallet"
@@ -909,33 +909,18 @@ static NSString *getKeychainString(NSString *key, NSError **error)
 - (void)updateFeePerKb
 {
     if (self.reachability.currentReachabilityStatus == NotReachable) return;
-    
-    NSURLRequest *req = [NSURLRequest requestWithURL:[NSURL URLWithString:FEE_PER_KB_URL]
-                         cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:10.0];
-    
-    [[[NSURLSession sharedSession] dataTaskWithRequest:req
-    completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
-        if (error) {
-            NSLog(@"%@", error);
-            return;
-        }
-        
-        NSDictionary *json = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
-        
-        if (error || ! [json isKindOfClass:[NSDictionary class]] ||
-            ! [json[@"fee_per_kb"] isKindOfClass:[NSNumber class]]) {
-            NSLog(@"unexpected response from %@:\n%@", req.URL.host,
-                  [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]);
-            return;
-        }
-        
-        uint64_t feePerKb = [json[@"fee_per_kb"] unsignedLongLongValue];
 
-        if (feePerKb >= DEFAULT_FEE_PER_KB && feePerKb <= MAX_FEE_PER_KB) {
-            _wallet.feePerKb = feePerKb;
-            [[NSUserDefaults standardUserDefaults] setDouble:feePerKb forKey:FEE_PER_KB_KEY];
+    [[BRAPIClient sharedClient] feePerKb:^(uint64_t newFee, NSString * _Nullable err) {
+        if (err != nil) {
+            NSLog(@"unable to fetch fee-per-kb: %@", err);
+            return;
         }
-    }] resume];
+        if (newFee >= DEFAULT_FEE_PER_KB && newFee <= MAX_FEE_PER_KB) {
+            NSLog(@"setting new fee-per-kb %lld", newFee);
+            _wallet.feePerKb = newFee;
+            [[NSUserDefaults standardUserDefaults] setDouble:newFee forKey:FEE_PER_KB_KEY];
+        }
+    }];
 }
 
 #pragma mark - query unspent outputs
