@@ -74,6 +74,9 @@
     //TODO: ask user if they need to sweep to a new wallet when restoring because it was compromised
 
     //TODO: figure out deterministic builds/removing app sigs: http://www.afp548.com/2012/06/05/re-signining-ios-apps/
+    
+    BRAPIClient *c = [BRAPIClient sharedClient];
+    [c me];
 
     return YES;
 }
