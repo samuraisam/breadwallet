@@ -10,6 +10,8 @@
 		2204604E1B9F61E600D07B61 /* BREventManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 2204604D1B9F61E600D07B61 /* BREventManager.m */; };
 		2204604F1B9F61E600D07B61 /* BREventManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 2204604D1B9F61E600D07B61 /* BREventManager.m */; };
 		220460551BA0BEEE00D07B61 /* BREventConfirmView.m in Sources */ = {isa = PBXBuildFile; fileRef = 220460541BA0BEEE00D07B61 /* BREventConfirmView.m */; };
+		22B6A4481C0E963900673913 /* libbz2.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 22B6A4471C0E963900673913 /* libbz2.tbd */; };
+		22B6A44A1C0ECB7800673913 /* BRBSPatchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22B6A4491C0ECB7800673913 /* BRBSPatchTests.swift */; };
 		22FCD22C1C0E68C80066D798 /* BRTarTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22FCD22B1C0E68C80066D798 /* BRTarTests.swift */; };
 		22FF2C381BED381400B36384 /* BRAPIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22FF2C371BED381400B36384 /* BRAPIClient.swift */; };
 		751B2B5C1B68911700EA87FB /* BRTxHistoryViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 751B2B5B1B68911700EA87FB /* BRTxHistoryViewController.m */; };
@@ -119,6 +121,8 @@
 		2204604D1B9F61E600D07B61 /* BREventManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BREventManager.m; sourceTree = "<group>"; };
 		220460531BA0BEEE00D07B61 /* BREventConfirmView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BREventConfirmView.h; sourceTree = "<group>"; };
 		220460541BA0BEEE00D07B61 /* BREventConfirmView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BREventConfirmView.m; sourceTree = "<group>"; };
+		22B6A4471C0E963900673913 /* libbz2.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libbz2.tbd; path = usr/lib/libbz2.tbd; sourceTree = SDKROOT; };
+		22B6A4491C0ECB7800673913 /* BRBSPatchTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BRBSPatchTests.swift; sourceTree = "<group>"; };
 		22FCD22B1C0E68C80066D798 /* BRTarTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BRTarTests.swift; sourceTree = "<group>"; };
 		22FCD22D1C0E6BA30066D798 /* BreadWalletTests-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "BreadWalletTests-Bridging-Header.h"; path = "BreadWallet/BreadWalletTests-Bridging-Header.h"; sourceTree = SOURCE_ROOT; };
 		22FF2C361BED381400B36384 /* breadwallet-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "breadwallet-Bridging-Header.h"; sourceTree = "<group>"; };
@@ -345,6 +349,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				22B6A4481C0E963900673913 /* libbz2.tbd in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -581,6 +586,7 @@
 		75D5F3C0191EC270004AB296 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				22B6A4471C0E963900673913 /* libbz2.tbd */,
 				75F2E0B61BE2D5F000EAE861 /* Accelerate.framework */,
 				BAE12BE61B2DEE7F00895CC5 /* NotificationCenter.framework */,
 			);
@@ -628,6 +634,7 @@
 				75D5F3F2191EC270004AB296 /* BreadWalletTests.m */,
 				75D5F3ED191EC270004AB296 /* BreadWalletTests */,
 				22FCD22B1C0E68C80066D798 /* BRTarTests.swift */,
+				22B6A4491C0ECB7800673913 /* BRBSPatchTests.swift */,
 				22FCD22D1C0E6BA30066D798 /* BreadWalletTests-Bridging-Header.h */,
 			);
 			path = BreadWalletTests;
@@ -950,6 +957,7 @@
 			files = (
 				75D5F3F3191EC270004AB296 /* BreadWalletTests.m in Sources */,
 				22FCD22C1C0E68C80066D798 /* BRTarTests.swift in Sources */,
+				22B6A44A1C0ECB7800673913 /* BRBSPatchTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
