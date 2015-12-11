@@ -121,6 +121,7 @@
 		2204604D1B9F61E600D07B61 /* BREventManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BREventManager.m; sourceTree = "<group>"; };
 		220460531BA0BEEE00D07B61 /* BREventConfirmView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BREventConfirmView.h; sourceTree = "<group>"; };
 		220460541BA0BEEE00D07B61 /* BREventConfirmView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BREventConfirmView.m; sourceTree = "<group>"; };
+		222040C71C1A3803005CE1C3 /* BRHTTPServerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BRHTTPServerTests.swift; sourceTree = "<group>"; };
 		22B6A4471C0E963900673913 /* libbz2.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libbz2.tbd; path = usr/lib/libbz2.tbd; sourceTree = SDKROOT; };
 		22B6A4491C0ECB7800673913 /* BRBSPatchTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BRBSPatchTests.swift; sourceTree = "<group>"; };
 		22FCD22B1C0E68C80066D798 /* BRTarTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BRTarTests.swift; sourceTree = "<group>"; };
@@ -635,6 +636,7 @@
 				75D5F3ED191EC270004AB296 /* BreadWalletTests */,
 				22FCD22B1C0E68C80066D798 /* BRTarTests.swift */,
 				22B6A4491C0ECB7800673913 /* BRBSPatchTests.swift */,
+				222040C71C1A3803005CE1C3 /* BRHTTPServerTests.swift */,
 				22FCD22D1C0E6BA30066D798 /* BreadWalletTests-Bridging-Header.h */,
 			);
 			path = BreadWalletTests;
@@ -955,6 +957,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				222040C81C1A3803005CE1C3 /* BRHTTPServerTests.swift in Sources */,
 				75D5F3F3191EC270004AB296 /* BreadWalletTests.m in Sources */,
 				22FCD22C1C0E68C80066D798 /* BRTarTests.swift in Sources */,
 				22B6A44A1C0ECB7800673913 /* BRBSPatchTests.swift in Sources */,
