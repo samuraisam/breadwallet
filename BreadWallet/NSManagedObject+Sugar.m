@@ -244,18 +244,14 @@ static NSUInteger _fetchBatchSize = 100;
         }
 
         if (coordinator) {
-            NSManagedObjectContext *writermoc = nil, *mainmoc = nil;
+            NSManagedObjectContext *moc = nil;
 
-            // create a separate context for writing to the persistent store asynchronously
-            writermoc = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSPrivateQueueConcurrencyType];
-            writermoc.persistentStoreCoordinator = coordinator;
-
-            mainmoc = [[NSManagedObjectContext alloc] initWithConcurrencyType:_concurrencyType];
-            mainmoc.parentContext = writermoc;
+            moc = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSPrivateQueueConcurrencyType];
+            moc.persistentStoreCoordinator = coordinator;
 
             objc_setAssociatedObject([NSManagedObject class], &_storeURLKey, storeURL,
                                      OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-            [NSManagedObject setContext:mainmoc];
+            [NSManagedObject setContext:moc];
 
             // this will save changes to the persistent store before the application terminates
             [[NSNotificationCenter defaultCenter] addObserverForName:UIApplicationWillTerminateNotification object:nil
@@ -286,31 +282,26 @@ static NSUInteger _fetchBatchSize = 100;
 + (void)saveContext
 {
     if (! self.context.hasChanges) return;
+    
+    [self.context performBlockAndWait:^{
+        if (self.context.hasChanges) {
+            @autoreleasepool {
+                NSError *error = nil;
+                NSUInteger taskId = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{}];
 
-    [self.context performBlock:^{
-        NSError *error = nil;
+                // this seems to fix unreleased temporary object IDs
+                [self.context obtainPermanentIDsForObjects:self.context.registeredObjects.allObjects error:nil];
 
-        if (self.context.hasChanges && ! [self.context save:&error]) { // save changes to writer context
-            NSLog(@"%s: %@", __func__, error);
+                if (! [self.context save:&error]) { // persist changes
+                    NSLog(@"%s: %@", __func__, error);
 #if DEBUG
-            abort();
+                    abort();
 #endif
-        }
-
-        [self.context.parentContext performBlock:^{
-            NSError *error = nil;
-            NSUInteger taskId = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{}];
-
-            // write changes to persistent store
-            if (self.context.parentContext.hasChanges && ! [self.context.parentContext save:&error]) {
-                NSLog(@"%s: %@", __func__, error);
-#if DEBUG
-                abort();
-#endif
+                }
+                
+                [[UIApplication sharedApplication] endBackgroundTask:taskId];
             }
-
-            [[UIApplication sharedApplication] endBackgroundTask:taskId];
-        }];
+        }
     }];
 }
 
@@ -327,6 +318,7 @@ static NSUInteger _fetchBatchSize = 100;
     NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:self.entityName];
 
     request.fetchBatchSize = _fetchBatchSize;
+    request.returnsObjectsAsFaults = NO;
     return request;
 }
 

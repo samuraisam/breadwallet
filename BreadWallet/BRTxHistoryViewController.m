@@ -104,9 +104,10 @@ static NSString *dateFormat(NSString *template)
     manager.didAuthenticate = YES;
     [self unlock:nil];
     tx.txHash = UINT256_ZERO;
-    self.transactions = @[tx, tx, tx, tx, tx, tx];
 
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0.5*NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+        self.transactions = @[tx, tx, tx, tx, tx, tx];
+        [self.tableView reloadData];
         self.navigationItem.title = [NSString stringWithFormat:@"%@ (%@)", [manager stringForAmount:42980000],
                                      [manager localCurrencyStringForAmount:42980000]];
     });
@@ -164,6 +165,7 @@ static NSString *dateFormat(NSString *template)
         self.txStatusObserver =
             [[NSNotificationCenter defaultCenter] addObserverForName:BRPeerManagerTxStatusNotification object:nil
             queue:nil usingBlock:^(NSNotification *note) {
+                self.transactions = manager.wallet.recentTransactions;
                 [self.tableView reloadData];
             }];
     }
@@ -489,7 +491,7 @@ static NSString *dateFormat(NSString *template)
                     unconfirmedLabel.text = NSLocalizedString(@"post-dated", nil);
                     unconfirmedLabel.backgroundColor = [UIColor redColor];
                 }
-                else if (confirms == 0 && tx.timestamp < 1) { // timestamp gets set when tx is first verified
+                else if (confirms == 0 && ! [manager.wallet transactionIsVerified:tx]) {
                     unconfirmedLabel.text = NSLocalizedString(@"unverified", nil);
                 }
                 else if (confirms < 6) {

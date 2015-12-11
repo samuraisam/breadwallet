@@ -114,7 +114,6 @@
         break;
     }
 
-    NSUserDefaults *defs = [NSUserDefaults standardUserDefaults];
     BRWalletManager *manager = [BRWalletManager sharedInstance];
 
     self.urlObserver =
@@ -281,7 +280,7 @@
         queue:nil usingBlock:^(NSNotification *note) {
             [self.receiveViewController updateAddress];
             self.balance = manager.wallet.balance;
-            [defs removeObjectForKey:HAS_AUTHENTICATED_KEY];
+            [[NSUserDefaults standardUserDefaults] removeObjectForKey:HAS_AUTHENTICATED_KEY];
         }];
 
     self.syncStartedObserver =
@@ -331,6 +330,15 @@
     [self.view addSubview:label];
 #endif
 
+#if SNAPSHOT
+    [self.navigationController
+     presentViewController:[self.storyboard instantiateViewControllerWithIdentifier:@"NewWalletNav"] animated:NO
+     completion:^{
+        [self.navigationController.presentedViewController.view
+         addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(nextScreen:)]];
+     }];
+#endif
+
     if (manager.watchOnly) { // watch only wallet
         UILabel *label = [UILabel new];
         
@@ -344,28 +352,8 @@
         [self.view addSubview:label];
     }
 
-#if SNAPSHOT
-    [self.navigationController
-     presentViewController:[self.storyboard instantiateViewControllerWithIdentifier:@"NewWalletNav"] animated:NO
-     completion:^{
-         [self.navigationController.presentedViewController.view
-          addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(nextScreen:)]];
-     }];
-#endif
-
     AudioServicesCreateSystemSoundID((__bridge CFURLRef)[[NSBundle mainBundle] URLForResource:@"coinflip"
                                                          withExtension:@"aiff"], &_pingsound);
-    
-    if ([defs integerForKey:SETTINGS_MAX_DIGITS_KEY] == 5) {
-        manager.format.currencySymbol = @"m" BTC NARROW_NBSP;
-        manager.format.maximumFractionDigits = 5;
-        manager.format.maximum = @((MAX_MONEY/SATOSHIS)*1000);
-    }
-    else if ([defs integerForKey:SETTINGS_MAX_DIGITS_KEY] == 8) {
-        manager.format.currencySymbol = BTC NARROW_NBSP;
-        manager.format.maximumFractionDigits = 8;
-        manager.format.maximum = @(MAX_MONEY/SATOSHIS);
-    }
 
     if (! manager.noWallet) {
         //TODO: do some kickass quick logo animation, fast circle spin that slows
@@ -416,6 +404,17 @@
     if (self.protectedObserver) [[NSNotificationCenter defaultCenter] removeObserver:self.protectedObserver];
     self.protectedObserver = nil;
 
+    if ([defs integerForKey:SETTINGS_MAX_DIGITS_KEY] == 5) {
+        manager.format.currencySymbol = @"m" BTC NARROW_NBSP;
+        manager.format.maximumFractionDigits = 5;
+        manager.format.maximum = @((MAX_MONEY/SATOSHIS)*1000);
+    }
+    else if ([defs integerForKey:SETTINGS_MAX_DIGITS_KEY] == 8) {
+        manager.format.currencySymbol = BTC NARROW_NBSP;
+        manager.format.maximumFractionDigits = 8;
+        manager.format.maximum = @(MAX_MONEY/SATOSHIS);
+    }
+    
     if (manager.noWallet) {
         if (! manager.passcodeEnabled) {
             [[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"turn device passcode on", nil)
@@ -446,14 +445,22 @@
         [self.receiveViewController updateAddress];
         if (self.reachability.currentReachabilityStatus == NotReachable) [self showErrorBar];
 
-        if (! [defs boolForKey:HAS_AUTHENTICATED_KEY] && [manager authenticateWithPrompt:nil andTouchId:NO]) {
+        if (self.navigationController.visibleViewController == self) {
+            [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDefault animated:YES];
+            [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationFade];
+        }
+
+#if SNAPSHOT
+        return;
+#endif
+
+        if (! [defs boolForKey:HAS_AUTHENTICATED_KEY]) {
+            while (! [manager authenticateWithPrompt:nil andTouchId:NO]) { }
             [defs setBool:YES forKey:HAS_AUTHENTICATED_KEY];
             [self unlock:nil];
         }
 
         if (self.navigationController.visibleViewController == self) {
-            [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDefault animated:YES];
-            [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationFade];
             if (self.showTips) [self performSelector:@selector(tip:) withObject:nil afterDelay:0.3];
         }
         
@@ -576,7 +583,11 @@
     if (timeout <= DBL_EPSILON) {
         if ([[BRPeerManager sharedInstance] timestampForBlockHeight:[BRPeerManager sharedInstance].lastBlockHeight] +
             60*60*24*7 < [NSDate timeIntervalSinceReferenceDate]) {
-            [self showSyncing];
+            if ([BRWalletManager sharedInstance].seedCreationTime + 60*60*24 < start) {
+                self.percent.hidden = NO;
+                self.navigationItem.titleView = nil;
+                self.navigationItem.title = NSLocalizedString(@"syncing...", nil);
+            }
         }
         else [self performSelector:@selector(showSyncing) withObject:nil afterDelay:5.0];
     }

@@ -27,6 +27,7 @@
 #import "BRRootViewController.h"
 #import "BRPaymentRequest.h"
 #import "BRWalletManager.h"
+#import "BRPeerManager.h"
 #import "BRTransaction.h"
 #import "BRBubbleView.h"
 #import "BRAppGroupConstants.h"
@@ -44,6 +45,7 @@
 @property (nonatomic, strong) BRBubbleView *tipView;
 @property (nonatomic, assign) BOOL showTips;
 @property (nonatomic, strong) NSUserDefaults *groupDefs;
+@property (nonatomic, strong) id balanceObserver, txStatusObserver;
 
 @property (nonatomic, strong) IBOutlet UILabel *label;
 @property (nonatomic, strong) IBOutlet UIButton *addressButton;
@@ -55,12 +57,14 @@
 
 - (void)viewDidLoad
 {
-    BRPaymentRequest *req;
-    
     [super viewDidLoad];
 
+    BRWalletManager *manager = [BRWalletManager sharedInstance];
+    BRPaymentRequest *req;
+
     self.groupDefs = [[NSUserDefaults alloc] initWithSuiteName:APP_GROUP_ID];
-    req = [BRPaymentRequest requestWithString:[self.groupDefs stringForKey:APP_GROUP_RECEIVE_ADDRESS_KEY]];
+    req = (_paymentRequest) ? _paymentRequest :
+          [BRPaymentRequest requestWithString:[self.groupDefs stringForKey:APP_GROUP_RECEIVE_ADDRESS_KEY]];
 
     if (req.isValid) {
         self.qrView.image = [UIImage imageWithQRCodeData:req.data size:self.qrView.bounds.size
@@ -69,6 +73,11 @@
     }
     else [self.addressButton setTitle:nil forState:UIControlStateNormal];
     
+    if (req.amount > 0) {
+        self.label.text = [NSString stringWithFormat:@"%@ (%@)", [manager stringForAmount:req.amount],
+                           [manager localCurrencyStringForAmount:req.amount]];
+    }
+
     self.addressButton.titleLabel.adjustsFontSizeToFitWidth = YES;
     [self updateAddress];
 }
@@ -80,6 +89,12 @@
     [super viewWillDisappear:animated];
 }
 
+- (void)dealloc
+{
+    if (self.balanceObserver) [[NSNotificationCenter defaultCenter] removeObserver:self.balanceObserver];
+    if (self.txStatusObserver) [[NSNotificationCenter defaultCenter] removeObserver:self.txStatusObserver];
+}
+
 - (void)updateAddress
 {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
@@ -87,7 +102,6 @@
         BRPaymentRequest *req = self.paymentRequest;
         
         dispatch_async(dispatch_get_main_queue(), ^{
-            if ([self.paymentAddress isEqual:self.addressButton.currentTitle]) return;
             self.qrView.image = [UIImage imageWithQRCodeData:req.data size:self.qrView.bounds.size
                                  color:[CIColor colorWithRed:0.0 green:0.0 blue:0.0]];
             [self.addressButton setTitle:self.paymentAddress forState:UIControlStateNormal];
@@ -95,6 +109,22 @@
             if (req.amount > 0) {
                 self.label.text = [NSString stringWithFormat:@"%@ (%@)", [manager stringForAmount:req.amount],
                                    [manager localCurrencyStringForAmount:req.amount]];
+                
+                if (! self.balanceObserver) {
+                    self.balanceObserver =
+                        [[NSNotificationCenter defaultCenter] addObserverForName:BRWalletBalanceChangedNotification
+                        object:nil queue:nil usingBlock:^(NSNotification *note) {
+                            [self checkRequestStatus];
+                        }];
+                }
+                
+                if (! self.txStatusObserver) {
+                    self.txStatusObserver =
+                        [[NSNotificationCenter defaultCenter] addObserverForName:BRPeerManagerTxStatusNotification
+                        object:nil queue:nil usingBlock:^(NSNotification *note) {
+                            [self checkRequestStatus];
+                        }];
+                }
             }
             else if (req.isValid) {
                 [self.groupDefs setObject:req.data forKey:APP_GROUP_REQUEST_DATA_KEY];
@@ -108,6 +138,33 @@
             }
         });
     });
+}
+
+- (void)checkRequestStatus
+{
+    BRWalletManager *manager = [BRWalletManager sharedInstance];
+    BRPaymentRequest *req = self.paymentRequest;
+    uint64_t total = 0, fuzz = [manager amountForLocalCurrencyString:[manager localCurrencyStringForAmount:1]]*2;
+    
+    if (! [manager.wallet addressIsUsed:self.paymentAddress]) return;
+
+    for (BRTransaction *tx in manager.wallet.recentTransactions) {
+        if ([tx.outputAddresses containsObject:self.paymentAddress]) continue;
+        if (tx.blockHeight == TX_UNCONFIRMED &&
+            [[BRPeerManager sharedInstance] relayCountForTransaction:tx.txHash] < PEER_MAX_CONNECTIONS) continue;
+        total += [manager.wallet amountReceivedFromTransaction:tx];
+                 
+        if (total + fuzz >= req.amount) {
+            UIView *view = self.navigationController.presentingViewController.view;
+
+            [self done:nil];
+            [view addSubview:[[[BRBubbleView viewWithText:[NSString
+             stringWithFormat:NSLocalizedString(@"received %@ (%@)", nil), [manager stringForAmount:total],
+             [manager localCurrencyStringForAmount:total]]
+             center:CGPointMake(view.bounds.size.width/2, view.bounds.size.height/2)] popIn] popOutAfterDelay:3.0]];
+            break;
+        }
+    }
 }
 
 - (BRPaymentRequest *)paymentRequest
@@ -328,9 +385,9 @@ error:(NSError *)error
     BRReceiveViewController *receiveController = [self.storyboard
                                                   instantiateViewControllerWithIdentifier:@"RequestViewController"];
     
-    receiveController.view.backgroundColor = self.parentViewController.parentViewController.view.backgroundColor;
     receiveController.paymentRequest = self.paymentRequest;
     receiveController.paymentRequest.amount = amount;
+    receiveController.view.backgroundColor = self.parentViewController.parentViewController.view.backgroundColor;
     navController.delegate = receiveController;
     [navController pushViewController:receiveController animated:YES];
 }

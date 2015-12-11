@@ -44,7 +44,7 @@
 #define CIRCLE  @"\xE2\x97\x8C" // dotted circle (utf-8)
 #define DOT     @"\xE2\x97\x8F" // black circle (utf-8)
 
-#define UNSPENT_URL    @"https://api.chain.com/v2/%@/addresses/%@/unspents?api-key-id=eed0d7697a880144bb854676f88d123f"
+#define UNSPENT_URL    @"https://api.blockcypher.com/v1/btc/%@/addrs/%@?unspentOnly=1&includeScript=1&limit=200"
 #define TICKER_URL     @"https://bitpay.com/rates"
 
 #define SEED_ENTROPY_LENGTH   (128/8)
@@ -406,7 +406,8 @@ static NSString *getKeychainString(NSString *key, NSError **error)
 {
     NSData *d = getKeychainData(CREATION_TIME_KEY, nil);
 
-    return (d.length < sizeof(NSTimeInterval)) ? BIP39_CREATION_TIME : *(const NSTimeInterval *)d.bytes;
+    if (d.length == sizeof(NSTimeInterval)) return *(const NSTimeInterval *)d.bytes;
+    return (self.watchOnly) ? 0 : BIP39_CREATION_TIME;
 }
 
 // private key for signing authenticated api calls
@@ -929,9 +930,9 @@ static NSString *getKeychainString(NSString *key, NSError **error)
 - (void)utxosForAddress:(NSString *)address
 completion:(void (^)(NSArray *utxos, NSArray *amounts, NSArray *scripts, NSError *error))completion
 {
-    NSURL *u = [NSURL URLWithString:[NSString stringWithFormat:UNSPENT_URL, @"bitcoin", address]];
+    NSURL *u = [NSURL URLWithString:[NSString stringWithFormat:UNSPENT_URL, @"main", address]];
 #if BITCOIN_TESTNET
-    u = [NSURL URLWithString:[NSString stringWithFormat:UNSPENT_URL, @"testnet3", address]];
+    u = [NSURL URLWithString:[NSString stringWithFormat:UNSPENT_URL, @"test3", address]];
 #endif
     NSURLRequest *req = [NSURLRequest requestWithURL:u cachePolicy:NSURLRequestReloadIgnoringCacheData
                          timeoutInterval:20.0];
@@ -953,22 +954,21 @@ completion:(void (^)(NSArray *utxos, NSArray *amounts, NSArray *scripts, NSError
             return;
         }
         
-        if (! [json isKindOfClass:[NSArray class]]) {
+        if (! [json isKindOfClass:[NSDictionary class]] || ! [json[@"txrefs"] isKindOfClass:[NSArray class]]) {
             completion(nil, nil, nil,
                        [NSError errorWithDomain:@"BreadWallet" code:417 userInfo:@{NSLocalizedDescriptionKey:
                         [NSString stringWithFormat:NSLocalizedString(@"unexpected response from %@", nil), u.host]}]);
             return;
         }
         
-        for (NSDictionary *utxo in json) {
-            if (! [utxo isKindOfClass:[NSDictionary class]] ||
-                ! [utxo[@"transaction_hash"] isKindOfClass:[NSString class]] ||
-                [utxo[@"transaction_hash"] hexToData].length != sizeof(UInt256) ||
-                ! [utxo[@"output_index"] isKindOfClass:[NSNumber class]] ||
-                ! [utxo[@"script_hex"] isKindOfClass:[NSString class]] ||
-                ! [utxo[@"script_hex"] hexToData] ||
-                ! [utxo[@"script_type"] isKindOfClass:[NSString class]] ||
-                ! [utxo[@"value"] isKindOfClass:[NSNumber class]]) {
+        for (NSDictionary *txref in json[@"txrefs"]) {
+            if (! [txref isKindOfClass:[NSDictionary class]] ||
+                ! [txref[@"tx_hash"] isKindOfClass:[NSString class]] ||
+                [txref[@"tx_hash"] hexToData].length != sizeof(UInt256) ||
+                ! [txref[@"tx_output_n"] isKindOfClass:[NSNumber class]] ||
+                ! [txref[@"script"] isKindOfClass:[NSString class]] ||
+                ! [txref[@"script"] hexToData] ||
+                ! [txref[@"value"] isKindOfClass:[NSNumber class]]) {
                 completion(nil, nil, nil,
                            [NSError errorWithDomain:@"BreadWallet" code:417 userInfo:@{NSLocalizedDescriptionKey:
                             [NSString stringWithFormat:NSLocalizedString(@"unexpected response from %@", nil),
@@ -976,12 +976,11 @@ completion:(void (^)(NSArray *utxos, NSArray *amounts, NSArray *scripts, NSError
                 return;
             }
             
-            if (! [utxo[@"script_type"] isEqual:@"pubkeyhash"] && ! [utxo[@"script_type"] isEqual:@"pubkey"]) continue;
-            o.hash = *(const UInt256 *)[utxo[@"transaction_hash"] hexToData].reverse.bytes;
-            o.n = [utxo[@"output_index"] unsignedIntValue];
+            o.hash = *(const UInt256 *)[txref[@"tx_hash"] hexToData].reverse.bytes;
+            o.n = [txref[@"tx_output_n"] unsignedIntValue];
             [utxos addObject:brutxo_obj(o)];
-            [amounts addObject:utxo[@"value"]];
-            [scripts addObject:[utxo[@"script_hex"] hexToData]];
+            [amounts addObject:txref[@"value"]];
+            [scripts addObject:[txref[@"script"] hexToData]];
         }
         
         completion(utxos, amounts, scripts, nil);

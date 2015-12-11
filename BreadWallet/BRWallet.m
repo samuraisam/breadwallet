@@ -89,24 +89,28 @@ masterPublicKey:(NSData *)masterPublicKey seed:(NSData *(^)(NSString *authprompt
         [BRTxMetadataEntity setContext:self.moc];
 
         for (BRAddressEntity *e in [BRAddressEntity allObjects]) {
-            NSMutableArray *a = (e.internal) ? self.internalAddresses : self.externalAddresses;
-
-            while (e.index >= a.count) [a addObject:[NSNull null]];
-            a[e.index] = e.address;
-            [self.allAddresses addObject:e.address];
+            @autoreleasepool {
+                NSMutableArray *a = (e.internal) ? self.internalAddresses : self.externalAddresses;
+                
+                while (e.index >= a.count) [a addObject:[NSNull null]];
+                a[e.index] = e.address;
+                [self.allAddresses addObject:e.address];
+            }
         }
 
         for (BRTxMetadataEntity *e in [BRTxMetadataEntity allObjects]) {
-            if (e.type != TX_MDTYPE_MSG) continue;
-        
-            BRTransaction *tx = e.transaction;
-            NSValue *hash = (tx) ? uint256_obj(tx.txHash) : nil;
-            
-            if (! tx) continue;
-            self.allTx[hash] = tx;
-            [self.transactions addObject:tx];
-            [self.usedAddresses addObjectsFromArray:tx.inputAddresses];
-            [self.usedAddresses addObjectsFromArray:tx.outputAddresses];
+            @autoreleasepool {
+                if (e.type != TX_MDTYPE_MSG) continue;
+                
+                BRTransaction *tx = e.transaction;
+                NSValue *hash = (tx) ? uint256_obj(tx.txHash) : nil;
+                
+                if (! tx) continue;
+                self.allTx[hash] = tx;
+                [self.transactions addObject:tx];
+                [self.usedAddresses addObjectsFromArray:tx.inputAddresses];
+                [self.usedAddresses addObjectsFromArray:tx.outputAddresses];
+            }
         }
         
         if ([BRTransactionEntity countAllObjects] > self.allTx.count) {
@@ -115,30 +119,35 @@ masterPublicKey:(NSData *)masterPublicKey seed:(NSData *(^)(NSString *authprompt
             [BRTxOutputEntity allObjects];
             
             for (BRTransactionEntity *e in [BRTransactionEntity allObjects]) {
-                BRTransaction *tx = e.transaction;
-                NSValue *hash = (tx) ? uint256_obj(tx.txHash) : nil;
-
-                if (! tx || self.allTx[hash] != nil) continue;
-                [updateTx addObject:tx];
-                self.allTx[hash] = tx;
-                [self.transactions addObject:tx];
-                [self.usedAddresses addObjectsFromArray:tx.inputAddresses];
-                [self.usedAddresses addObjectsFromArray:tx.outputAddresses];
+                @autoreleasepool {
+                    BRTransaction *tx = e.transaction;
+                    NSValue *hash = (tx) ? uint256_obj(tx.txHash) : nil;
+                    
+                    if (! tx || self.allTx[hash] != nil) continue;
+                    
+                    [updateTx addObject:tx];
+                    self.allTx[hash] = tx;
+                    [self.transactions addObject:tx];
+                    [self.usedAddresses addObjectsFromArray:tx.inputAddresses];
+                    [self.usedAddresses addObjectsFromArray:tx.outputAddresses];
+                }
             }
         }
     }];
-
-    [self sortTransactions];
-    _balance = UINT64_MAX; // trigger balance changed notification even if balance is zero
-    [self updateBalance];
-
+    
     if (updateTx.count > 0) {
         [self.moc performBlock:^{
             for (BRTransaction *tx in updateTx) {
                 [[BRTxMetadataEntity managedObject] setAttributesFromTx:tx];
             }
+            
+            [BRTxMetadataEntity saveContext];
         }];
     }
+    
+    [self sortTransactions];
+    _balance = UINT64_MAX; // trigger balance changed notification even if balance is zero
+    [self updateBalance];
 
     return self;
 }
@@ -257,56 +266,58 @@ masterPublicKey:(NSData *)masterPublicKey seed:(NSData *(^)(NSString *authprompt
     NSMutableArray *balanceHistory = [NSMutableArray array];
 
     for (BRTransaction *tx in [self.transactions reverseObjectEnumerator]) {
-        NSMutableSet *spent = [NSMutableSet set];
-        uint32_t i = 0, n = 0;
-        BRTransaction *transaction;
-        UInt256 h;
-        BRUTXO o;
-
-        for (NSValue *hash in tx.inputHashes) {
-            n = [tx.inputIndexes[i++] unsignedIntValue];
-            [hash getValue:&h];
-            [spent addObject:brutxo_obj(((BRUTXO) { h, n }))];
-        }
-
-        // check if any inputs are invalid or already spent
-        if (tx.blockHeight == TX_UNCONFIRMED &&
-            ([spent intersectsSet:spentOutputs] || [[NSSet setWithArray:tx.inputHashes] intersectsSet:invalidTx])) {
-            [invalidTx addObject:uint256_obj(tx.txHash)];
-            [balanceHistory insertObject:@(balance) atIndex:0];
-            continue;
-        }
-
-        [spentOutputs unionSet:spent]; // add inputs to spent output set
-        n = 0;
-
-        //TODO: don't add outputs below TX_MIN_OUTPUT_AMOUNT
-        //TODO: don't add coin generation outputs < 100 blocks deep, or non-final lockTime > 1 block/10min in future
-        //NOTE: balance/UTXOs will then need to be recalculated when last block changes
-        for (NSString *address in tx.outputAddresses) { // add outputs to UTXO set
-            if ([self containsAddress:address]) {
-                [utxos addObject:brutxo_obj(((BRUTXO) { tx.txHash, n }))];
-                balance += [tx.outputAmounts[n] unsignedLongLongValue];
+        @autoreleasepool {
+            NSMutableSet *spent = [NSMutableSet set];
+            uint32_t i = 0, n = 0;
+            BRTransaction *transaction;
+            UInt256 h;
+            BRUTXO o;
+            
+            for (NSValue *hash in tx.inputHashes) {
+                n = [tx.inputIndexes[i++] unsignedIntValue];
+                [hash getValue:&h];
+                [spent addObject:brutxo_obj(((BRUTXO) { h, n }))];
             }
             
-            n++;
+            // check if any inputs are invalid or already spent
+            if (tx.blockHeight == TX_UNCONFIRMED &&
+                ([spent intersectsSet:spentOutputs] || [[NSSet setWithArray:tx.inputHashes] intersectsSet:invalidTx])) {
+                [invalidTx addObject:uint256_obj(tx.txHash)];
+                [balanceHistory insertObject:@(balance) atIndex:0];
+                continue;
+            }
+            
+            [spentOutputs unionSet:spent]; // add inputs to spent output set
+            n = 0;
+            
+            //TODO: don't add outputs below TX_MIN_OUTPUT_AMOUNT
+            //TODO: don't add coin generation outputs < 100 blocks deep, or non-final lockTime > 1 block/10min in future
+            //NOTE: balance/UTXOs will then need to be recalculated when last block changes
+            for (NSString *address in tx.outputAddresses) { // add outputs to UTXO set
+                if ([self containsAddress:address]) {
+                    [utxos addObject:brutxo_obj(((BRUTXO) { tx.txHash, n }))];
+                    balance += [tx.outputAmounts[n] unsignedLongLongValue];
+                }
+                
+                n++;
+            }
+            
+            // transaction ordering is not guaranteed, so check the entire UTXO set against the entire spent output set
+            [spent setSet:utxos.set];
+            [spent intersectSet:spentOutputs];
+            
+            for (NSValue *output in spent) { // remove any spent outputs from UTXO set
+                [output getValue:&o];
+                transaction = self.allTx[uint256_obj(o.hash)];
+                [utxos removeObject:output];
+                balance -= [transaction.outputAmounts[o.n] unsignedLongLongValue];
+            }
+            
+            if (prevBalance < balance) totalReceived += balance - prevBalance;
+            if (balance < prevBalance) totalSent += prevBalance - balance;
+            [balanceHistory insertObject:@(balance) atIndex:0];
+            prevBalance = balance;
         }
-
-        // transaction ordering is not guaranteed, so check the entire UTXO set against the entire spent output set
-        [spent setSet:utxos.set];
-        [spent intersectSet:spentOutputs];
-        
-        for (NSValue *output in spent) { // remove any spent outputs from UTXO set
-            [output getValue:&o];
-            transaction = self.allTx[uint256_obj(o.hash)];
-            [utxos removeObject:output];
-            balance -= [transaction.outputAmounts[o.n] unsignedLongLongValue];
-        }
-        
-        if (prevBalance < balance) totalReceived += balance - prevBalance;
-        if (balance < prevBalance) totalSent += prevBalance - balance;
-        [balanceHistory insertObject:@(balance) atIndex:0];
-        prevBalance = balance;
     }
 
     self.invalidTx = invalidTx;
@@ -394,21 +405,46 @@ masterPublicKey:(NSData *)masterPublicKey seed:(NSData *(^)(NSString *authprompt
     NSUInteger i = 0, cpfpSize = 0;
     BRUTXO o;
 
+    if (amounts.count != scripts.count || amounts.count < 1) return nil; // sanity check
+
     for (NSData *script in scripts) {
         if (script.length == 0) return nil;
         [transaction addOutputScript:script amount:[amounts[i] unsignedLongLongValue]];
         amount += [amounts[i++] unsignedLongLongValue];
     }
 
-    //TODO: make sure transaction is less than TX_MAX_SIZE
     //TODO: use up all UTXOs for all used addresses to avoid leaving funds in addresses whose public key is revealed
     //TODO: avoid combining addresses in a single transaction when possible to reduce information leakage
-    //TODO: use any UTXOs received from output addresses to mitigate an attacker double spending and requesting a refund
+    //TODO: use up UTXOs received from any of the output scripts that this transaction sends funds to, to mitigate an
+    //      attacker double spending and requesting a refund
     for (NSValue *output in self.utxos) {
         [output getValue:&o];
         tx = self.allTx[uint256_obj(o.hash)];
         if (! tx) continue;
         [transaction addInputHash:tx.txHash index:o.n script:tx.outputScripts[o.n]];
+        
+        if (transaction.size + 34 > TX_MAX_SIZE) { // transaction size-in-bytes too large
+            NSUInteger txSize = 10 + self.utxos.count*148 + (scripts.count + 1)*34;
+        
+            // check for sufficient total funds before building a smaller transaction
+            if (self.balance < amount + [self feeForTxSize:txSize + cpfpSize]) {
+                NSLog(@"Insufficient funds. %llu is less than transaction amount:%llu", self.balance,
+                      amount + [self feeForTxSize:txSize + cpfpSize]);
+                return nil;
+            }
+        
+            uint64_t lastAmount = [amounts.lastObject unsignedLongLongValue];
+            NSArray *newAmounts = [amounts subarrayWithRange:NSMakeRange(0, amounts.count - 1)],
+                    *newScripts = [scripts subarrayWithRange:NSMakeRange(0, scripts.count - 1)];
+        
+            if (lastAmount > amount + feeAmount + self.minOutputAmount - balance) { // reduce final output amount
+                newAmounts = [newAmounts arrayByAddingObject:@(lastAmount - (amount + feeAmount - balance))];
+                newScripts = [newScripts arrayByAddingObject:scripts.lastObject];
+            }
+            
+            return [self transactionForAmounts:newAmounts toOutputScripts:newScripts withFee:fee];
+        }
+        
         balance += [tx.outputAmounts[o.n] unsignedLongLongValue];
         
         // add up size of unconfirmed, non-change inputs for child-pays-for-parent fee calculation
@@ -514,11 +550,10 @@ masterPublicKey:(NSData *)masterPublicKey seed:(NSData *(^)(NSString *authprompt
         
         if ([BRTxMetadataEntity countObjectsMatching:@"txHash == %@ && type == %d",
              [NSData dataWithBytes:&txHash length:sizeof(txHash)], TX_MDTYPE_MSG] == 0) {
-            [[BRTransactionEntity managedObject] setAttributesFromTx:transaction];
+            [[BRTxMetadataEntity managedObject] setAttributesFromTx:transaction];
         }
     }];
     
-    if ((self.transactions.count % 100) == 0) [BRTransactionEntity saveContext];
     return YES;
 }
 
@@ -587,13 +622,35 @@ masterPublicKey:(NSData *)masterPublicKey seed:(NSData *(^)(NSString *authprompt
     return YES;
 }
 
+// returns true if all sequence numbers are final (otherwise transaction can be replaced-by-fee), if no outputs are
+// dust, transaction size is not over TX_MAX_SIZE, timestamp is greater than 0, and no inputs are known to be unverfied
+- (BOOL)transactionIsVerified:(BRTransaction *)transaction
+{
+    if (transaction.blockHeight != TX_UNCONFIRMED) return YES; // confirmed transactions are always verified
+    if (transaction.timestamp == 0) return NO; // a timestamp of 0 indicates transaction is to remain unverified
+    if (transaction.size > TX_MAX_SIZE) return NO; // check transaction size is under TX_MAX_SIZE
+    
+    for (NSNumber *sequence in transaction.inputSequences) { // check that all sequence numbers are final
+        if (sequence.unsignedIntValue < UINT32_MAX) return NO;
+    }
+
+    for (NSNumber *amount in transaction.outputAmounts) { // check that no outputs are dust
+        if (amount.unsignedLongLongValue < TX_MIN_OUTPUT_AMOUNT) return NO;
+    }
+
+    for (NSValue *txHash in transaction.inputHashes) { // check if any inputs are known to be unverfied
+        if (! self.allTx[txHash]) continue;
+        if (! [self transactionIsVerified:self.allTx[txHash]]) return NO;
+    }
+
+    return YES;
+}
+
 // returns true if transaction won't be valid by blockHeight + 1 or within the next 10 minutes
 - (BOOL)transactionIsPostdated:(BRTransaction *)transaction atBlockHeight:(uint32_t)blockHeight
 {
     if (transaction.blockHeight != TX_UNCONFIRMED) return NO; // confirmed transactions are not postdated
 
-    // TODO: XXX consider marking any unconfirmed transaction with a non-final sequence number as postdated
-    // TODO: XXX notify that transactions with dust outputs are unlikely to confirm
     for (NSValue *txHash in transaction.inputHashes) { // check if any inputs are known to be postdated
         if ([self transactionIsPostdated:self.allTx[txHash] atBlockHeight:blockHeight]) return YES;
     }
@@ -610,7 +667,8 @@ masterPublicKey:(NSData *)masterPublicKey seed:(NSData *(^)(NSString *authprompt
     return NO;
 }
 
-// set the block heights and timestamps for the given transactions
+// set the block heights and timestamps for the given transactions, use a height of TX_UNCONFIRMED and timestamp of 0 to
+// indicate a transaction and it's dependents should remain marked as unverified (not 0-conf safe)
 - (void)setBlockHeight:(int32_t)height andTimestamp:(NSTimeInterval)timestamp forTxHashes:(NSArray *)txHashes
 {
     NSMutableArray *hashes = [NSMutableArray array];
@@ -634,19 +692,35 @@ masterPublicKey:(NSData *)masterPublicKey seed:(NSData *(^)(NSString *authprompt
         [self sortTransactions];
         [self updateBalance];
 
-        [self.moc performBlock:^{
-            for (BRTransactionEntity *e in [BRTransactionEntity objectsMatching:@"txHash in %@", hashes]) {
-                e.blockHeight = height;
-                e.timestamp = timestamp;
-            }
-            
-            for (BRTxMetadataEntity *e in [BRTxMetadataEntity objectsMatching:@"txHash in %@ && type == %d", hashes,
-                                           TX_MDTYPE_MSG]) {
-                BRTransaction *tx = e.transaction;
+        [self.moc performBlockAndWait:^{
+            @autoreleasepool {
+                NSMutableSet *entities = [NSMutableSet set];
                 
-                tx.blockHeight = height;
-                tx.timestamp = timestamp;
-                [e setAttributesFromTx:tx];
+                for (BRTransactionEntity *e in [BRTransactionEntity objectsMatching:@"txHash in %@", hashes]) {
+                    e.blockHeight = height;
+                    e.timestamp = timestamp;
+                    [entities addObject:e];
+                }
+            
+                for (BRTxMetadataEntity *e in [BRTxMetadataEntity objectsMatching:@"txHash in %@ && type == %d", hashes,
+                                               TX_MDTYPE_MSG]) {
+                    @autoreleasepool {
+                        BRTransaction *tx = e.transaction;
+                        
+                        tx.blockHeight = height;
+                        tx.timestamp = timestamp;
+                        [e setAttributesFromTx:tx];
+                        [entities addObject:e];
+                    }
+                }
+            
+                if (height != TX_UNCONFIRMED) {
+                    [BRTxMetadataEntity saveContext];
+
+                    for (NSManagedObject *e in entities) {
+                        [self.moc refreshObject:e mergeChanges:NO];
+                    }
+                }
             }
         }];
     }
