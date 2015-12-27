@@ -27,6 +27,7 @@
 #import "BRPeerManager.h"
 #import "BRWalletManager.h"
 #import "BREventManager.h"
+#import "BRPhoneWCSessionManager.h"
 
 #if BITCOIN_TESTNET
 #pragma message "testnet build"
@@ -77,6 +78,8 @@
     //TODO: implement importing of private keys split with shamir's secret sharing:
     //      https://github.com/cetuscetus/btctool/blob/bip/bip-xxxx.mediawiki
 
+    // start WCSession manager
+    [BRPhoneWCSessionManager sharedInstance];
     return YES;
 }
 
