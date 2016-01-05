@@ -324,6 +324,7 @@
     label.textColor = [UIColor redColor];
     label.textAlignment = NSTextAlignmentRight;
     label.text = @"testnet";
+    label.tag = 0xbeef;
     [label sizeToFit];
     label.center = CGPointMake(self.view.frame.size.width - label.frame.size.width,
                                self.view.frame.size.height - (label.frame.size.height + 5));
@@ -331,6 +332,7 @@
 #endif
 
 #if SNAPSHOT
+    [self.view viewWithTag:0xbeef].hidden = YES;
     [self.navigationController
      presentViewController:[self.storyboard instantiateViewControllerWithIdentifier:@"NewWalletNav"] animated:NO
      completion:^{
@@ -671,7 +673,14 @@
 
     counter++;
     self.percent.text = [NSString stringWithFormat:@"%0.1f%%", (progress > 0.1 ? progress - 0.1 : 0.0)*111.0];
-    if (progress + DBL_EPSILON < 1.0) [self performSelector:@selector(updateProgress) withObject:nil afterDelay:0.2];
+
+    if (progress + DBL_EPSILON >= 1.0) {
+        if (self.timeout < 1.0) [self stopActivityWithSuccess:YES];
+        if (! self.percent.hidden) [self hideTips];
+        self.percent.hidden = YES;
+        if (! [BRWalletManager sharedInstance].didAuthenticate) self.navigationItem.titleView = self.logo;
+    }
+    else [self performSelector:@selector(updateProgress) withObject:nil afterDelay:0.2];
 }
 
 - (void)ping
