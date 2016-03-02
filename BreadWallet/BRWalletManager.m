@@ -570,6 +570,7 @@ static NSString *getKeychainString(NSString *key, NSError **error)
                                    (self.secureTime + NSTimeIntervalSince1970))/60.0;
             NSString *unit = NSLocalizedString(@"minutes", nil);
             
+            if (wait > pow(6, failCount - 3)) wait = pow(6, failCount - 3); // we don't have secureTime yet
             if (wait < 2.0) wait = 1.0, unit = NSLocalizedString(@"minute", nil);
 
             if (wait >= 60.0) {
@@ -591,6 +592,12 @@ static NSString *getKeychainString(NSString *key, NSError **error)
                                       (int)wait, unit];
             self.alertView.delegate = self;
             if (! self.alertView.isVisible) [self.alertView show];
+            
+            while (! self.didPresent || self.alertView.visible) {
+                [[NSRunLoop mainRunLoop] runMode:NSDefaultRunLoopMode
+                 beforeDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
+            }
+
             return NO;
         }
         
