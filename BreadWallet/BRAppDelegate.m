@@ -90,7 +90,7 @@
     
     BRWebViewController *wvc = [[BRWebViewController alloc] initWithBundleName:@"front"];
 //    wvc.debugEndpoint = @"https://4acd2c15.ngrok.io";
-    wvc.debugEndpoint = @"http://localhost:8000";
+    wvc.debugEndpoint = @"http://localhost:3000";
     self.window.rootViewController = wvc;
     [self.window makeKeyAndVisible];
     
