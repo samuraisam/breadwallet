@@ -92,6 +92,11 @@ class BRTar {
                     break
                 }
                 blockCount += (size - 1) / tarBlockSize + 1
+                // ensure directory exists (some tar programs may not create directory headers...)
+                let newFileDirname = (newFilePath as NSString).stringByDeletingLastPathComponent
+                if !fm.fileExistsAtPath(newFileDirname) {
+                    try fm.createDirectoryAtPath(newFileDirname, withIntermediateDirectories: true, attributes: nil)
+                }
                 // write file
                 fm.createFileAtPath(newFilePath, contents: nil, attributes: nil)
                 guard let destFh = NSFileHandle(forWritingAtPath: newFilePath) else {
@@ -101,10 +106,10 @@ class BRTar {
                 tarFh.seekToFileOffset(loc + tarBlockSize)
                 let maxSize = tarMaxBlockLoadInMemory * tarBlockSize
                 while size > maxSize {
-                    autoreleasepool({ () -> () in
+                    autoreleasepool {
                         destFh.writeData(tarFh.readDataOfLength(Int(maxSize)))
                         size -= maxSize
-                    })
+                    }
                 }
                 destFh.writeData(tarFh.readDataOfLength(Int(size)))
                 destFh.closeFile()
@@ -152,7 +157,19 @@ class BRTar {
     
     static private func readNameAtLocation(location: UInt64, fromHandle handle: NSFileHandle) throws -> String {
         handle.seekToFileOffset(location + tarNamePosition)
-        guard let ret = NSString(data: handle.readDataOfLength(Int(tarNameSize)), encoding: NSASCIIStringEncoding)
+        let data = handle.readDataOfLength(Int(tarNameSize))
+        let bytes = UnsafePointer<UInt8>(data.bytes)
+        // remove null characters
+        var nameLen = 0
+        for i in 0..<data.length {
+            if bytes[i] == 0 {
+                nameLen = i
+                break
+            }
+        }
+        handle.seekToFileOffset(location + tarNamePosition)
+        let nameData = handle.readDataOfLength(nameLen)
+        guard let ret = NSString(data: nameData, encoding: NSASCIIStringEncoding)
             else {
                 log("unable to read name")
                 throw BRTarError.Unknown
